@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
+    <width>1120</width>
     <height>900</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>520</y>
+     <y>530</y>
      <width>300</width>
      <height>300</height>
     </rect>
@@ -56,7 +56,7 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>490</y>
+     <y>500</y>
      <width>231</width>
      <height>16</height>
     </rect>
@@ -140,7 +140,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>&lt;------- x -------</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#0433ff;&quot;&gt;&amp;lt;------- x -------&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QLabel" name="labelx_y_scan_direction">
@@ -421,8 +421,8 @@
   <widget class="QWidget" name="widget_display_scan_window_ch2" native="true">
    <property name="geometry">
     <rect>
-     <x>660</x>
-     <y>520</y>
+     <x>580</x>
+     <y>530</y>
      <width>300</width>
      <height>300</height>
     </rect>
@@ -434,8 +434,8 @@
   <widget class="QLabel" name="label_scan_window_ch2">
    <property name="geometry">
     <rect>
-     <x>700</x>
-     <y>490</y>
+     <x>620</x>
+     <y>500</y>
      <width>231</width>
      <height>16</height>
     </rect>
@@ -492,11 +492,14 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="minimum">
+    <double>-180.000000000000000</double>
+   </property>
    <property name="maximum">
-    <double>99.989999999999995</double>
+    <double>180.000000000000000</double>
    </property>
    <property name="value">
-    <double>10.000000000000000</double>
+    <double>0.000000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="label_rotation">
@@ -550,6 +553,135 @@
    <property name="text">
     <string>Image</string>
    </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit_filename_trace_ch1">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>730</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>ch1 trace</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit_filename_retrace_ch1">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>770</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>ch1 retrace</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit_filename_trace_ch2">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>730</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>ch2 trace</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit_filename_retrace_ch2">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>770</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>ch2 retrace</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_filename_ch1">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>670</y>
+     <width>111</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Channel 1
+Filenames (txt, tiff)
+trace and retrace</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_filename_ch2">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>660</y>
+     <width>111</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Channel 2
+Filenames (txt, tiff)
+trace and retrace</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit_directory">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>840</y>
+     <width>601</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_directory">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>850</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save Directory:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_directory">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>840</y>
+     <width>121</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select Directory</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>60</y>
+     <width>281</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_display_piezo_limit"/>
   </widget>
  </widget>
  <customwidgets>
