@@ -56,11 +56,12 @@ class SPMController(QWidget):
             subplot.pcolormesh(self.data_store[self.data_choose][0], self.data_store[self.data_choose][1], self.data_store[self.data_choose][self.channel_choose + 1], cmap = "afmhot")
 
         exceeds_limit = False
-        if (widget == self.widget_display_piezo_limit):
 
-            for p in [self.p1, self.p2, self.p3, self.p4]:
-                if p[0] > self.piezo_limit_x or p[0] < 0 or p[1] > self.piezo_limit_y or p[1] < 0:
-                    exceeds_limit = True
+
+        for p in [self.p1, self.p2, self.p3, self.p4]:
+            if p[0] > self.piezo_limit_x or p[0] < 0 or p[1] > self.piezo_limit_y or p[1] < 0:
+                exceeds_limit = True
+        if (widget == self.widget_display_piezo_limit):
             if exceeds_limit:
                 self.error_lock = True
                 self.label_error.setText("🚫 Error: Scan window exceeds piezo limit")
@@ -143,11 +144,11 @@ class SPMController(QWidget):
         self.spinBox_y_pixels.valueChanged.connect(self.determine_scan_window)
         self.doubleSpinBox_rotation.valueChanged.connect(self.determine_scan_window)
 
-    def scan(self):
+    # def scan(self):
 
 
 
-class
+# class
 
 if __name__ == "__main__":
     app = QApplication([])

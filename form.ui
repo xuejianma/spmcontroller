@@ -698,7 +698,7 @@ trace and retrace</string>
     </rect>
    </property>
    <property name="text">
-    <string>ch1 trace</string>
+    <string>{d}_{t}_ch1 trace</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_filename_retrace_ch1">
@@ -711,7 +711,7 @@ trace and retrace</string>
     </rect>
    </property>
    <property name="text">
-    <string>ch1 retrace</string>
+    <string>{d}_{t}_ch1 retrace</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_filename_trace_ch2">
@@ -724,7 +724,7 @@ trace and retrace</string>
     </rect>
    </property>
    <property name="text">
-    <string>ch2 trace</string>
+    <string>{d}_{t}_ch2 trace</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_filename_retrace_ch2">
@@ -737,7 +737,7 @@ trace and retrace</string>
     </rect>
    </property>
    <property name="text">
-    <string>ch2 retrace</string>
+    <string>{d}_{t}_ch2 retrace</string>
    </property>
   </widget>
  </widget>
