@@ -6,11 +6,13 @@ from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLabel, QVBoxLayout, QSizePolicy
 from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal
+from time import sleep
 import numpy as np
 
 
 
 class SPMController(QWidget):
+    update_voltage_signal = pyqtSignal()
     def __init__(self):
         super(SPMController, self).__init__()
         self.error_lock = False
@@ -21,8 +23,8 @@ class SPMController(QWidget):
         self.initialize_formats();
         self.determine_scan_window()
         self.connect_all()
-        self.x_curr = 0
-        self.y_curr = 0
+        self.curr_coords = [0, 0]
+
         #check_minmaxrotation_valid()
 
     def load_ui(self):
@@ -88,6 +90,7 @@ class SPMController(QWidget):
         self.ymax_input = self.doubleSpinBox_y_max.value()
         self.xpixels = self.spinBox_x_pixels.value()
         self.ypixels = self.spinBox_y_pixels.value()
+        self.frequency = self.doubleSpinBox_frequency.value()
         self.rotation_degree = self.doubleSpinBox_rotation.value()
         self.rotation = self.rotation_degree / 180 * np.pi
         center = np.array([[(self.xmin_input + self.xmax_input) / 2,
@@ -142,13 +145,81 @@ class SPMController(QWidget):
         self.doubleSpinBox_y_max.valueChanged.connect(self.determine_scan_window)
         self.spinBox_x_pixels.valueChanged.connect(self.determine_scan_window)
         self.spinBox_y_pixels.valueChanged.connect(self.determine_scan_window)
+        self.doubleSpinBox_frequency.valueChanged.connect(self.determine_scan_window)
         self.doubleSpinBox_rotation.valueChanged.connect(self.determine_scan_window)
+        self.update_voltage_signal.connect(self.update_voltage)
+        self.pushButton_scan.clicked.connect(self.start_scan)
 
-    # def scan(self):
+    def start_scan(self):
+
+        self.thread = QThread()
+        self.scan = Scan(self.curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal)
+        self.scan.moveToThread(self.thread)
+        self.thread.started.connect(self.scan.run)
+        self.thread.start()
 
 
 
-# class
+    def update_voltage(self):
+        print("Updated voltage: x = ",self.curr_coords[0],", y = ",self.curr_coords[1])
+'''
+import nidaqmx
+with nidaqmx.Task() as task:
+    task.ao_channels.add_ao_voltage_chan("NIdevice/ao3")
+    task.write(0.)
+'''
+
+class Scan(QWidget):
+    def __init__(self, curr_coords, XX, YY, frequency, signal):
+        super(Scan, self).__init__()
+        self.signal = signal
+        self.isRunning = True
+        self.curr_coords = curr_coords
+        self.x_array = XX[0]
+        self.y_array = YY[0]
+        self.p_start = np.array([self.x_array[0], self.y_array[0]])
+        self.frequency = frequency
+
+    def run(self):
+        print("start scan")
+        single_time = 1 / self.frequency / len(self.x_array)
+        if (self.curr_coords[0] != self.p_start[0] or self.curr_coords[1] != self.p_start[1]):
+            move_to_start()
+        for i in range(len(self.x_array)):
+            self.curr_coords[0] = self.x_array[i]
+            self.curr_coords[1] = self.y_array[i]
+            sleep(single_time)
+            self.signal.emit()
+        print("end scan")
+
+
+    def move_to_start(self):
+        MoveToTarget.move(self.curr_coords, self.p_start, self.signal, steps = 256, total_time = 1 / self.frequency)
+
+
+class MoveToTarget:
+    def move(self, curr_coords, target, signal, steps, total_time):
+        print("start move-to-target")
+        single_time = total_time / steps
+        x_array = np.linspace(curr_coords[0], target[0], steps)
+        y_array = np.linspace(curr_coords[1], target[1]. steps)
+        for i in range(len(x_array)):
+            #TODO: if halted, stop for loop
+
+            curr_coords[0] = x_array[i][0]
+            curr_coords[1] = y_array[i][1]
+            sleep(single_time)
+            signal.emit()
+        print("end move-to-target")
+
+class MoveSingleStep:
+    def move(self, curr_coords, p_B):
+        curr_coords[0] = p_B[0]
+        curr_coords[1] = p_B[1]
+
+
+
+
 
 if __name__ == "__main__":
     app = QApplication([])
