@@ -103,7 +103,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>700</x>
-     <y>70</y>
+     <y>80</y>
      <width>81</width>
      <height>22</height>
     </rect>
@@ -177,7 +177,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>700</x>
-     <y>110</y>
+     <y>120</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -196,7 +196,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>900</x>
-     <y>110</y>
+     <y>120</y>
      <width>81</width>
      <height>22</height>
     </rect>
@@ -212,7 +212,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>900</x>
-     <y>70</y>
+     <y>80</y>
      <width>81</width>
      <height>22</height>
     </rect>
@@ -225,7 +225,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>630</x>
-     <y>70</y>
+     <y>80</y>
      <width>60</width>
      <height>16</height>
     </rect>
@@ -238,7 +238,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>630</x>
-     <y>110</y>
+     <y>120</y>
      <width>60</width>
      <height>16</height>
     </rect>
@@ -251,7 +251,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>830</x>
-     <y>70</y>
+     <y>80</y>
      <width>60</width>
      <height>16</height>
     </rect>
@@ -264,7 +264,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>830</x>
-     <y>110</y>
+     <y>120</y>
      <width>60</width>
      <height>16</height>
     </rect>
@@ -277,7 +277,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>610</x>
-     <y>80</y>
+     <y>90</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -290,7 +290,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>610</x>
-     <y>120</y>
+     <y>130</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -303,13 +303,16 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>700</x>
-     <y>150</y>
+     <y>160</y>
      <width>81</width>
      <height>21</height>
     </rect>
    </property>
    <property name="keyboardTracking">
     <bool>false</bool>
+   </property>
+   <property name="minimum">
+    <number>1</number>
    </property>
    <property name="maximum">
     <number>1000000000</number>
@@ -322,13 +325,16 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>900</x>
-     <y>150</y>
+     <y>160</y>
      <width>81</width>
      <height>22</height>
     </rect>
    </property>
    <property name="keyboardTracking">
     <bool>false</bool>
+   </property>
+   <property name="minimum">
+    <number>1</number>
    </property>
    <property name="maximum">
     <number>1000000000</number>
@@ -341,7 +347,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>630</x>
-     <y>150</y>
+     <y>160</y>
      <width>51</width>
      <height>16</height>
     </rect>
@@ -354,7 +360,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>830</x>
-     <y>150</y>
+     <y>160</y>
      <width>51</width>
      <height>16</height>
     </rect>
@@ -367,7 +373,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>580</x>
-     <y>260</y>
+     <y>270</y>
      <width>441</width>
      <height>101</height>
     </rect>
@@ -380,7 +386,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>580</x>
-     <y>390</y>
+     <y>400</y>
      <width>441</width>
      <height>101</height>
     </rect>
@@ -389,7 +395,10 @@ Recommended: 50</string>
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_ch1">
+  <widget class="QRadioButton" name="radioButton_main_ch1">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>120</x>
@@ -404,8 +413,11 @@ Recommended: 50</string>
    <property name="checked">
     <bool>true</bool>
    </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup</string>
+   </attribute>
   </widget>
-  <widget class="QRadioButton" name="radioButton_ch2">
+  <widget class="QRadioButton" name="radioButton_main_ch2">
    <property name="geometry">
     <rect>
      <x>120</x>
@@ -417,6 +429,12 @@ Recommended: 50</string>
    <property name="text">
     <string>Show Channel 2</string>
    </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup</string>
+   </attribute>
   </widget>
   <widget class="QLabel" name="label_scan_window_ch2">
    <property name="geometry">
@@ -435,7 +453,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>580</x>
-     <y>230</y>
+     <y>240</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -448,7 +466,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>580</x>
-     <y>370</y>
+     <y>380</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -461,7 +479,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>589</x>
-     <y>190</y>
+     <y>200</y>
      <width>101</width>
      <height>20</height>
     </rect>
@@ -474,7 +492,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>900</x>
-     <y>190</y>
+     <y>200</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -496,7 +514,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>810</x>
-     <y>190</y>
+     <y>200</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -509,7 +527,7 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>700</x>
-     <y>190</y>
+     <y>200</y>
      <width>81</width>
      <height>22</height>
     </rect>
@@ -517,8 +535,17 @@ Recommended: 50</string>
    <property name="keyboardTracking">
     <bool>false</bool>
    </property>
+   <property name="decimals">
+    <number>3</number>
+   </property>
+   <property name="minimum">
+    <double>0.001000000000000</double>
+   </property>
    <property name="maximum">
     <double>1.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.010000000000000</double>
    </property>
    <property name="value">
     <double>0.020000000000000</double>
@@ -527,7 +554,7 @@ Recommended: 50</string>
   <widget class="QPushButton" name="pushButton_scan">
    <property name="geometry">
     <rect>
-     <x>720</x>
+     <x>440</x>
      <y>30</y>
      <width>71</width>
      <height>32</height>
@@ -540,7 +567,7 @@ Recommended: 50</string>
   <widget class="QPushButton" name="pushButton_image">
    <property name="geometry">
     <rect>
-     <x>810</x>
+     <x>510</x>
      <y>30</y>
      <width>71</width>
      <height>32</height>
@@ -554,14 +581,14 @@ Recommended: 50</string>
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>690</y>
+     <y>740</y>
      <width>111</width>
      <height>41</height>
     </rect>
    </property>
    <property name="text">
     <string>Channel 1
-Filenames (txt, tiff)
+Filenames (*.tiff)
 trace and retrace</string>
    </property>
   </widget>
@@ -569,28 +596,28 @@ trace and retrace</string>
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>680</y>
+     <y>740</y>
      <width>111</width>
      <height>61</height>
     </rect>
    </property>
    <property name="text">
     <string>Channel 2
-Filenames (txt, tiff)
+Filenames (*.tiff)
 trace and retrace</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_directory">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>90</x>
      <y>860</y>
-     <width>101</width>
-     <height>16</height>
+     <width>131</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Save Directory:</string>
+    <string>Auto Save Directory:</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_directory">
@@ -643,7 +670,7 @@ trace and retrace</string>
    <property name="geometry">
     <rect>
      <x>810</x>
-     <y>210</y>
+     <y>220</y>
      <width>161</width>
      <height>20</height>
     </rect>
@@ -669,7 +696,7 @@ trace and retrace</string>
    <property name="geometry">
     <rect>
      <x>790</x>
-     <y>70</y>
+     <y>80</y>
      <width>20</width>
      <height>111</height>
     </rect>
@@ -692,7 +719,7 @@ trace and retrace</string>
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>750</y>
+     <y>790</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -705,7 +732,7 @@ trace and retrace</string>
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>780</y>
+     <y>810</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -718,7 +745,7 @@ trace and retrace</string>
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>750</y>
+     <y>800</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -731,13 +758,344 @@ trace and retrace</string>
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>780</y>
+     <y>820</y>
      <width>131</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
     <string>{d}_{t}_ch2 retrace</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_current_x">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>30</y>
+     <width>171</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Current x (V): 0.0</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_current_y">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>50</y>
+     <width>171</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Current y (V): 0.0</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBox_goto_x">
+   <property name="geometry">
+    <rect>
+     <x>910</x>
+     <y>30</y>
+     <width>62</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBox_goto_y">
+   <property name="geometry">
+    <rect>
+     <x>910</x>
+     <y>50</y>
+     <width>62</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_goto">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>30</y>
+     <width>61</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Goto:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_goto0">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>30</y>
+     <width>71</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Goto 0</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line_goto">
+   <property name="geometry">
+    <rect>
+     <x>840</x>
+     <y>20</y>
+     <width>20</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_goto_x">
+   <property name="geometry">
+    <rect>
+     <x>980</x>
+     <y>30</y>
+     <width>60</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>x (V)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_goto_y">
+   <property name="geometry">
+    <rect>
+     <x>980</x>
+     <y>50</y>
+     <width>60</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>y (V)</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_ch1_retrace">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>570</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>retrece</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_3</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_ch1_trace">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>550</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>trace</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_3</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_ch2_retrace">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>570</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>retrece</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_4</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_ch2_trace">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>550</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>trace</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_4</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_main_retrace">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>450</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>retrece</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_2</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_main_trace">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>430</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>trace</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_2</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_colorbar_auto_main">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>340</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>auto</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_5</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_colorbar_manual_main">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>360</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>manual (V):</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_5</string>
+   </attribute>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBox_colorbar_manual_min_main">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>380</y>
+     <width>62</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>false</bool>
+   </property>
+   <property name="keyboardTracking">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBox_colorbar_manual_max_main">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>400</y>
+     <width>62</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="keyboardTracking">
+    <bool>false</bool>
+   </property>
+   <property name="maximum">
+    <double>1000000.000000000000000</double>
+   </property>
+   <property name="value">
+    <double>0.500000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_colorbar_manual_min_main">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>380</y>
+     <width>31</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>min:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_colorbar_manual_max_main">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>400</y>
+     <width>31</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>max:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_colorbar_main">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>320</y>
+     <width>111</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Colorbar range</string>
    </property>
   </widget>
  </widget>
@@ -751,4 +1109,11 @@ trace and retrace</string>
  </customwidgets>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_5"/>
+ </buttongroups>
 </ui>
