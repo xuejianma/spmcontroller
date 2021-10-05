@@ -11,17 +11,22 @@ from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 from pyqtgraph import mkPen
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLabel, QVBoxLayout, QSizePolicy
-from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal
+from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings
 from scan import Scan, MoveToTarget, Map
+from plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
+from hardware import OutputVoltage, InputVoltage
+from os.path import isdir
 import numpy as np
 
 
 class SPMController(QWidget):
-    update_voltage_signal = pyqtSignal()
-
+    update_graphs_signal = pyqtSignal()
+    output_voltage_signal = pyqtSignal()
     def __init__(self):
         super(SPMController, self).__init__()
+        self.curr_coord_z = 0.0
         self.error_lock = False
+        self.error_lock_text = "🚫 Error: Scan window exceeds piezo limit"
         self.data_store = []  # 5 x n, (XX, YY, array1, array2) x n)
         self.data_choose = -1
         self.channel_choose = 1  # 1 or 2
@@ -29,7 +34,11 @@ class SPMController(QWidget):
         self.map_on_boolean = False
         self.map_trace = {'XX': [], 'YY': [], 'ch1': [], 'ch2': []}
         self.map_retrace = {'XX': [], 'YY': [], 'ch1': [], 'ch2': []}
+        self.colorbar_manual_main = False
+        self.colorbar_manual_ch1 = False
+        self.colorbar_manual_ch2 = False
         self.load_ui()
+        self.preload()
         self.initialize_formats()
         self.determine_scan_window()
         self.connect_all()
@@ -40,14 +49,35 @@ class SPMController(QWidget):
                                     self.doubleSpinBox_piezo_limit_x, self.doubleSpinBox_piezo_limit_y,
                                     self.lineEdit_filename_trace_ch1, self.lineEdit_filename_trace_ch2,
                                     self.lineEdit_filename_retrace_ch1, self.lineEdit_filename_retrace_ch2,
-                                    self.lineEdit_directory]
-        self.on_off_button_list = [self.pushButton_scan, self.pushButton_image, self.pushButton_goto0,
-                                   self.pushButton_goto, self.doubleSpinBox_goto_x, self.doubleSpinBox_goto_y]
+                                    self.lineEdit_directory, self.doubleSpinBox_goto_x, self.doubleSpinBox_goto_y,
+                                    self.pushButton_goto0,
+                                    self.pushButton_goto,
+                                    self.pushButton_reconnect_hardware,
+                                    ]
+        self.on_off_button_list = [self.pushButton_scan, self.pushButton_image,  #self.doubleSpinBox_goto_x, self.doubleSpinBox_goto_y,
+                                   ]
         self.line_trace = {'X': [], 'ch1': [], 'ch2': []}
         self.line_retrace = {'X': [], 'ch1': [], 'ch2': []}
 
+        self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
+        self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
+        self.output_voltage_z = OutputVoltage(port='x', label_error=self.label_error)
+        self.input_voltage_ch1 = InputVoltage(port='ch1', label_error=self.label_error)
+        self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
 
         # check_minmaxrotation_valid()
+
+    def hardware_io(self):
+        self.output_voltage_x.close()
+        self.output_voltage_y.close()
+        self.output_voltage_z.close()
+        self.input_voltage_ch1.close()
+        self.input_voltage_ch2.close()
+        self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
+        self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
+        self.output_voltage_z = OutputVoltage(port='x', label_error=self.label_error)
+        self.input_voltage_ch1 = InputVoltage(port='ch1', label_error=self.label_error)
+        self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
 
     def load_ui(self):
         path = os.path.join(os.path.dirname(__file__), "form.ui")
@@ -63,89 +93,7 @@ class SPMController(QWidget):
         self.widget_display_scan_window_ch2 = MatplotlibWidget()
         self.verticalLayout_display_scan_window_ch2.addWidget(self.widget_display_scan_window_ch2)
 
-    def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max, colorbar_manual = False):
-        widget.getFigure().clear()
-        subplot = widget.getFigure().subplots()
-        subplot.set_aspect(1)
-        subplot.set_facecolor('black')
-        subplot.set_xlim(xlim_min, xlim_max)
-        subplot.set_ylim(ylim_min, ylim_max)
-        subplot.invert_xaxis()
-        subplot.invert_yaxis()
-        subplot.plot([0, self.piezo_limit_x], [0, 0], '--', c='white')
-        subplot.plot([self.piezo_limit_x, self.piezo_limit_x], [0, self.piezo_limit_y], '--', c='white')
-        subplot.plot([self.piezo_limit_x, 0], [self.piezo_limit_y, self.piezo_limit_y], '--', c='white')
-        subplot.plot([0, 0], [self.piezo_limit_y, 0], '--', c='white')
-        if (len(self.data_store) > 0):
-            subplot.pcolormesh(self.data_store[self.data_choose][0], self.data_store[self.data_choose][1],
-                               self.data_store[self.data_choose][self.channel_choose + 1], cmap="afmhot")
 
-        exceeds_limit = False
-
-        for p in [self.p1, self.p2, self.p3, self.p4]:
-            if p[0] > self.piezo_limit_x or p[0] < 0 or p[1] > self.piezo_limit_y or p[1] < 0:
-                exceeds_limit = True
-        if widget == self.widget_display_piezo_limit:
-            if exceeds_limit:
-                self.error_lock = True
-                self.label_error.setText("🚫 Error: Scan window exceeds piezo limit")
-            else:
-                self.error_lock = True
-                self.label_error.setText("")
-        if len(self.map_trace['XX']) != 0:
-            if widget == self.widget_display_piezo_limit:
-                if self.radioButton_main_ch1.isChecked():
-                    if self.radioButton_main_trace.isChecked():
-                        if not colorbar_manual:
-                            subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch1'],
-                                               cmap='afmhot')
-                        else:
-                            subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch1'],
-                                               cmap='afmhot', vmin = self.doubleSpinBox_colorbar_manual_min_main.value(), vmax = self.doubleSpinBox_colorbar_manual_max_main.value())
-                    else:
-                        if not colorbar_manual:
-                            subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch1'],
-                                                cmap='afmhot')
-                        else:
-                            subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch1'],
-                                               cmap='afmhot', vmin = self.doubleSpinBox_colorbar_manual_min_main.value(), vmax = self.doubleSpinBox_colorbar_manual_max_main.value())
-                else:
-                    if self.radioButton_main_trace.isChecked():
-                        if not colorbar_manual:
-                            subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch2'],
-                                               cmap='afmhot')
-                        else:
-                            subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch2'],
-                                               cmap='afmhot', vmin = self.doubleSpinBox_colorbar_manual_min_main.value(), vmax = self.doubleSpinBox_colorbar_manual_max_main.value())
-                    else:
-                        if not colorbar_manual:
-                            subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch2'],
-                                                cmap='afmhot')
-                        else:
-                            subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch2'],
-                                               cmap='afmhot', vmin = self.doubleSpinBox_colorbar_manual_min_main.value(), vmax = self.doubleSpinBox_colorbar_manual_max_main.value())
-            elif widget == self.widget_display_scan_window_ch1:
-                if self.radioButton_ch1_trace.isChecked():
-                    subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch1'], cmap = 'afmhot')
-                else:
-                    subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch1'], cmap='afmhot')
-            elif widget == self.widget_display_scan_window_ch2:
-                if self.radioButton_ch2_trace.isChecked():
-                    subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch2'], cmap = 'afmhot')
-                else:
-                    subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch2'], cmap='afmhot')
-
-
-        subplot.plot([self.p1[0], self.p2[0]], [self.p1[1], self.p2[1]], '--', linewidth=3,
-                     c='red' if exceeds_limit else 'orange')
-        subplot.plot([self.p2[0], self.p3[0]], [self.p2[1], self.p3[1]], '--', linewidth=3,
-                     c='red' if exceeds_limit else 'green')
-        subplot.plot([self.p3[0], self.p4[0]], [self.p3[1], self.p4[1]], '--', linewidth=3,
-                     c='red' if exceeds_limit else 'green')
-        subplot.plot([self.p4[0], self.p1[0]], [self.p4[1], self.p1[1]], '--', linewidth=3,
-                     c='red' if exceeds_limit else 'green')
-        subplot.plot([self.p1[0]], [self.p1[1]], '.', markersize=20, c='red')
-        widget.draw()
 
     def determine_scan_window(self):
         self.piezo_limit_x = self.doubleSpinBox_piezo_limit_x.value()
@@ -181,22 +129,22 @@ class SPMController(QWidget):
         self.YY = xx_yy_rot[1, :].reshape(YY_input.shape)
         self.update_graphs()
 
-    def update_graphs(self, single = 'all', colorbar_manual = False):
+    def update_graphs(self, single = 'all'):
         xlim_min = np.min([self.p1[0], self.p2[0], self.p3[0], self.p4[0]])
         xlim_max = np.max([self.p1[0], self.p2[0], self.p3[0], self.p4[0]])
         ylim_min = np.min([self.p1[1], self.p2[1], self.p3[1], self.p4[1]])
         ylim_max = np.max([self.p1[1], self.p2[1], self.p3[1], self.p4[1]])
         if single == 'all' or single == 'main':
             self.plot_scan_range(self.widget_display_piezo_limit, xlim_min=0, xlim_max=self.piezo_limit_x, ylim_min=0,
-                                 ylim_max=self.piezo_limit_y, colorbar_manual = colorbar_manual)
+                                 ylim_max=self.piezo_limit_y)
         if single == 'all' or single == 'ch1':
             self.plot_scan_range(self.widget_display_scan_window_ch1, xlim_min=xlim_min, xlim_max=xlim_max,
                                  ylim_min=ylim_min,
-                                 ylim_max=ylim_max, colorbar_manual = colorbar_manual)
+                                 ylim_max=ylim_max)
         if single == 'all' or single == 'ch2':
             self.plot_scan_range(self.widget_display_scan_window_ch2, xlim_min=xlim_min, xlim_max=xlim_max,
                                  ylim_min=ylim_min,
-                                 ylim_max=ylim_max, colorbar_manual = colorbar_manual)
+                                 ylim_max=ylim_max)
 
     def rotate_coord(self, p, center, rotate_matrix):
         p = np.reshape(p, (2, -1))
@@ -219,32 +167,61 @@ class SPMController(QWidget):
         self.spinBox_y_pixels.valueChanged.connect(self.determine_scan_window)
         self.doubleSpinBox_frequency.valueChanged.connect(self.determine_scan_window)
         self.doubleSpinBox_rotation.valueChanged.connect(self.determine_scan_window)
-        self.update_voltage_signal.connect(self.update_voltage)
+        self.update_graphs_signal.connect(self.update_voltage)
+        self.output_voltage_signal.connect(self.output_voltage)
         self.pushButton_scan.clicked.connect(self.toggle_scan_button)
         self.pushButton_goto0.clicked.connect(lambda: self.goto_position(np.array([0, 0])))
         self.pushButton_goto.clicked.connect(lambda: self.goto_position(np.array([self.doubleSpinBox_goto_x.value(),
                                                                    self.doubleSpinBox_goto_y.value()])))
+        self.checkBox_maintenance.toggled.connect(self.toggle_maintenance)
+        self.doubleSpinBox_current_x.valueChanged.connect(self.update_voltage_maintenance)
+        self.doubleSpinBox_current_y.valueChanged.connect(self.update_voltage_maintenance)
         self.pushButton_image.clicked.connect(self.toggle_map_button)
         self.buttonGroup.buttonToggled.connect(lambda: self.update_graphs(single = 'main'))
         self.buttonGroup_2.buttonToggled.connect(lambda: self.update_graphs(single = 'main'))
         self.buttonGroup_3.buttonToggled.connect(lambda: self.update_graphs(single = 'ch1'))
         self.buttonGroup_4.buttonToggled.connect(lambda: self.update_graphs(single = 'ch2'))
+
         self.buttonGroup_5.buttonToggled.connect(self.toggle_colorbar_main)
         self.doubleSpinBox_colorbar_manual_min_main.valueChanged.connect(self.toggle_colorbar_main)
         self.doubleSpinBox_colorbar_manual_max_main.valueChanged.connect(self.toggle_colorbar_main)
 
-    def toggle_colorbar_main(self):
-        if self.radioButton_colorbar_manual_main.isChecked():
-            self.update_graphs(single='main', colorbar_manual=True)
-            self.doubleSpinBox_colorbar_manual_min_main.setDisabled(False)
-            self.doubleSpinBox_colorbar_manual_max_main.setDisabled(False)
-        else:
-            self.update_graphs(single='main', colorbar_manual=False)
-            self.doubleSpinBox_colorbar_manual_min_main.setDisabled(True)
-            self.doubleSpinBox_colorbar_manual_max_main.setDisabled(True)
+        self.buttonGroup_6.buttonToggled.connect(self.toggle_colorbar_ch1)
+        self.doubleSpinBox_colorbar_manual_min_ch1.valueChanged.connect(self.toggle_colorbar_ch1)
+        self.doubleSpinBox_colorbar_manual_max_ch1.valueChanged.connect(self.toggle_colorbar_ch1)
 
+        self.buttonGroup_7.buttonToggled.connect(self.toggle_colorbar_ch2)
+        self.doubleSpinBox_colorbar_manual_min_ch2.valueChanged.connect(self.toggle_colorbar_ch2)
+        self.doubleSpinBox_colorbar_manual_max_ch2.valueChanged.connect(self.toggle_colorbar_ch2)
+
+        self.pushButton_directory.clicked.connect(self.selectDirectory)
+        self.doubleSpinBox_z.valueChanged.connect(self.output_voltage_z_direction)
+        self.pushButton_reconnect_hardware.clicked.connect(self.hardware_io)
+
+    def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
+        plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max)
+
+    def toggle_colorbar_main(self):
+        toggle_colorbar_main(self)
+
+    def toggle_colorbar_ch1(self):
+        toggle_colorbar_ch1(self)
+
+    def toggle_colorbar_ch2(self):
+        toggle_colorbar_ch2(self)
+
+    def toggle_maintenance(self):
+        if self.checkBox_maintenance.isChecked():
+            self.doubleSpinBox_current_x.setDisabled(False)
+            self.doubleSpinBox_current_y.setDisabled(False)
+        else:
+            self.doubleSpinBox_current_x.setDisabled(True)
+            self.doubleSpinBox_current_y.setDisabled(True)
 
     def toggle_scan_button(self):
+        if self.error_lock:
+            self.label_error.setText(self.error_lock_text)
+            return
         if self.scan_on_boolean:
             self.on_off_spinbox_list_turn_on()
             self.pushButton_image.setDisabled(False)
@@ -257,6 +234,12 @@ class SPMController(QWidget):
         self.scan_on_boolean = not self.scan_on_boolean
 
     def toggle_map_button(self):
+        if self.error_lock:
+            self.label_error.setText(self.error_lock_text)
+            return
+        if not isdir(self.lineEdit_directory.text()):
+            self.label_error.setText("🚫 Error: Auto save directory not found")
+            return
         if self.map_on_boolean:
             self.on_off_spinbox_list_turn_on()
             self.pushButton_scan.setDisabled(False)
@@ -268,13 +251,18 @@ class SPMController(QWidget):
             self.start_map()
         self.map_on_boolean = not self.map_on_boolean
 
+    def update_voltage_maintenance(self):
+        self.curr_coords[0] = self.doubleSpinBox_current_x.value()
+        self.curr_coords[1] = self.doubleSpinBox_current_y.value()
+        self.update_voltage()
+
     def start_scan(self):
         self.thread = QThread()
         self.scan = Scan(self)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
         self.scan.moveToThread(self.thread)
         self.thread.started.connect(self.scan.run)
         self.scan.finished.connect(self.scan.deleteLater)
-        self.scan.finished.connect(self.thread.quit)
+        self.scan.finished.connect(self.thread.exit)
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
@@ -287,7 +275,7 @@ class SPMController(QWidget):
         self.map.finishedAfterMapping.connect(self.toggle_map_button)
         # self.map.finished.connect(self.on_off_spinbox_list_turn_on)
         self.map.finished.connect(self.map.deleteLater)
-        self.map.finished.connect(self.thread.quit)
+        self.map.finished.connect(self.thread.exit)
         self.map.lineFinished.connect(self.update_graphs)
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
@@ -296,12 +284,20 @@ class SPMController(QWidget):
     def update_voltage(self):
         # print("Updated voltage: x = ", self.curr_coords[0], ", y = ", self.curr_coords[1])
         self.label_current_x.setText("Current x (V): " + str(self.curr_coords[0]))
-        self.label_current_y.setText("Current y (V): " + str(self.curr_coords[1]))
-        #todo: update line graph with certain time interval.
+        self.label_current_y.setText("Current x (V): " + str(self.curr_coords[1]))
         self.update_line_graph()
 
+    def output_voltage(self):
+        self.output_voltage_x.outputVoltage(self.curr_coords[0])
+        self.output_voltage_y.outputVoltage(self.curr_coords[1])
+
+    def output_voltage_z_direction(self):
+        self.curr_coord_z = np.round(self.doubleSpinBox_z.value(), 6)
+        self.output_voltage_z.outputVoltage(self.curr_coord_z)
+
     def get_voltage_ch1_ch2(self):
-        return (np.random.random() + 1, np.random.random() + 2)
+        # return (np.random.random() + 1, np.random.random() + 2)
+        return self.input_voltage_ch1.getVoltage(), self.input_voltage_ch2.getVoltage()
 
     def update_line_graph(self):
         self.widget_linescan_ch1.clear()
@@ -324,7 +320,7 @@ class SPMController(QWidget):
         self.move.finished.connect(self.move.deleteLater)
         self.move.finished.connect(self.on_off_button_list_turn_on)
         self.move.finished.connect(self.on_off_spinbox_list_turn_on)
-        self.move.finished.connect(self.thread.quit)
+        self.move.finished.connect(self.thread.exit)
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
@@ -342,7 +338,61 @@ class SPMController(QWidget):
     def on_off_spinbox_list_turn_off(self):
         for w in self.on_off_spinbox_list:
             w.setDisabled(True)
+
+    def selectDirectory(self):
+        directoryName = QFileDialog.getExistingDirectory(self, 'Select directory')#getOpenFileName(self, 'Open file', '.', '')
+        self.label_error.setText("")
+        self.lineEdit_directory.setText(directoryName)
+
+
+
+    def preload(self):
+        self.settings = QSettings('SPMController', 'App1')
+        try:
+            self.doubleSpinBox_x_min.setValue(self.settings.value('doubleSpinBox_x_min'))
+            self.doubleSpinBox_x_max.setValue(self.settings.value('doubleSpinBox_x_max'))
+            self.doubleSpinBox_y_min.setValue(self.settings.value('doubleSpinBox_y_min'))
+            self.doubleSpinBox_y_max.setValue(self.settings.value('doubleSpinBox_y_max'))
+            self.spinBox_x_pixels.setValue(self.settings.value('spinBox_x_pixels'))
+            self.spinBox_y_pixels.setValue(self.settings.value('spinBox_y_pixels'))
+            self.doubleSpinBox_frequency.setValue(self.settings.value('doubleSpinBox_frequency'))
+            self.doubleSpinBox_rotation.setValue(self.settings.value('doubleSpinBox_rotation'))
+            self.lineEdit_directory.setText(self.settings.value('lineEdit_directory'))
+            self.lineEdit_filename_trace_ch1.setText(self.settings.value('lineEdit_filename_trace_ch1'))
+            self.lineEdit_filename_retrace_ch1.setText(self.settings.value('lineEdit_filename_retrace_ch1'))
+            self.lineEdit_filename_trace_ch2.setText(self.settings.value('lineEdit_filename_trace_ch2'))
+            self.lineEdit_filename_retrace_ch2.setText(self.settings.value('lineEdit_filename_retrace_ch2'))
+            self.doubleSpinBox_piezo_limit_x.setValue(self.settings.value('doubleSpinBox_piezo_limit_x'))
+            self.doubleSpinBox_piezo_limit_y.setValue(self.settings.value('doubleSpinBox_piezo_limit_y'))
+        except:
+            pass
+
+
+    def closeEvent(self, event):
+        self.settings.setValue('doubleSpinBox_x_min', self.doubleSpinBox_x_min.value())
+        self.settings.setValue('doubleSpinBox_x_max', self.doubleSpinBox_x_max.value())
+        self.settings.setValue('doubleSpinBox_y_min', self.doubleSpinBox_y_min.value())
+        self.settings.setValue('doubleSpinBox_y_max', self.doubleSpinBox_y_max.value())
+        self.settings.setValue('spinBox_x_pixels', self.spinBox_x_pixels.value())
+        self.settings.setValue('spinBox_y_pixels', self.spinBox_y_pixels.value())
+        self.settings.setValue('doubleSpinBox_frequency', self.doubleSpinBox_frequency.value())
+        self.settings.setValue('doubleSpinBox_rotation', self.doubleSpinBox_rotation.value())
+        self.settings.setValue('lineEdit_directory', self.lineEdit_directory.text())
+        self.settings.setValue('lineEdit_filename_trace_ch1', self.lineEdit_filename_trace_ch1.text())
+        self.settings.setValue('lineEdit_filename_retrace_ch1', self.lineEdit_filename_retrace_ch1.text())
+        self.settings.setValue('lineEdit_filename_trace_ch2', self.lineEdit_filename_trace_ch2.text())
+        self.settings.setValue('lineEdit_filename_retrace_ch2', self.lineEdit_filename_retrace_ch2.text())
+        self.settings.setValue('doubleSpinBox_piezo_limit_x', self.doubleSpinBox_piezo_limit_x.value())
+        self.settings.setValue('doubleSpinBox_piezo_limit_y', self.doubleSpinBox_piezo_limit_y.value())
+        self.output_voltage_x.close()
+        self.output_voltage_y.close()
+        self.output_voltage_z.close()
+        self.input_voltage_ch1.close()
+        self.input_voltage_ch2.close()
+
+
 '''
+TODO: load current position based on values
 import nidaqmx
 with nidaqmx.Task() as task:
     task.ao_channels.add_ao_voltage_chan("NIdevice/ao3")

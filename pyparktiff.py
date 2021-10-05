@@ -231,14 +231,14 @@ def SaveParkTiff(data, X_scan_size, Y_scan_size, file_path):
     DataMin = data.min()
     for i in data:
         for j in i:
-            val = (j-DataMin)/(DataMax-DataMin)*255
+            val = (j-DataMin)/(DataMax-DataMin)*255 if DataMax-DataMin != 0 else j
             f.write(struct.pack("<B", int(val)))
 
     #ScanData
     DataGain = max(abs(DataMax),abs(DataMin))/float(32767)
     for i in data:
         for j in i:
-            val = j / DataGain
+            val = j / DataGain if DataGain != 0 else j
             f.write(struct.pack("<h", int(val)))
 
     f.write(struct.pack("x")*100)
@@ -261,9 +261,9 @@ def SaveParkTiff(data, X_scan_size, Y_scan_size, file_path):
     f.write(struct.pack("x")*16)
 
     # DataMin
-    f.write(struct.pack("<i",int(DataMin/DataGain)))
+    f.write(struct.pack("<i",int(DataMin/DataGain if DataGain != 0 else DataMin)))
     # DataMax
-    f.write(struct.pack("<i",int(DataMax/DataGain)))
+    f.write(struct.pack("<i",int(DataMax/DataGain if DataGain != 0 else DataMax)))
     f.write(struct.pack("x")*312)
     f.close()
 

@@ -45,8 +45,9 @@ class Scan(QObject):
                 self.parent.curr_coords[0] = self.x_array[i]
                 self.parent.curr_coords[1] = self.y_array[i]
                 sleep(self.single_time)
+                self.parent.output_voltage_signal.emit()
                 if self.counts % self.mod_unit == 0 or i == len(self.x_array) - 1:
-                    self.parent.update_voltage_signal.emit()
+                    self.parent.update_graphs_signal.emit()
                 ch1_ch2 = self.parent.get_voltage_ch1_ch2()
                 self.parent.line_trace['X'].append(self.parent.X_raw[i])
                 self.parent.line_trace['ch1'].append(ch1_ch2[0])
@@ -62,8 +63,9 @@ class Scan(QObject):
                 self.parent.curr_coords[0] = self.x_array[i]
                 self.parent.curr_coords[1] = self.y_array[i]
                 sleep(self.single_time)
+                self.parent.output_voltage_signal.emit()
                 if self.counts % self.mod_unit == 0 or i == 0:
-                    self.parent.update_voltage_signal.emit()
+                    self.parent.update_graphs_signal.emit()
                 ch1_ch2 = self.parent.get_voltage_ch1_ch2()
                 self.parent.line_retrace['X'].append(self.parent.X_raw[i])
                 self.parent.line_retrace['ch1'].append(ch1_ch2[0])
@@ -142,8 +144,9 @@ class Map(QObject):
                 self.parent.curr_coords[0] = self.x_array[i]
                 self.parent.curr_coords[1] = self.y_array[i]
                 sleep(self.single_time)
+                self.parent.output_voltage_signal.emit()
                 if self.counts % self.mod_unit == 0 or i == len(self.x_array) - 1:
-                    self.parent.update_voltage_signal.emit()
+                    self.parent.update_graphs_signal.emit()
                 ch1_ch2 = self.parent.get_voltage_ch1_ch2()
                 self.parent.line_trace['X'].append(self.parent.X_raw[i])
                 self.parent.line_trace['ch1'].append(ch1_ch2[0])
@@ -156,26 +159,26 @@ class Map(QObject):
                 self.parent.map_trace['ch2'].append(self.parent.line_trace['ch2'].copy())
                 self.lineFinished.emit()
 
-                self.thread1 = QThread()
+                self.parent.thread1 = QThread() # thread1 is assigned to self.parent to avoid abrupt killing of the saving thread while it's running
                 self.save1 = SaveTiffFile(self.parent.map_trace['ch1'], self.parent.X_raw[-1], self.parent.Y_raw[-1],
                                           self.filename_trace_ch1, self.directory)
-                self.save1.moveToThread(self.thread1)
-                self.thread1.started.connect(self.save1.save)
+                self.save1.moveToThread(self.parent.thread1)
+                self.parent.thread1.started.connect(self.save1.save)
                 self.save1.finished.connect(self.save1.deleteLater)
-                self.save1.finished.connect(self.thread1.exit)
-                self.thread1.finished.connect(self.thread1.deleteLater)
+                self.save1.finished.connect(self.parent.thread1.exit)
+                self.parent.thread1.finished.connect(self.parent.thread1.deleteLater)
 
-                self.thread1.start()
+                self.parent.thread1.start()
 
-                self.thread2 = QThread()
+                self.parent.thread2 = QThread()
                 self.save2 = SaveTiffFile(self.parent.map_trace['ch2'], self.parent.X_raw[-1], self.parent.Y_raw[-1],
                                           self.filename_trace_ch2, self.directory)
-                self.save2.moveToThread(self.thread2)
-                self.save2.finished.connect(self.thread2.exit)
+                self.save2.moveToThread(self.parent.thread2)
+                self.save2.finished.connect(self.parent.thread2.exit)
                 self.save2.finished.connect(self.save2.deleteLater)
-                self.thread2.finished.connect(self.thread2.deleteLater)
-                self.thread2.started.connect(self.save2.save)
-                self.thread2.start()
+                self.parent.thread2.finished.connect(self.parent.thread2.deleteLater)
+                self.parent.thread2.started.connect(self.save2.save)
+                self.parent.thread2.start()
 
             # retrace:
             for i in reversed(range(len(self.x_array))):
@@ -187,8 +190,9 @@ class Map(QObject):
                 self.parent.curr_coords[0] = self.x_array[i]
                 self.parent.curr_coords[1] = self.y_array[i]
                 sleep(self.single_time)
+                self.parent.output_voltage_signal.emit()
                 if self.counts % self.mod_unit == 0 or i == 0:
-                    self.parent.update_voltage_signal.emit()
+                    self.parent.update_graphs_signal.emit()
                 ch1_ch2 = self.parent.get_voltage_ch1_ch2()
                 self.parent.line_retrace['X'].append(self.parent.X_raw[i])
                 self.parent.line_retrace['ch1'].append(ch1_ch2[0])
@@ -200,25 +204,25 @@ class Map(QObject):
                 self.parent.map_retrace['ch2'].append(self.parent.line_retrace['ch2'].copy())
                 self.lineFinished.emit()
 
-                self.thread3 = QThread()
+                self.parent.thread3 = QThread()
                 self.save3 = SaveTiffFile(self.parent.map_retrace['ch1'], self.parent.X_raw[-1], self.parent.Y_raw[-1],
                                           self.filename_retrace_ch1, self.directory)
-                self.save3.moveToThread(self.thread3)
-                self.save3.finished.connect(self.thread3.exit)
+                self.save3.moveToThread(self.parent.thread3)
+                self.save3.finished.connect(self.parent.thread3.exit)
                 self.save3.finished.connect(self.save3.deleteLater)
-                self.thread3.finished.connect(self.thread3.deleteLater)
-                self.thread3.started.connect(self.save3.save)
-                self.thread3.start()
+                self.parent.thread3.finished.connect(self.parent.thread3.deleteLater)
+                self.parent.thread3.started.connect(self.save3.save)
+                self.parent.thread3.start()
 
-                self.thread4 = QThread()
+                self.parent.thread4 = QThread()
                 self.save4 = SaveTiffFile(self.parent.map_retrace['ch2'], self.parent.X_raw[-1], self.parent.Y_raw[-1],
                                           self.filename_retrace_ch2, self.directory)
-                self.save4.moveToThread(self.thread4)
-                self.save4.finished.connect(self.thread4.exit)
+                self.save4.moveToThread(self.parent.thread4)
+                self.save4.finished.connect(self.parent.thread4.exit)
                 self.save4.finished.connect(self.save4.deleteLater)
-                self.thread4.finished.connect(self.thread4.deleteLater)
-                self.thread4.started.connect(self.save4.save)
-                self.thread4.start()
+                self.parent.thread4.finished.connect(self.parent.thread4.deleteLater)
+                self.parent.thread4.started.connect(self.save4.save)
+                self.parent.thread4.start()
             row_num += 1
             print("end scan")
         if self.parent.map_on_boolean:
@@ -272,8 +276,9 @@ class MoveToTarget(QObject):
             sleep(single_time)
             self.single_time = 1 / self.parent.frequency / 2 / len(x_array)
             self.mod_unit = np.max([1, int(0.1 / self.single_time)])
+            self.parent.output_voltage_signal.emit()
             if self.counts % self.mod_unit == 0:
-                self.parent.update_voltage_signal.emit()
+                self.parent.update_graphs_signal.emit()
             self.counts += 1
         print("end move-to-target")
         # for w in self.parent.on_off_button_list:
@@ -293,6 +298,6 @@ class SaveTiffFile(QObject):
 
     def save(self):
         SaveParkTiff(data=self.data, X_scan_size=self.xmax, Y_scan_size=self.ymax,
-                     file_path=self.directory + self.filename)
+                     file_path=self.directory + '/' + self.filename)
         self.finished.emit()
         print('save done')

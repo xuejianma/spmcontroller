@@ -2,13 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c1566c47-c141-4d43-bc0f-7d1af85bcb6d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/pyparktiff.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scan.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hardware.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plotscanrange.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/form.ui" beforeDir="false" afterPath="$PROJECT_DIR$/form.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/form.ui.autosave" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/matplotlibwidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/matplotlibwidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyparktiff.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyparktiff.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scan.py" beforeDir="false" afterPath="$PROJECT_DIR$/scan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
