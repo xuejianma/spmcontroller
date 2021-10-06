@@ -21,7 +21,7 @@ import numpy as np
 
 class SPMController(QWidget):
     update_graphs_signal = pyqtSignal()
-    output_voltage_signal = pyqtSignal()
+    # output_voltage_signal = pyqtSignal()
     def __init__(self):
         super(SPMController, self).__init__()
         self.curr_coord_z = 0.0
@@ -61,9 +61,10 @@ class SPMController(QWidget):
 
         self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
         self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
-        self.output_voltage_z = OutputVoltage(port='x', label_error=self.label_error)
-        self.input_voltage_ch1 = InputVoltage(port='ch1', label_error=self.label_error)
-        self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
+        self.output_voltage_z = OutputVoltage(port='z', label_error=self.label_error)
+        self.input_voltage_ch1_ch2 = InputVoltage(label_error=self.label_error)
+        # self.input_voltage_ch1 = InputVoltage(port='ch1', label_error=self.label_error)
+        # self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
 
         # check_minmaxrotation_valid()
 
@@ -71,13 +72,15 @@ class SPMController(QWidget):
         self.output_voltage_x.close()
         self.output_voltage_y.close()
         self.output_voltage_z.close()
-        self.input_voltage_ch1.close()
-        self.input_voltage_ch2.close()
+        # self.input_voltage_ch1.close()
+        # self.input_voltage_ch2.close()
+        self.input_voltage_ch1_ch2.close()
         self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
         self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
         self.output_voltage_z = OutputVoltage(port='x', label_error=self.label_error)
-        self.input_voltage_ch1 = InputVoltage(port='ch1', label_error=self.label_error)
-        self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
+        # self.input_voltage_ch1 = InputVoltage(port='ch1', label_error=self.label_error)
+        # self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
+        self.input_voltage_ch1_ch2 = InputVoltage(label_error=self.label_error)
 
     def load_ui(self):
         path = os.path.join(os.path.dirname(__file__), "form.ui")
@@ -168,7 +171,7 @@ class SPMController(QWidget):
         self.doubleSpinBox_frequency.valueChanged.connect(self.determine_scan_window)
         self.doubleSpinBox_rotation.valueChanged.connect(self.determine_scan_window)
         self.update_graphs_signal.connect(self.update_voltage)
-        self.output_voltage_signal.connect(self.output_voltage)
+        # self.output_voltage_signal.connect(self.output_voltage)
         self.pushButton_scan.clicked.connect(self.toggle_scan_button)
         self.pushButton_goto0.clicked.connect(lambda: self.goto_position(np.array([0, 0])))
         self.pushButton_goto.clicked.connect(lambda: self.goto_position(np.array([self.doubleSpinBox_goto_x.value(),
@@ -284,7 +287,7 @@ class SPMController(QWidget):
     def update_voltage(self):
         # print("Updated voltage: x = ", self.curr_coords[0], ", y = ", self.curr_coords[1])
         self.label_current_x.setText("Current x (V): " + str(self.curr_coords[0]))
-        self.label_current_y.setText("Current x (V): " + str(self.curr_coords[1]))
+        self.label_current_y.setText("Current y (V): " + str(self.curr_coords[1]))
         self.update_line_graph()
 
     def output_voltage(self):
@@ -297,7 +300,8 @@ class SPMController(QWidget):
 
     def get_voltage_ch1_ch2(self):
         # return (np.random.random() + 1, np.random.random() + 2)
-        return self.input_voltage_ch1.getVoltage(), self.input_voltage_ch2.getVoltage()
+        # return self.input_voltage_ch1.getVoltage(), self.input_voltage_ch2.getVoltage()
+        return self.input_voltage_ch1_ch2.getVoltage()
 
     def update_line_graph(self):
         self.widget_linescan_ch1.clear()
@@ -349,21 +353,21 @@ class SPMController(QWidget):
     def preload(self):
         self.settings = QSettings('SPMController', 'App1')
         try:
-            self.doubleSpinBox_x_min.setValue(self.settings.value('doubleSpinBox_x_min'))
-            self.doubleSpinBox_x_max.setValue(self.settings.value('doubleSpinBox_x_max'))
-            self.doubleSpinBox_y_min.setValue(self.settings.value('doubleSpinBox_y_min'))
-            self.doubleSpinBox_y_max.setValue(self.settings.value('doubleSpinBox_y_max'))
+            self.doubleSpinBox_x_min.setValue(float(self.settings.value('doubleSpinBox_x_min')))
+            self.doubleSpinBox_x_max.setValue(float(self.settings.value('doubleSpinBox_x_max')))
+            self.doubleSpinBox_y_min.setValue(float(self.settings.value('doubleSpinBox_y_min')))
+            self.doubleSpinBox_y_max.setValue(float(self.settings.value('doubleSpinBox_y_max')))
             self.spinBox_x_pixels.setValue(self.settings.value('spinBox_x_pixels'))
             self.spinBox_y_pixels.setValue(self.settings.value('spinBox_y_pixels'))
-            self.doubleSpinBox_frequency.setValue(self.settings.value('doubleSpinBox_frequency'))
-            self.doubleSpinBox_rotation.setValue(self.settings.value('doubleSpinBox_rotation'))
+            self.doubleSpinBox_frequency.setValue(float(self.settings.value('doubleSpinBox_frequency')))
+            self.doubleSpinBox_rotation.setValue(float(self.settings.value('doubleSpinBox_rotation')))
             self.lineEdit_directory.setText(self.settings.value('lineEdit_directory'))
             self.lineEdit_filename_trace_ch1.setText(self.settings.value('lineEdit_filename_trace_ch1'))
             self.lineEdit_filename_retrace_ch1.setText(self.settings.value('lineEdit_filename_retrace_ch1'))
             self.lineEdit_filename_trace_ch2.setText(self.settings.value('lineEdit_filename_trace_ch2'))
             self.lineEdit_filename_retrace_ch2.setText(self.settings.value('lineEdit_filename_retrace_ch2'))
-            self.doubleSpinBox_piezo_limit_x.setValue(self.settings.value('doubleSpinBox_piezo_limit_x'))
-            self.doubleSpinBox_piezo_limit_y.setValue(self.settings.value('doubleSpinBox_piezo_limit_y'))
+            self.doubleSpinBox_piezo_limit_x.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_x')))
+            self.doubleSpinBox_piezo_limit_y.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_y')))
         except:
             pass
 
@@ -387,8 +391,9 @@ class SPMController(QWidget):
         self.output_voltage_x.close()
         self.output_voltage_y.close()
         self.output_voltage_z.close()
-        self.input_voltage_ch1.close()
-        self.input_voltage_ch2.close()
+        # self.input_voltage_ch1.close()
+        # self.input_voltage_ch2.close()
+        self.input_voltage_ch1_ch2.close()
 
 
 '''

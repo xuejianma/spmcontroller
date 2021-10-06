@@ -542,7 +542,7 @@ Recommended: 50</string>
     <double>0.001000000000000</double>
    </property>
    <property name="maximum">
-    <double>0.500000000000000</double>
+    <double>1.000000000000000</double>
    </property>
    <property name="singleStep">
     <double>0.010000000000000</double>
@@ -588,7 +588,7 @@ Recommended: 50</string>
    </property>
    <property name="text">
     <string>Channel 1
-Filenames (*.tiff)
+Filenames (*.txt, *.tiff)
 trace and retrace</string>
    </property>
   </widget>
@@ -603,7 +603,7 @@ trace and retrace</string>
    </property>
    <property name="text">
     <string>Channel 2
-Filenames (*.tiff)
+Filenames (*.txt, *.tiff)
 trace and retrace</string>
    </property>
   </widget>
@@ -1434,7 +1434,7 @@ trace and retrace</string>
     </rect>
    </property>
    <property name="keyboardTracking">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="decimals">
     <number>6</number>
@@ -1481,12 +1481,12 @@ trace and retrace</string>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_7"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_6"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>
