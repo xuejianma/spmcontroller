@@ -14,9 +14,12 @@ from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLa
 from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings
 from scan import Scan, MoveToTarget, Map
 from plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
+from anc300 import ANC300
 from hardware import OutputVoltage, InputVoltage
 from os.path import isdir
+from pyvisa import ResourceManager
 import numpy as np
+
 
 
 class SPMController(QWidget):
@@ -24,6 +27,9 @@ class SPMController(QWidget):
     # output_voltage_signal = pyqtSignal()
     def __init__(self):
         super(SPMController, self).__init__()
+        # self.anc_controller = ANC300(3)
+        # self.rm = ResourceManager()
+        self.anc_controller = ANC300(3)
         self.curr_coord_z = 0.0
         self.error_lock = False
         self.error_lock_text = "🚫 Error: Scan window exceeds piezo limit"
@@ -38,6 +44,7 @@ class SPMController(QWidget):
         self.colorbar_manual_ch1 = False
         self.colorbar_manual_ch2 = False
         self.load_ui()
+        # self.list_resources()
         self.preload()
         self.initialize_formats()
         self.determine_scan_window()
@@ -67,6 +74,7 @@ class SPMController(QWidget):
         # self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
 
         # check_minmaxrotation_valid()
+
 
     def hardware_io(self):
         self.output_voltage_x.close()
@@ -200,6 +208,9 @@ class SPMController(QWidget):
         self.pushButton_directory.clicked.connect(self.selectDirectory)
         self.doubleSpinBox_z.valueChanged.connect(self.output_voltage_z_direction)
         self.pushButton_reconnect_hardware.clicked.connect(self.hardware_io)
+
+        # self.comboBox_anc300.currentIndexChanged.connect(self.choose_anc300)
+        self.pushButton_positioner_on.clicked.connect(lambda: self.anc_controller.setm(4, "stp"))
 
     def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
         plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max)
@@ -395,6 +406,21 @@ class SPMController(QWidget):
         # self.input_voltage_ch2.close()
         self.input_voltage_ch1_ch2.close()
 
+    # def list_resources(self):
+    #     usb_list = self.rm.list_resources()
+    #     for item in usb_list:
+    #         self.comboBox_anc300.addItem(item)
+    #         if "ASRL3" in item:
+    #             self.comboBox_anc300.setCurrentText(item)  # find and define oscilloscope USB port
+    #             self.choose_anc300()
+    #
+    # def choose_anc300(self):
+    #     try:
+    #         self.anc_controller = ANC300(self.rm.open_resource(self.comboBox_anc300.currentText()))
+    #         self.label_error_approach.setText("")
+    #     except:
+    #         self.label_error_approach.setText("🚫 Device " + self.comboBox_anc300.currentText() + " occupied")
+    #         self.anc_controller = None
 
 '''
 TODO: load current position based on values

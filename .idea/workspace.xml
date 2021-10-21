@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="c1566c47-c141-4d43-bc0f-7d1af85bcb6d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/spmcontroller.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/spmcontroller.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/form.ui" beforeDir="false" afterPath="$PROJECT_DIR$/form.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/form.ui.autosave" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/hardware.py" beforeDir="false" afterPath="$PROJECT_DIR$/hardware.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plotscanrange.py" beforeDir="false" afterPath="$PROJECT_DIR$/plotscanrange.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scan.py" beforeDir="false" afterPath="$PROJECT_DIR$/scan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,9 +61,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\Zhaodong Chu\Anaconda3\envs\DiffusionAnalysis\python.exe" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
@@ -120,35 +132,39 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="362" y="170" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1633467226677">
+    <state x="362" y="170" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1634781113502">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state x="362" y="170" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1633467226677" />
+    <state x="362" y="170" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1634781113502" />
     <state x="2094" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633465645836" />
+    <state x="570" y="252" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1634780604855">
+      <screen x="0" y="0" width="1680" height="1010" />
+    </state>
+    <state x="570" y="252" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1634780604855" />
     <state x="2349" y="115" key="#main" timestamp="1633465095737">
       <screen x="1680" y="0" width="1920" height="1040" />
     </state>
     <state x="2349" y="115" key="#main/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633465095737" />
-    <state width="1899" height="139" key="GridCell.Tab.0.bottom" timestamp="1633500872956">
-      <screen x="1680" y="0" width="1920" height="1040" />
+    <state width="1659" height="133" key="GridCell.Tab.0.bottom" timestamp="1634783963206">
+      <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="1659" height="139" key="GridCell.Tab.0.bottom/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1633468584442" />
-    <state width="1899" height="139" key="GridCell.Tab.0.bottom/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633500872956" />
-    <state width="1899" height="139" key="GridCell.Tab.0.center" timestamp="1633500872955">
-      <screen x="1680" y="0" width="1920" height="1040" />
+    <state width="1659" height="133" key="GridCell.Tab.0.bottom/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1634783963206" />
+    <state width="1899" height="139" key="GridCell.Tab.0.bottom/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633637979752" />
+    <state width="1659" height="133" key="GridCell.Tab.0.center" timestamp="1634783963206">
+      <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="1659" height="139" key="GridCell.Tab.0.center/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1633468584442" />
-    <state width="1899" height="139" key="GridCell.Tab.0.center/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633500872955" />
-    <state width="1899" height="139" key="GridCell.Tab.0.left" timestamp="1633500872955">
-      <screen x="1680" y="0" width="1920" height="1040" />
+    <state width="1659" height="133" key="GridCell.Tab.0.center/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1634783963206" />
+    <state width="1899" height="139" key="GridCell.Tab.0.center/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633637979752" />
+    <state width="1659" height="133" key="GridCell.Tab.0.left" timestamp="1634783963206">
+      <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="1659" height="139" key="GridCell.Tab.0.left/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1633468584442" />
-    <state width="1899" height="139" key="GridCell.Tab.0.left/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633500872955" />
-    <state width="1899" height="139" key="GridCell.Tab.0.right" timestamp="1633500872956">
-      <screen x="1680" y="0" width="1920" height="1040" />
+    <state width="1659" height="133" key="GridCell.Tab.0.left/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1634783963206" />
+    <state width="1899" height="139" key="GridCell.Tab.0.left/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633637979752" />
+    <state width="1659" height="133" key="GridCell.Tab.0.right" timestamp="1634783963206">
+      <screen x="0" y="0" width="1680" height="1010" />
     </state>
-    <state width="1659" height="139" key="GridCell.Tab.0.right/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1633468584442" />
-    <state width="1899" height="139" key="GridCell.Tab.0.right/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633500872956" />
+    <state width="1659" height="133" key="GridCell.Tab.0.right/0.0.1680.1010/1680.0.1920.1040@0.0.1680.1010" timestamp="1634783963206" />
+    <state width="1899" height="139" key="GridCell.Tab.0.right/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1633637979752" />
     <state x="403" y="160" key="SettingsEditor" timestamp="1633465816960">
       <screen x="0" y="0" width="1680" height="1010" />
     </state>
