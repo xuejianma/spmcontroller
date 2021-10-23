@@ -29,9 +29,10 @@ class SPMController(QWidget):
         super(SPMController, self).__init__()
         # self.anc_controller = ANC300(3)
         # self.rm = ResourceManager()
-        self.anc_controller = ANC300(3)
+
         self.curr_coord_z = 0.0
         self.error_lock = False
+        self.positioner_moving = False
         self.error_lock_text = "🚫 Error: Scan window exceeds piezo limit"
         self.data_store = []  # 5 x n, (XX, YY, array1, array2) x n)
         self.data_choose = -1
@@ -44,6 +45,14 @@ class SPMController(QWidget):
         self.colorbar_manual_ch1 = False
         self.colorbar_manual_ch2 = False
         self.load_ui()
+        try:
+            self.anc_controller = ANC300(3)
+            self.label_error_approach.setText("")
+        except:
+            self.anc_controller = None
+            self.label_error_approach.setText("🚫 Error: ANC300 hardware not detected!")
+        # try:
+        #     self.lockin_top =
         # self.list_resources()
         self.preload()
         self.initialize_formats()
@@ -103,6 +112,9 @@ class SPMController(QWidget):
         self.verticalLayout_display_scan_window_ch1.addWidget(self.widget_display_scan_window_ch1)
         self.widget_display_scan_window_ch2 = MatplotlibWidget()
         self.verticalLayout_display_scan_window_ch2.addWidget(self.widget_display_scan_window_ch2)
+
+        self.widget_linescan_approach_ch1.setBackground("w")
+        self.widget_linescan_approach_ch2.setBackground("w")
 
 
 
@@ -210,7 +222,28 @@ class SPMController(QWidget):
         self.pushButton_reconnect_hardware.clicked.connect(self.hardware_io)
 
         # self.comboBox_anc300.currentIndexChanged.connect(self.choose_anc300)
+        self.pushButton_reconnect_anc300.clicked.connect(self.reconnect_anc300)
         self.pushButton_positioner_on.clicked.connect(lambda: self.anc_controller.setm(4, "stp"))
+        self.pushButton_positioner_off.clicked.connect(lambda: self.anc_controller.setm(4, "gnd"))
+        self.pushButton_scanner_x_dc_on.clicked.connect(lambda: self.anc_controller.setdci(1, "on"))
+        self.pushButton_scanner_x_dc_off.clicked.connect(lambda: self.anc_controller.setdci(1, "off"))
+        self.pushButton_scanner_y_dc_on.clicked.connect(lambda: self.anc_controller.setdci(2, "on"))
+        self.pushButton_scanner_y_dc_off.clicked.connect(lambda: self.anc_controller.setdci(2, "off"))
+        self.pushButton_scanner_z_dc_on.clicked.connect(lambda: self.anc_controller.setdci(3, "on"))
+        self.pushButton_scanner_z_dc_off.clicked.connect(lambda: self.anc_controller.setdci(3, "off"))
+        self.pushButton_scanner_x_ac_on.clicked.connect(lambda: self.anc_controller.setaci(1, "on"))
+        self.pushButton_scanner_x_ac_off.clicked.connect(lambda: self.anc_controller.setaci(1, "off"))
+        self.pushButton_scanner_y_ac_on.clicked.connect(lambda: self.anc_controller.setaci(2, "on"))
+        self.pushButton_scanner_y_ac_off.clicked.connect(lambda: self.anc_controller.setaci(2, "off"))
+        self.pushButton_scanner_z_ac_on.clicked.connect(lambda: self.anc_controller.setaci(3, "on"))
+        self.pushButton_scanner_z_ac_off.clicked.connect(lambda: self.anc_controller.setaci(3, "off"))
+
+        self.pushButton_positioner_move.clicked.connect(self.move_positioner_toggle)
+        self.spinBox_positioner_frequency.valueChanged.connect(
+            lambda: self.anc_controller.setf(4, self.spinBox_positioner_frequency.value()))
+        self.doubleSpinBox_positioner_amplitude.valueChanged.connect(
+            lambda: self.anc_controller.setv(4, self.doubleSpinBox_positioner_amplitude.value()))
+
 
     def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
         plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max)
@@ -406,22 +439,35 @@ class SPMController(QWidget):
         # self.input_voltage_ch2.close()
         self.input_voltage_ch1_ch2.close()
 
-    # def list_resources(self):
-    #     usb_list = self.rm.list_resources()
-    #     for item in usb_list:
-    #         self.comboBox_anc300.addItem(item)
-    #         if "ASRL3" in item:
-    #             self.comboBox_anc300.setCurrentText(item)  # find and define oscilloscope USB port
-    #             self.choose_anc300()
-    #
-    # def choose_anc300(self):
-    #     try:
-    #         self.anc_controller = ANC300(self.rm.open_resource(self.comboBox_anc300.currentText()))
-    #         self.label_error_approach.setText("")
-    #     except:
-    #         self.label_error_approach.setText("🚫 Device " + self.comboBox_anc300.currentText() + " occupied")
-    #         self.anc_controller = None
+    def reconnect_anc300(self):
+        try:
+            self.anc_controller = ANC300(3)
+            self.label_error_approach.setText("")
+        except:
+            self.anc_controller = None
+            self.label_error_approach.setText("🚫 Error: ANC300 hardware not detected!")
 
+    def move_positioner_toggle(self):
+        if self.positioner_moving:
+            self.anc_controller.stop(4)
+            self.checkBox_positioner_up.setDisabled(False)
+            self.checkBox_positioner_down.setDisabled(False)
+            self.label_positioner_running.setText("")
+            self.pushButton_positioner_move.setText("Move")
+            self.positioner_moving = False
+        else:
+            self.checkBox_positioner_up.setDisabled(True)
+            self.checkBox_positioner_down.setDisabled(True)
+            try:
+                if self.checkBox_positioner_up.isChecked():
+                    self.anc_controller.stepu(4, 'c')
+                else:
+                    self.anc_controller.stepd(4, 'c')
+                self.label_positioner_running.setText("Moving...")
+            except:
+                self.label_positioner_running.setText("🚫 Error: Positioner Off")
+            self.pushButton_positioner_move.setText("Stop")
+            self.positioner_moving = True
 '''
 TODO: load current position based on values
 import nidaqmx

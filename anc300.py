@@ -1,9 +1,13 @@
+"""
+Created by Xiaoyu Wu / Yuan Ren pre-2018
+"""
+
+
 import pyvisa as visa
 
 # Attention: AID range {1, 2, 3, 4}. Not starting from 0!
 
 class ANC300():
-
 
     def __init__(self, COM_number):
         #COM_number = 3 for ST-500 system
@@ -92,7 +96,7 @@ class ANC300():
 
     def stepu(self, AID, C):
     # C = 'c' for continuous stepping; 1,2,3,... for fixed number of steps
-        self.setm(AID, "stp")
+    #     self.setm(AID, "stp")
         self.instrument.write("stepu "+str(AID)+" "+str(C)+"\n")
         tempstr = self.instrument.read()
         while (tempstr.strip() != 'OK'):
@@ -101,7 +105,7 @@ class ANC300():
 
     def stepd(self, AID, C):
     # C = 'c' for continuous stepping; 1,2,3,... for fixed number of steps
-        self.setm(AID, "stp")
+    #     self.setm(AID, "stp")
         self.instrument.write("stepd "+str(AID)+" "+str(C)+"\n")
         tempstr = self.instrument.read()
         while (tempstr.strip() != 'OK'):
