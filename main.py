@@ -12,18 +12,20 @@ from pyqtgraph import mkPen
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLabel, QVBoxLayout, QSizePolicy
 from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings
-from scan import Scan, MoveToTarget, Map
+from scan import Scan, MoveToTarget, Map, ApproachDisplay
 from plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
 from anc300 import ANC300
+from sr830 import SR830
 from hardware import OutputVoltage, InputVoltage
 from os.path import isdir
 from pyvisa import ResourceManager
 import numpy as np
 
 
-
 class SPMController(QWidget):
     update_graphs_signal = pyqtSignal()
+    update_display_approach_signal = pyqtSignal()
+
     # output_voltage_signal = pyqtSignal()
     def __init__(self):
         super(SPMController, self).__init__()
@@ -33,8 +35,11 @@ class SPMController(QWidget):
         self.curr_coord_z = 0.0
         self.error_lock = False
         self.positioner_moving = False
+        self.display_approach_on = False
         self.error_lock_text = "🚫 Error: Scan window exceeds piezo limit"
         self.data_store = []  # 5 x n, (XX, YY, array1, array2) x n)
+        self.display_list_ch1 = []
+        self.display_list_ch2 = []
         self.data_choose = -1
         self.channel_choose = 1  # 1 or 2
         self.scan_on_boolean = False
@@ -45,14 +50,9 @@ class SPMController(QWidget):
         self.colorbar_manual_ch1 = False
         self.colorbar_manual_ch2 = False
         self.load_ui()
-        try:
-            self.anc_controller = ANC300(3)
-            self.label_error_approach.setText("")
-        except:
-            self.anc_controller = None
-            self.label_error_approach.setText("🚫 Error: ANC300 hardware not detected!")
-        # try:
-        #     self.lockin_top =
+        self.reconnect_anc300()
+        self.reconnect_lockin()
+
         # self.list_resources()
         self.preload()
         self.initialize_formats()
@@ -61,7 +61,7 @@ class SPMController(QWidget):
         self.curr_coords = [0, 0]
         self.on_off_spinbox_list = [self.doubleSpinBox_x_min, self.doubleSpinBox_x_max, self.doubleSpinBox_y_min,
                                     self.doubleSpinBox_y_max, self.spinBox_x_pixels, self.spinBox_y_pixels,
-                                    self.doubleSpinBox_rotation,#self.doubleSpinBox_frequency,
+                                    self.doubleSpinBox_rotation,  # self.doubleSpinBox_frequency,
                                     self.doubleSpinBox_piezo_limit_x, self.doubleSpinBox_piezo_limit_y,
                                     self.lineEdit_filename_trace_ch1, self.lineEdit_filename_trace_ch2,
                                     self.lineEdit_filename_retrace_ch1, self.lineEdit_filename_retrace_ch2,
@@ -70,7 +70,8 @@ class SPMController(QWidget):
                                     self.pushButton_goto,
                                     self.pushButton_reconnect_hardware,
                                     ]
-        self.on_off_button_list = [self.pushButton_scan, self.pushButton_image,  #self.doubleSpinBox_goto_x, self.doubleSpinBox_goto_y,
+        self.on_off_button_list = [self.pushButton_scan, self.pushButton_image,
+                                   # self.doubleSpinBox_goto_x, self.doubleSpinBox_goto_y,
                                    ]
         self.line_trace = {'X': [], 'ch1': [], 'ch2': []}
         self.line_retrace = {'X': [], 'ch1': [], 'ch2': []}
@@ -99,6 +100,7 @@ class SPMController(QWidget):
         # self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
         self.input_voltage_ch1_ch2 = InputVoltage(label_error=self.label_error)
 
+
     def load_ui(self):
         path = os.path.join(os.path.dirname(__file__), "form.ui")
         uic.loadUi(path, self)
@@ -115,8 +117,6 @@ class SPMController(QWidget):
 
         self.widget_linescan_approach_ch1.setBackground("w")
         self.widget_linescan_approach_ch2.setBackground("w")
-
-
 
     def determine_scan_window(self):
         self.piezo_limit_x = self.doubleSpinBox_piezo_limit_x.value()
@@ -152,7 +152,7 @@ class SPMController(QWidget):
         self.YY = xx_yy_rot[1, :].reshape(YY_input.shape)
         self.update_graphs()
 
-    def update_graphs(self, single = 'all'):
+    def update_graphs(self, single='all'):
         xlim_min = np.min([self.p1[0], self.p2[0], self.p3[0], self.p4[0]])
         xlim_max = np.max([self.p1[0], self.p2[0], self.p3[0], self.p4[0]])
         ylim_min = np.min([self.p1[1], self.p2[1], self.p3[1], self.p4[1]])
@@ -168,6 +168,12 @@ class SPMController(QWidget):
             self.plot_scan_range(self.widget_display_scan_window_ch2, xlim_min=xlim_min, xlim_max=xlim_max,
                                  ylim_min=ylim_min,
                                  ylim_max=ylim_max)
+
+    def update_display_approach(self):
+        self.widget_linescan_approach_ch1.clear()
+        self.widget_linescan_approach_ch2.clear()
+        self.widget_linescan_approach_ch1.plot(self.display_list_ch1, pen=mkPen(color=(0, 0, 0)))
+        self.widget_linescan_approach_ch2.plot(self.display_list_ch2, pen=mkPen(color=(0, 0, 0)))
 
     def rotate_coord(self, p, center, rotate_matrix):
         p = np.reshape(p, (2, -1))
@@ -195,15 +201,15 @@ class SPMController(QWidget):
         self.pushButton_scan.clicked.connect(self.toggle_scan_button)
         self.pushButton_goto0.clicked.connect(lambda: self.goto_position(np.array([0, 0])))
         self.pushButton_goto.clicked.connect(lambda: self.goto_position(np.array([self.doubleSpinBox_goto_x.value(),
-                                                                   self.doubleSpinBox_goto_y.value()])))
+                                                                                  self.doubleSpinBox_goto_y.value()])))
         self.checkBox_maintenance.toggled.connect(self.toggle_maintenance)
         self.doubleSpinBox_current_x.valueChanged.connect(self.update_voltage_maintenance)
         self.doubleSpinBox_current_y.valueChanged.connect(self.update_voltage_maintenance)
         self.pushButton_image.clicked.connect(self.toggle_map_button)
-        self.buttonGroup.buttonToggled.connect(lambda: self.update_graphs(single = 'main'))
-        self.buttonGroup_2.buttonToggled.connect(lambda: self.update_graphs(single = 'main'))
-        self.buttonGroup_3.buttonToggled.connect(lambda: self.update_graphs(single = 'ch1'))
-        self.buttonGroup_4.buttonToggled.connect(lambda: self.update_graphs(single = 'ch2'))
+        self.buttonGroup.buttonToggled.connect(lambda: self.update_graphs(single='main'))
+        self.buttonGroup_2.buttonToggled.connect(lambda: self.update_graphs(single='main'))
+        self.buttonGroup_3.buttonToggled.connect(lambda: self.update_graphs(single='ch1'))
+        self.buttonGroup_4.buttonToggled.connect(lambda: self.update_graphs(single='ch2'))
 
         self.buttonGroup_5.buttonToggled.connect(self.toggle_colorbar_main)
         self.doubleSpinBox_colorbar_manual_min_main.valueChanged.connect(self.toggle_colorbar_main)
@@ -225,6 +231,8 @@ class SPMController(QWidget):
         self.pushButton_reconnect_anc300.clicked.connect(self.reconnect_anc300)
         self.pushButton_positioner_on.clicked.connect(lambda: self.anc_controller.setm(4, "stp"))
         self.pushButton_positioner_off.clicked.connect(lambda: self.anc_controller.setm(4, "gnd"))
+        self.pushButton_positioner_off.clicked.connect(
+            lambda: self.move_positioner_toggle() if self.positioner_moving else None)
         self.pushButton_scanner_x_dc_on.clicked.connect(lambda: self.anc_controller.setdci(1, "on"))
         self.pushButton_scanner_x_dc_off.clicked.connect(lambda: self.anc_controller.setdci(1, "off"))
         self.pushButton_scanner_y_dc_on.clicked.connect(lambda: self.anc_controller.setdci(2, "on"))
@@ -244,6 +252,32 @@ class SPMController(QWidget):
         self.doubleSpinBox_positioner_amplitude.valueChanged.connect(
             lambda: self.anc_controller.setv(4, self.doubleSpinBox_positioner_amplitude.value()))
 
+        #SR830 Top:
+        self.spinBox_lockin_top_reference.valueChanged.connect(
+            lambda: self.lockin_top.set_reference_source(self.spinBox_lockin_top_reference.value()))
+        self.doubleSpinBox_lockin_top_reference_internal_frequency.valueChanged.connect(
+            lambda: self.lockin_top.set_frequency(self.doubleSpinBox_lockin_top_reference_internal_frequency.value()))
+        self.spinBox_lockin_top_time_constant.valueChanged.connect(
+            lambda: self.lockin_top.set_time_constant(self.spinBox_lockin_top_time_constant.value()))
+        self.spinBox_lockin_top_display.valueChanged.connect(
+            lambda: self.lockin_top.set_display(1, self.spinBox_lockin_top_display.value()))
+        self.spinBox_lockin_top_output_mode.valueChanged.connect(
+            lambda: self.lockin_top.set_output(1, self.spinBox_lockin_top_output_mode.value()))
+        #SR830 Bottom:
+        self.spinBox_lockin_bottom_reference.valueChanged.connect(
+            lambda: self.lockin_bottom.set_reference_source(self.spinBox_lockin_bottom_reference.value()))
+        self.doubleSpinBox_lockin_bottom_reference_internal_frequency.valueChanged.connect(
+            lambda: self.lockin_bottom.set_frequency(self.doubleSpinBox_lockin_bottom_reference_internal_frequency.value()))
+        self.spinBox_lockin_bottom_time_constant.valueChanged.connect(
+            lambda: self.lockin_bottom.set_time_constant(self.spinBox_lockin_bottom_time_constant.value()))
+        self.spinBox_lockin_bottom_display.valueChanged.connect(
+            lambda: self.lockin_bottom.set_display(1, self.spinBox_lockin_bottom_display.value()))
+        self.spinBox_lockin_bottom_output_mode.valueChanged.connect(
+            lambda: self.lockin_bottom.set_output(1, self.spinBox_lockin_bottom_output_mode.value()))
+        # start display for approach
+        self.pushButton_approach_monitor.clicked.connect(self.toggle_display_approach_button)
+
+        self.update_display_approach_signal.connect(self.update_display_approach)
 
     def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
         plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max)
@@ -270,15 +304,22 @@ class SPMController(QWidget):
             self.label_error.setText(self.error_lock_text)
             return
         if self.scan_on_boolean:
+            # The reason we didn't put the following expression outside of if-else is because while loop in start_
+            # scan's Scan() needs to
+            # determine whether to run based on the new boolean value. It somehow works if we put it at the end, but
+            # simply because assigining new thread takes more time, and it has time to change boolean value before
+            # the running really starts.
+            self.scan_on_boolean = not self.scan_on_boolean
             self.on_off_spinbox_list_turn_on()
             self.pushButton_image.setDisabled(False)
             self.pushButton_scan.setText("Scan")
         else:
+            self.scan_on_boolean = not self.scan_on_boolean
             self.pushButton_scan.setText("OFF")
             self.on_off_spinbox_list_turn_off()
             self.pushButton_image.setDisabled(True)
             self.start_scan()
-        self.scan_on_boolean = not self.scan_on_boolean
+
 
     def toggle_map_button(self):
         if self.error_lock:
@@ -288,15 +329,27 @@ class SPMController(QWidget):
             self.label_error.setText("🚫 Error: Auto save directory not found")
             return
         if self.map_on_boolean:
+            self.map_on_boolean = not self.map_on_boolean
             self.on_off_spinbox_list_turn_on()
             self.pushButton_scan.setDisabled(False)
             self.pushButton_image.setText("Image")
         else:
+            self.map_on_boolean = not self.map_on_boolean
             self.pushButton_image.setText("OFF")
             self.on_off_spinbox_list_turn_off()
             self.pushButton_scan.setDisabled(True)
             self.start_map()
-        self.map_on_boolean = not self.map_on_boolean
+
+
+    def toggle_display_approach_button(self):
+        if self.display_approach_on:
+            self.display_approach_on = not self.display_approach_on
+            self.pushButton_approach_monitor.setText("START  Display Channel 1 and Channel 2")
+        else:
+            self.display_approach_on = not self.display_approach_on
+            self.pushButton_approach_monitor.setText("STOP  Display Channel 1 and Channel 2")
+            self.start_display_approach()
+
 
     def update_voltage_maintenance(self):
         self.curr_coords[0] = self.doubleSpinBox_current_x.value()
@@ -305,7 +358,8 @@ class SPMController(QWidget):
 
     def start_scan(self):
         self.thread = QThread()
-        self.scan = Scan(self)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
+        self.scan = Scan(
+            self)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
         self.scan.moveToThread(self.thread)
         self.thread.started.connect(self.scan.run)
         self.scan.finished.connect(self.scan.deleteLater)
@@ -315,7 +369,8 @@ class SPMController(QWidget):
 
     def start_map(self):
         self.thread = QThread()
-        self.map = Map(self)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
+        self.map = Map(
+            self)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
         self.map.moveToThread(self.thread)
         self.thread.started.connect(self.map.run)
         self.thread.started.connect(self.update_graphs)
@@ -327,6 +382,15 @@ class SPMController(QWidget):
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
+    def start_display_approach(self):
+        self.thread = QThread()
+        self.approach_display = ApproachDisplay(self)
+        self.approach_display.moveToThread(self.thread)
+        self.thread.started.connect(self.approach_display.run)
+        self.approach_display.finished.connect(self.approach_display.deleteLater)
+        self.approach_display.finished.connect(self.thread.exit)
+        self.thread.finished.connect(self.thread.deleteLater)
+        self.thread.start()
 
     def update_voltage(self):
         # print("Updated voltage: x = ", self.curr_coords[0], ", y = ", self.curr_coords[1])
@@ -350,17 +414,19 @@ class SPMController(QWidget):
     def update_line_graph(self):
         self.widget_linescan_ch1.clear()
         self.widget_linescan_ch2.clear()
-        self.widget_linescan_ch1.plot(self.line_trace['X'], self.line_trace['ch1'], pen = mkPen(color=(0, 180, 0)))
-        self.widget_linescan_ch1.plot(self.line_retrace['X'], self.line_retrace['ch1'], pen = mkPen(color=(180, 0, 0)))
-        self.widget_linescan_ch2.plot(self.line_trace['X'], self.line_trace['ch2'], pen = mkPen(color=(0, 180, 0)))
-        self.widget_linescan_ch2.plot(self.line_retrace['X'], self.line_retrace['ch2'], pen = mkPen(color=(180, 0, 0)))
+        self.widget_linescan_ch1.plot(self.line_trace['X'], self.line_trace['ch1'], pen=mkPen(color=(0, 180, 0)))
+        self.widget_linescan_ch1.plot(self.line_retrace['X'], self.line_retrace['ch1'], pen=mkPen(color=(180, 0, 0)))
+        self.widget_linescan_ch2.plot(self.line_trace['X'], self.line_trace['ch2'], pen=mkPen(color=(0, 180, 0)))
+        self.widget_linescan_ch2.plot(self.line_retrace['X'], self.line_retrace['ch2'], pen=mkPen(color=(180, 0, 0)))
 
     # def update_map_graph(self):
 
 
+
     def goto_position(self, p):
         self.thread = QThread()
-        self.move = MoveToTarget(self, p, manual_move=True)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
+        self.move = MoveToTarget(self, p,
+                                 manual_move=True)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
         self.move.moveToThread(self.thread)
         self.thread.started.connect(self.move.move)
         self.move.started.connect(self.on_off_button_list_turn_off)
@@ -372,27 +438,30 @@ class SPMController(QWidget):
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
-    def on_off_button_list_turn_on(self, without_pushButton_image = False, without_pushButton_scan = False):
+    def on_off_button_list_turn_on(self, without_pushButton_image=False, without_pushButton_scan=False):
         for w in self.on_off_button_list:
-            if (without_pushButton_image and w == self.pushButton_image) or (without_pushButton_scan and w == self.pushButton_scan):
+            if (without_pushButton_image and w == self.pushButton_image) or (
+                    without_pushButton_scan and w == self.pushButton_scan):
                 continue
             w.setDisabled(False)
+
     def on_off_button_list_turn_off(self):
         for w in self.on_off_button_list:
             w.setDisabled(True)
+
     def on_off_spinbox_list_turn_on(self):
         for w in self.on_off_spinbox_list:
             w.setDisabled(False)
+
     def on_off_spinbox_list_turn_off(self):
         for w in self.on_off_spinbox_list:
             w.setDisabled(True)
 
     def selectDirectory(self):
-        directoryName = QFileDialog.getExistingDirectory(self, 'Select directory')#getOpenFileName(self, 'Open file', '.', '')
+        directoryName = QFileDialog.getExistingDirectory(self,
+                                                         'Select directory')  # getOpenFileName(self, 'Open file', '.', '')
         self.label_error.setText("")
         self.lineEdit_directory.setText(directoryName)
-
-
 
     def preload(self):
         self.settings = QSettings('SPMController', 'App1')
@@ -414,7 +483,6 @@ class SPMController(QWidget):
             self.doubleSpinBox_piezo_limit_y.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_y')))
         except:
             pass
-
 
     def closeEvent(self, event):
         self.settings.setValue('doubleSpinBox_x_min', self.doubleSpinBox_x_min.value())
@@ -447,6 +515,36 @@ class SPMController(QWidget):
             self.anc_controller = None
             self.label_error_approach.setText("🚫 Error: ANC300 hardware not detected!")
 
+    def reconnect_lockin(self):
+        try:
+            self.lockin_top = SR830(9)
+            self.label_error_lockin_top.setText("")
+            self.initialize_lockin_top()
+        except:
+            self.lockin_top = None
+            self.label_error_lockin_top.setText("🚫 SR830 (Top) hardware not detected!")
+
+        try:
+            self.lockin_bottom = SR830(8)
+            self.label_error_lockin_bottom.setText("")
+            self.initialize_lockin_bottom()
+        except:
+            self.lockin_bottom = None
+            self.label_error_lockin_bottom.setText("🚫 SR830 (Bottom) hardware not detected!")
+    def initialize_lockin_top(self):
+        self.lockin_top.set_reference_source(self.spinBox_lockin_top_reference.value())
+        self.lockin_top.set_frequency(self.doubleSpinBox_lockin_top_reference_internal_frequency.value())
+        self.lockin_top.set_time_constant(self.spinBox_lockin_top_time_constant.value())
+        self.lockin_top.set_display(1, self.spinBox_lockin_top_display.value())
+        self.lockin_top.set_output(1, self.spinBox_lockin_top_output_mode.value())
+
+    def initialize_lockin_bottom(self):
+        self.lockin_bottom.set_reference_source(self.spinBox_lockin_bottom_reference.value())
+        self.lockin_bottom.set_frequency(self.doubleSpinBox_lockin_bottom_reference_internal_frequency.value())
+        self.lockin_bottom.set_time_constant(self.spinBox_lockin_bottom_time_constant.value())
+        self.lockin_bottom.set_display(1, self.spinBox_lockin_bottom_display.value())
+        self.lockin_bottom.set_output(1, self.spinBox_lockin_bottom_output_mode.value())
+
     def move_positioner_toggle(self):
         if self.positioner_moving:
             self.anc_controller.stop(4)
@@ -456,8 +554,12 @@ class SPMController(QWidget):
             self.pushButton_positioner_move.setText("Move")
             self.positioner_moving = False
         else:
+            self.pushButton_positioner_move.setDisabled(True)
+            self.repaint()
             self.checkBox_positioner_up.setDisabled(True)
             self.checkBox_positioner_down.setDisabled(True)
+            self.pushButton_positioner_move.setText("Stop")
+            self.positioner_moving = True
             try:
                 if self.checkBox_positioner_up.isChecked():
                     self.anc_controller.stepu(4, 'c')
@@ -466,8 +568,15 @@ class SPMController(QWidget):
                 self.label_positioner_running.setText("Moving...")
             except:
                 self.label_positioner_running.setText("🚫 Error: Positioner Off")
-            self.pushButton_positioner_move.setText("Stop")
-            self.positioner_moving = True
+                self.checkBox_positioner_up.setDisabled(False)
+                self.checkBox_positioner_down.setDisabled(False)
+                self.pushButton_positioner_move.setText("Move")
+                self.positioner_moving = False
+            self.pushButton_positioner_move.setDisabled(False)
+
+
+
+
 '''
 TODO: load current position based on values
 import nidaqmx
@@ -475,11 +584,6 @@ with nidaqmx.Task() as task:
     task.ao_channels.add_ao_voltage_chan("NIdevice/ao3")
     task.write(0.)
 '''
-
-
-
-
-
 
 if __name__ == "__main__":
     app = QApplication([])

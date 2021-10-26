@@ -2,6 +2,8 @@
 Created by Xuejian Ma at 10/2/2021.
 All rights reserved.
 """
+from pyqtgraph import mkPen
+
 from pyparktiff import SaveParkTiff
 from time import sleep
 from PyQt5.QtCore import QObject, pyqtSignal, QThread
@@ -257,6 +259,25 @@ class Map(QObject):
         self.move.finished.connect(lambda: self.parent.on_off_button_list_turn_on(without_pushButton_scan=True))
         self.move.move()
 
+
+class ApproachDisplay(QObject):
+    finished = pyqtSignal()
+    def __init__(self, parent):
+        super(ApproachDisplay, self).__init__()
+        self.max_count = 300
+        self.parent = parent
+    def run(self):
+        while self.parent.display_approach_on:
+            sleep(0.05)
+            ch1, ch2 = self.parent.get_voltage_ch1_ch2()
+            # print(ch1, ch2)
+            if len(self.parent.display_list_ch1) == self.max_count:
+                self.parent.display_list_ch1.pop(0)
+                self.parent.display_list_ch2.pop(0)
+            self.parent.display_list_ch1.append(ch1)
+            self.parent.display_list_ch2.append(ch2)
+            self.parent.update_display_approach_signal.emit()
+        self.finished.emit()
 
 def distance(p_A, p_B):
     return np.sqrt((p_A[0] - p_B[0]) ** 2 + (p_A[1] - p_B[1]) ** 2)

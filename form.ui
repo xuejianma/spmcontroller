@@ -344,8 +344,8 @@
     <widget class="QGroupBox" name="groupBox_positioner">
      <property name="geometry">
       <rect>
-       <x>503</x>
-       <y>570</y>
+       <x>500</x>
+       <y>540</y>
        <width>221</width>
        <height>281</height>
       </rect>
@@ -520,8 +520,8 @@
     <widget class="PlotWidget" name="widget_linescan_approach_ch1" native="true">
      <property name="geometry">
       <rect>
-       <x>33</x>
-       <y>230</y>
+       <x>30</x>
+       <y>200</y>
        <width>1001</width>
        <height>141</height>
       </rect>
@@ -533,8 +533,8 @@
     <widget class="QLabel" name="label_approach_ch1">
      <property name="geometry">
       <rect>
-       <x>33</x>
-       <y>210</y>
+       <x>30</x>
+       <y>180</y>
        <width>71</width>
        <height>16</height>
       </rect>
@@ -546,8 +546,8 @@
     <widget class="QLabel" name="label_approach_ch2">
      <property name="geometry">
       <rect>
-       <x>33</x>
-       <y>380</y>
+       <x>30</x>
+       <y>350</y>
        <width>71</width>
        <height>16</height>
       </rect>
@@ -559,8 +559,8 @@
     <widget class="PlotWidget" name="widget_linescan_approach_ch2" native="true">
      <property name="geometry">
       <rect>
-       <x>33</x>
-       <y>400</y>
+       <x>30</x>
+       <y>370</y>
        <width>1001</width>
        <height>141</height>
       </rect>
@@ -569,11 +569,11 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_approach_monitor_start">
+    <widget class="QPushButton" name="pushButton_approach_monitor">
      <property name="geometry">
       <rect>
-       <x>213</x>
-       <y>160</y>
+       <x>420</x>
+       <y>130</y>
        <width>251</width>
        <height>51</height>
       </rect>
@@ -582,24 +582,11 @@
       <string>START  Display Channel 1 and Channel 2</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_approach_monitor_stop">
-     <property name="geometry">
-      <rect>
-       <x>513</x>
-       <y>160</y>
-       <width>251</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>STOP Display Channel 1 and Channel 2</string>
-     </property>
-    </widget>
     <widget class="QGroupBox" name="groupBox_approach_auto">
      <property name="geometry">
       <rect>
-       <x>773</x>
-       <y>560</y>
+       <x>770</x>
+       <y>530</y>
        <width>231</width>
        <height>321</height>
       </rect>
@@ -773,10 +760,10 @@
     <widget class="QGroupBox" name="groupBox_lockin">
      <property name="geometry">
       <rect>
-       <x>43</x>
-       <y>590</y>
+       <x>40</x>
+       <y>550</y>
        <width>251</width>
-       <height>311</height>
+       <height>361</height>
       </rect>
      </property>
      <property name="title">
@@ -833,10 +820,16 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
       <property name="maximum">
        <number>1</number>
       </property>
       <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
        <number>1</number>
       </property>
      </widget>
@@ -858,9 +851,18 @@
        <rect>
         <x>160</x>
         <y>70</y>
-        <width>61</width>
+        <width>81</width>
         <height>22</height>
        </rect>
+      </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="maximum">
+       <double>9999999999999999634067965630886574211027143225273567793680363843427086501542887424.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>400.000000000000000</double>
       </property>
      </widget>
      <widget class="QSpinBox" name="spinBox_lockin_top_time_constant">
@@ -872,11 +874,17 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
       <property name="maximum">
        <number>19</number>
       </property>
       <property name="singleStep">
        <number>1</number>
+      </property>
+      <property name="value">
+       <number>7</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_lockin_top_time_constant">
@@ -904,10 +912,16 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
       <property name="maximum">
        <number>4</number>
       </property>
       <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
        <number>1</number>
       </property>
      </widget>
@@ -955,6 +969,9 @@
       <property name="toolTip">
        <string/>
       </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
       <property name="maximum">
        <number>1</number>
       </property>
@@ -988,12 +1005,196 @@
        <string/>
       </property>
      </widget>
+     <widget class="QLabel" name="label_lockin_bottom_display">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>300</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0:  X&lt;br/&gt;1:  R&lt;br/&gt;2:  X Noise&lt;br/&gt;3:  Aux In 1&lt;br/&gt;4:  Aux In 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>X Display (?):</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_lockin_bottom_output_mode">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>330</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0:  CH1 Display&lt;br/&gt;1:  X&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>X Output Mode (?):</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_lockin_bottom_output_mode">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>330</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="maximum">
+       <number>1</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_lockin_bottom_time_constant">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>270</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="maximum">
+       <number>19</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>7</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_lockin_bottom_reference">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>210</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="maximum">
+       <number>1</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_lockin_bottom_time_constant">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>270</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0: 10 µs&lt;br/&gt;1: 30 µs&lt;br/&gt;2: 100 µs&lt;br/&gt;3: 300 µs&lt;br/&gt;4: 1 ms&lt;br/&gt;5: 3 ms&lt;br/&gt;6: 10 ms&lt;br/&gt;7: 30 ms&lt;br/&gt;8: 100 ms&lt;br/&gt;9: 300 ms&lt;br/&gt;10: 1 s&lt;br/&gt;11: 3 s&lt;br/&gt;12: 10 s&lt;br/&gt;13: 30 s&lt;br/&gt;14: 100 s&lt;br/&gt;15: 300 s&lt;br/&gt;16: 1 ks&lt;br/&gt;17: 3 ks&lt;br/&gt;18: 10 ks&lt;br/&gt;19: 30 ks&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Time Constant (?):</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="doubleSpinBox_lockin_bottom_reference_internal_frequency">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>240</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="maximum">
+       <double>9999999999999999634067965630886574211027143225273567793680363843427086501542887424.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>400.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_lockin_bottom_display">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>300</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="maximum">
+       <number>4</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_lockin_bottom_reference">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>210</y>
+        <width>111</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0: External&lt;br/&gt;1: Internal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reference Source (?):&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_lockin_bottom_reference_internal_frequency">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>240</y>
+        <width>111</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Internal Frequency (Hz):</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QPushButton" name="pushButton_reconnect_lockin">
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>560</y>
+       <y>520</y>
        <width>151</width>
        <height>32</height>
       </rect>
