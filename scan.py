@@ -264,11 +264,11 @@ class ApproachDisplay(QObject):
     finished = pyqtSignal()
     def __init__(self, parent):
         super(ApproachDisplay, self).__init__()
-        self.max_count = 300
+        self.max_count = 600
         self.parent = parent
     def run(self):
         while self.parent.display_approach_on:
-            sleep(0.05)
+            sleep(0.1)
             ch1, ch2 = self.parent.get_voltage_ch1_ch2()
             # print(ch1, ch2)
             if len(self.parent.display_list_ch1) == self.max_count:
