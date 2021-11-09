@@ -12,11 +12,11 @@ from pyqtgraph import mkPen
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLabel, QVBoxLayout, QSizePolicy
 from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings
-from scan import Scan, MoveToTarget, Map, ApproachDisplay
+from scan import Scan, MoveToTarget, Map, ApproachDisplay, MoveToTargetZ, AutoApproach
 from plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
 from anc300 import ANC300
 from sr830 import SR830
-from hardware import OutputVoltage, InputVoltage
+from hardware import OutputVoltage, InputVoltage, InputVoltageEncoder
 from os.path import isdir
 from pyvisa import ResourceManager
 import numpy as np
@@ -44,17 +44,19 @@ class SPMController(QWidget):
         self.channel_choose = 1  # 1 or 2
         self.scan_on_boolean = False
         self.map_on_boolean = False
+        self.auto_approach_on_boolean = False
         self.map_trace = {'XX': [], 'YY': [], 'ch1': [], 'ch2': []}
         self.map_retrace = {'XX': [], 'YY': [], 'ch1': [], 'ch2': []}
         self.colorbar_manual_main = False
         self.colorbar_manual_ch1 = False
         self.colorbar_manual_ch2 = False
         self.load_ui()
+        self.preload()
         self.reconnect_anc300()
         self.reconnect_lockin()
 
         # self.list_resources()
-        self.preload()
+
         self.initialize_formats()
         self.determine_scan_window()
         self.connect_all()
@@ -75,11 +77,14 @@ class SPMController(QWidget):
                                    ]
         self.line_trace = {'X': [], 'ch1': [], 'ch2': []}
         self.line_retrace = {'X': [], 'ch1': [], 'ch2': []}
-
-        self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
-        self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
-        self.output_voltage_z = OutputVoltage(port='z', label_error=self.label_error)
-        self.input_voltage_ch1_ch2 = InputVoltage(label_error=self.label_error)
+        self.hardware_io()
+        # self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
+        # self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
+        # self.output_voltage_z = OutputVoltage(port='z', label_error=self.label_error)
+        # self.input_voltage_ch1_ch2 = InputVoltage(label_error=self.label_error)
+        #
+        # self.output_voltage_encoder = OutputVoltage(port='encoder', label_error=self.label_error)
+        # self.input_voltage_encoder = InputVoltageEncoder(label_error=self.label_error)
         # self.input_voltage_ch1 = InputVoltage(port='ch1', label_error=self.label_error)
         # self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
 
@@ -87,18 +92,19 @@ class SPMController(QWidget):
 
 
     def hardware_io(self):
-        self.output_voltage_x.close()
-        self.output_voltage_y.close()
-        self.output_voltage_z.close()
-        # self.input_voltage_ch1.close()
-        # self.input_voltage_ch2.close()
-        self.input_voltage_ch1_ch2.close()
+        try:
+            self.output_voltage_x.close()
+            self.output_voltage_y.close()
+            self.output_voltage_z.close()
+            self.input_voltage_ch1_ch2.close()
+        except:
+            pass
         self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
         self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
-        self.output_voltage_z = OutputVoltage(port='x', label_error=self.label_error)
-        # self.input_voltage_ch1 = InputVoltage(port='ch1', label_error=self.label_error)
-        # self.input_voltage_ch2 = InputVoltage(port='ch2', label_error=self.label_error)
+        self.output_voltage_z = OutputVoltage(port='z', label_error=self.label_error)
         self.input_voltage_ch1_ch2 = InputVoltage(label_error=self.label_error)
+        self.output_voltage_encoder = OutputVoltage(port='encoder', label_error=self.label_error, ratio = 1000)
+        # self.input_voltage_encoder = InputVoltageEncoder(label_error=self.label_error)
 
 
     def load_ui(self):
@@ -278,6 +284,18 @@ class SPMController(QWidget):
         self.pushButton_approach_monitor.clicked.connect(self.toggle_display_approach_button)
 
         self.update_display_approach_signal.connect(self.update_display_approach)
+        self.doubleSpinBox_encoder.valueChanged.connect(
+            lambda: self.output_voltage_encoder.outputVoltage(self.doubleSpinBox_encoder.value()))
+
+        self.checkBox_encoder_reading.stateChanged.connect(self.real_time_encoder)
+
+        self.pushButton_z_goto.clicked.connect(
+            lambda: self.goto_position_z(self.doubleSpinBox_z_goto.value()))
+        self.pushButton_z_goto0.clicked.connect(
+            lambda: self.goto_position_z(0.0))
+
+        self.pushButton_approach_auto_start.clicked.connect(self.toggle_auto_approach_button)
+
 
     def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
         plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max)
@@ -351,6 +369,15 @@ class SPMController(QWidget):
             self.start_display_approach()
 
 
+    def toggle_auto_approach_button(self):
+        if self.auto_approach_on_boolean:
+            self.auto_approach_on_boolean = not self.auto_approach_on_boolean
+            self.pushButton_approach_auto_start.setText("START Auto Approach")
+        else:
+            self.auto_approach_on_boolean = not self.auto_approach_on_boolean
+            self.pushButton_approach_auto_start.setText("STOP Auto Approach")
+            self.auto_approach()
+
     def update_voltage_maintenance(self):
         self.curr_coords[0] = self.doubleSpinBox_current_x.value()
         self.curr_coords[1] = self.doubleSpinBox_current_y.value()
@@ -411,6 +438,22 @@ class SPMController(QWidget):
         # return self.input_voltage_ch1.getVoltage(), self.input_voltage_ch2.getVoltage()
         return self.input_voltage_ch1_ch2.getVoltage()
 
+    def real_time_encoder(self):
+        if self.checkBox_encoder_reading.isChecked():
+            self.thread_encoder = QThread()
+            self.input_voltage_encoder = InputVoltageEncoder(
+                label_error=self.label_error, lcdNumber_encoder_reading = self.lcdNumber_encoder_reading,
+                checkBox_encoder_reading = self.checkBox_encoder_reading)
+            self.input_voltage_encoder.moveToThread(self.thread_encoder)
+            self.thread_encoder.started.connect(self.input_voltage_encoder.run)
+            # self.input_voltage_encoder.update.connect(
+            #     lambda: self.lcdNumber_encoder_reading.display(self.input_voltage_encoder.curr_value))
+            self.input_voltage_encoder.finished.connect(self.input_voltage_encoder.deleteLater)
+            self.input_voltage_encoder.finished.connect(self.thread_encoder.exit)
+            self.thread_encoder.finished.connect(self.thread_encoder.deleteLater)
+            self.thread_encoder.start()
+
+
     def update_line_graph(self):
         self.widget_linescan_ch1.clear()
         self.widget_linescan_ch2.clear()
@@ -438,6 +481,37 @@ class SPMController(QWidget):
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
+    def goto_position_z(self, target, auto_approach = False, parent_finished_signal = None,
+                        parent_finishedAfterApproach_signal = None):
+        self.thread = QThread()
+        self.move = MoveToTargetZ(self, target, auto_approach, parent_finished_signal, parent_finishedAfterApproach_signal)
+        self.move.moveToThread(self.thread)
+        self.thread.started.connect(self.move.move)
+        self.move.started.connect(lambda: self.pushButton_z_goto.setDisabled(True))
+        self.move.started.connect(lambda: self.pushButton_z_goto0.setDisabled(True))
+        self.move.started.connect(lambda: self.doubleSpinBox_z.setDisabled(True))
+        self.move.started.connect(lambda: self.doubleSpinBox_z_goto.setDisabled(True))
+        self.move.finished.connect(lambda: self.pushButton_z_goto.setEnabled(True))
+        self.move.finished.connect(lambda: self.pushButton_z_goto0.setEnabled(True))
+        self.move.finished.connect(lambda: self.doubleSpinBox_z.setEnabled(True))
+        self.move.finished.connect(lambda: self.doubleSpinBox_z_goto.setEnabled(True))
+        self.move.finished.connect(self.move.deleteLater)
+        self.move.finished.connect(self.thread.exit)
+        self.thread.finished.connect(self.thread.deleteLater)
+        self.thread.start()
+
+    def auto_approach(self):
+        self.thread_approach = QThread()
+        self.approach_auto = AutoApproach(self)
+        self.approach_auto.moveToThread(self.thread_approach)
+        self.thread_approach.started.connect(self.approach_auto.move)
+        self.approach_auto.finished.connect(self.approach_auto.deleteLater)
+        self.approach_auto.finished.connect(self.thread_approach.exit)
+        self.approach_auto.finishedAfterApproach.connect(self.toggle_auto_approach_button)
+        self.thread_approach.finished.connect(self.thread_approach.deleteLater)
+        self.thread_approach.start()
+
+
     def on_off_button_list_turn_on(self, without_pushButton_image=False, without_pushButton_scan=False):
         for w in self.on_off_button_list:
             if (without_pushButton_image and w == self.pushButton_image) or (
@@ -464,27 +538,51 @@ class SPMController(QWidget):
         self.lineEdit_directory.setText(directoryName)
 
     def preload(self):
+        self.approach_attributes_int = {
+            'spinBox_lockin_top_reference': self.spinBox_lockin_top_reference,
+            'spinBox_lockin_top_time_constant': self.spinBox_lockin_top_time_constant,
+            'spinBox_lockin_top_display': self.spinBox_lockin_top_display,
+            'spinBox_lockin_top_output_mode': self.spinBox_lockin_top_output_mode,
+            'spinBox_lockin_bottom_reference': self.spinBox_lockin_bottom_reference,
+            'spinBox_lockin_bottom_time_constant': self.spinBox_lockin_bottom_time_constant,
+            'spinBox_lockin_bottom_display': self.spinBox_lockin_bottom_display,
+            'spinBox_lockin_bottom_output_mode': self.spinBox_lockin_bottom_output_mode,
+            'spinBox_positioner_frequency': self.spinBox_positioner_frequency,
+        }
+        self.approach_attributes_float = {
+            'doubleSpinBox_lockin_top_reference_internal_frequency': self.doubleSpinBox_lockin_top_reference_internal_frequency,
+            'doubleSpinBox_lockin_bottom_reference_internal_frequency': self.doubleSpinBox_lockin_bottom_reference_internal_frequency,
+            'doubleSpinBox_positioner_amplitude': self.doubleSpinBox_positioner_amplitude,
+            'doubleSpinBox_positioner_time_per_turn': self.doubleSpinBox_positioner_time_per_turn,
+            'doubleSpinBox_scanner_voltage_per_turn': self.doubleSpinBox_scanner_voltage_per_turn,
+            'doubleSpinBox_approach_scanner_speed': self.doubleSpinBox_approach_scanner_speed,
+        }
         self.settings = QSettings('SPMController', 'App1')
-        try:
-            self.doubleSpinBox_x_min.setValue(float(self.settings.value('doubleSpinBox_x_min')))
-            self.doubleSpinBox_x_max.setValue(float(self.settings.value('doubleSpinBox_x_max')))
-            self.doubleSpinBox_y_min.setValue(float(self.settings.value('doubleSpinBox_y_min')))
-            self.doubleSpinBox_y_max.setValue(float(self.settings.value('doubleSpinBox_y_max')))
-            self.spinBox_x_pixels.setValue(self.settings.value('spinBox_x_pixels'))
-            self.spinBox_y_pixels.setValue(self.settings.value('spinBox_y_pixels'))
-            self.doubleSpinBox_frequency.setValue(float(self.settings.value('doubleSpinBox_frequency')))
-            self.doubleSpinBox_rotation.setValue(float(self.settings.value('doubleSpinBox_rotation')))
-            self.lineEdit_directory.setText(self.settings.value('lineEdit_directory'))
-            self.lineEdit_filename_trace_ch1.setText(self.settings.value('lineEdit_filename_trace_ch1'))
-            self.lineEdit_filename_retrace_ch1.setText(self.settings.value('lineEdit_filename_retrace_ch1'))
-            self.lineEdit_filename_trace_ch2.setText(self.settings.value('lineEdit_filename_trace_ch2'))
-            self.lineEdit_filename_retrace_ch2.setText(self.settings.value('lineEdit_filename_retrace_ch2'))
-            self.doubleSpinBox_piezo_limit_x.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_x')))
-            self.doubleSpinBox_piezo_limit_y.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_y')))
-        except:
-            pass
+        # try:
+        self.doubleSpinBox_x_min.setValue(float(self.settings.value('doubleSpinBox_x_min')))
+        self.doubleSpinBox_x_max.setValue(float(self.settings.value('doubleSpinBox_x_max')))
+        self.doubleSpinBox_y_min.setValue(float(self.settings.value('doubleSpinBox_y_min')))
+        self.doubleSpinBox_y_max.setValue(float(self.settings.value('doubleSpinBox_y_max')))
+        self.spinBox_x_pixels.setValue(self.settings.value('spinBox_x_pixels'))
+        self.spinBox_y_pixels.setValue(self.settings.value('spinBox_y_pixels'))
+        self.doubleSpinBox_frequency.setValue(float(self.settings.value('doubleSpinBox_frequency')))
+        self.doubleSpinBox_rotation.setValue(float(self.settings.value('doubleSpinBox_rotation')))
+        self.lineEdit_directory.setText(self.settings.value('lineEdit_directory'))
+        self.lineEdit_filename_trace_ch1.setText(self.settings.value('lineEdit_filename_trace_ch1'))
+        self.lineEdit_filename_retrace_ch1.setText(self.settings.value('lineEdit_filename_retrace_ch1'))
+        self.lineEdit_filename_trace_ch2.setText(self.settings.value('lineEdit_filename_trace_ch2'))
+        self.lineEdit_filename_retrace_ch2.setText(self.settings.value('lineEdit_filename_retrace_ch2'))
+        self.doubleSpinBox_piezo_limit_x.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_x')))
+        self.doubleSpinBox_piezo_limit_y.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_y')))
+        for key in self.approach_attributes_float:
+            self.approach_attributes_float[key].setValue(float(self.settings.value(key)))
+        for key in self.approach_attributes_int:
+            self.approach_attributes_int[key].setValue(self.settings.value(key))
+        # except:
+        #     print("preload error ignored")
 
     def closeEvent(self, event):
+
         self.settings.setValue('doubleSpinBox_x_min', self.doubleSpinBox_x_min.value())
         self.settings.setValue('doubleSpinBox_x_max', self.doubleSpinBox_x_max.value())
         self.settings.setValue('doubleSpinBox_y_min', self.doubleSpinBox_y_min.value())
@@ -500,12 +598,18 @@ class SPMController(QWidget):
         self.settings.setValue('lineEdit_filename_retrace_ch2', self.lineEdit_filename_retrace_ch2.text())
         self.settings.setValue('doubleSpinBox_piezo_limit_x', self.doubleSpinBox_piezo_limit_x.value())
         self.settings.setValue('doubleSpinBox_piezo_limit_y', self.doubleSpinBox_piezo_limit_y.value())
+        for key in self.approach_attributes_float:
+            self.settings.setValue(key, self.approach_attributes_float[key].value())
+        for key in self.approach_attributes_int:
+            self.settings.setValue(key, self.approach_attributes_int[key].value())
+
         self.output_voltage_x.close()
         self.output_voltage_y.close()
         self.output_voltage_z.close()
-        # self.input_voltage_ch1.close()
-        # self.input_voltage_ch2.close()
         self.input_voltage_ch1_ch2.close()
+        self.output_voltage_encoder.outputVoltage(0.0)
+        self.output_voltage_encoder.close()
+        # self.input_voltage_encoder.close()
 
     def reconnect_anc300(self):
         try:

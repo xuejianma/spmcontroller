@@ -329,6 +329,51 @@ class MoveToTarget(QObject):
         self.finished.emit()
 
 
+class MoveToTargetZ(QObject):
+    started = pyqtSignal()
+    finished = pyqtSignal()
+    def __init__(self, parent, target, auto_approach = False, parent_finished_signal = None,
+                 parent_finishedAfterApproach_signal = None):
+        super(MoveToTargetZ, self).__init__()
+        self.target = target
+        self.parent = parent
+        self.auto_approach = auto_approach
+        self.parent_finished_signal = parent_finished_signal
+        self.parent_finishedAfterApproach_signal = parent_finishedAfterApproach_signal
+        self.delta = 0.1 if self.target >= self.parent.curr_coord_z else -0.1
+        self.array = np.round(np.arange(self.parent.curr_coord_z, self.target + self.delta, self.delta), 6)
+    def move(self):
+        self.started.emit()
+        for val in self.array:
+            if self.auto_approach and not self.parent.auto_approach_on_boolean:
+                break
+            # print(val)
+            self.parent.curr_coord_z = val
+            self.parent.doubleSpinBox_z.setValue(self.parent.curr_coord_z)
+            self.parent.output_voltage_z_direction()
+            time.sleep(0.05)
+        if self.parent_finished_signal is not None:
+            self.parent_finished_signal.emit()
+        if self.parent_finished_signal is not None and self.parent.auto_approach_on_boolean:
+            self.parent_finishedAfterApproach_signal.emit()
+        self.finished.emit()
+
+
+class AutoApproach(QObject):
+    finished = pyqtSignal()
+    finishedAfterApproach = pyqtSignal()
+    def __init__(self, parent):
+        super(AutoApproach, self).__init__()
+        self.parent = parent
+
+    def move(self):
+        # print("auto start")
+        self.parent.goto_position_z(
+            self.parent.doubleSpinBox_scanner_voltage_per_turn.value(),
+            auto_approach = True, parent_finished_signal = self.finished,
+            parent_finishedAfterApproach_signal = self.finishedAfterApproach)
+
+
 class SaveTiffFile(QObject):
     finished = pyqtSignal()
     def __init__(self, data, xmax, ymax, filename, directory):
@@ -345,3 +390,5 @@ class SaveTiffFile(QObject):
         np.savetxt(self.directory + '/' + self.filename + ".txt", self.data)
         self.finished.emit()
         print('save done')
+
+
