@@ -333,7 +333,7 @@ class MoveToTargetZ(QObject):
     started = pyqtSignal()
     finished = pyqtSignal()
     def __init__(self, parent, target, auto_approach = False, parent_finished_signal = None,
-                 parent_finishedAfterApproach_signal = None):
+                 parent_finishedAfterApproach_signal = None, auto_approach_obj = None):
         super(MoveToTargetZ, self).__init__()
         self.target = target
         self.parent = parent
@@ -342,9 +342,12 @@ class MoveToTargetZ(QObject):
         self.parent_finishedAfterApproach_signal = parent_finishedAfterApproach_signal
         self.delta = 0.1 if self.target >= self.parent.curr_coord_z else -0.1
         self.array = np.round(np.arange(self.parent.curr_coord_z, self.target + self.delta, self.delta), 6)
+        self.auto_approach_obj = auto_approach_obj
     def move(self):
         self.started.emit()
         for val in self.array:
+            if self.auto_approach_obj is not None:
+                self.auto_approach_obj.check_approached()
             if self.auto_approach and not self.parent.auto_approach_on_boolean:
                 break
             # print(val)
@@ -352,10 +355,11 @@ class MoveToTargetZ(QObject):
             self.parent.doubleSpinBox_z.setValue(self.parent.curr_coord_z)
             self.parent.output_voltage_z_direction()
             time.sleep(0.05)
-        if self.parent_finished_signal is not None:
-            self.parent_finished_signal.emit()
-        if self.parent_finished_signal is not None and self.parent.auto_approach_on_boolean:
-            self.parent_finishedAfterApproach_signal.emit()
+        # if self.parent_finished_signal is not None:
+        #     self.parent_finished_signal.emit()
+        # if self.parent_finished_signal is not None and self.parent.auto_approach_on_boolean:
+        #     self.parent_finishedAfterApproach_signal.emit()
+
         self.finished.emit()
 
 
@@ -365,13 +369,80 @@ class AutoApproach(QObject):
     def __init__(self, parent):
         super(AutoApproach, self).__init__()
         self.parent = parent
+        self.store_ch1 = []
+        self.store_ch2 = []
+        self.average = 0.0
+        self.threshold = 0.5
+        self.counts = 10
 
     def move(self):
         # print("auto start")
-        self.parent.goto_position_z(
-            self.parent.doubleSpinBox_scanner_voltage_per_turn.value(),
-            auto_approach = True, parent_finished_signal = self.finished,
-            parent_finishedAfterApproach_signal = self.finishedAfterApproach)
+        if not self.parent.display_approach_on:
+            self.parent.toggle_display_approach_button()
+
+        self.parent.goto_position_z_buttons_off()
+        self.parent.pushButton_approach_monitor.setDisabled(True)
+        while self.parent.auto_approach_on_boolean:
+            #scanner z moving up
+            self.move = MoveToTargetZ(self.parent, self.parent.doubleSpinBox_scanner_voltage_per_turn.value(),
+                                      auto_approach = True, parent_finished_signal = self.finished,
+                                      parent_finishedAfterApproach_signal = self.finishedAfterApproach,
+                                      auto_approach_obj = self)
+            # self.finishedAfterApproach.connect(self.parent.toggle_auto_approach_button)
+            self.move.move()
+            #scanner z moving down
+            if not self.parent.auto_approach_on_boolean:
+                break
+            self.move = MoveToTargetZ(self.parent, 0.0,
+                                      auto_approach=True, parent_finished_signal=self.finished,
+                                      parent_finishedAfterApproach_signal=self.finishedAfterApproach)
+            # self.finishedAfterApproach.connect(self.parent.toggle_auto_approach_button)
+            self.move.move()
+            #positioner z moving up
+            if not self.parent.auto_approach_on_boolean:
+                break
+            self.parent.checkBox_positioner_up.setChecked(True)
+            self.parent.move_positioner_toggle()
+            if not self.parent.auto_approach_on_boolean:
+                break
+            time.sleep(self.parent.doubleSpinBox_positioner_time_per_turn.value())
+            self.parent.move_positioner_toggle()
+            # positioner z moving down
+            if not self.parent.auto_approach_on_boolean:
+                break
+            self.parent.checkBox_positioner_down.setChecked(True)
+            self.parent.move_positioner_toggle()
+            if not self.parent.auto_approach_on_boolean:
+                break
+            time.sleep(self.parent.doubleSpinBox_positioner_time_per_turn.value())
+            self.parent.move_positioner_toggle()
+
+
+        self.parent.goto_position_z_buttons_on()
+        if not self.parent.auto_approach_on_boolean:
+            self.parent.auto_approach_on_boolean = True
+            self.parent.toggle_auto_approach_button()
+        self.parent.pushButton_approach_monitor.setEnabled(True)
+        self.finished.emit()
+
+    def check_approached(self):
+        if len(self.parent.display_list_ch1) == 0:
+            return False
+        curr_ch1 = self.parent.display_list_ch1[-1]
+        curr_ch2 = self.parent.display_list_ch2[-1]
+        print(curr_ch1)
+        if len(self.store_ch1) > self.counts:
+            if np.abs((curr_ch1 - self.average_ch1) / self.average_ch1) > self.threshold or \
+                    np.abs((curr_ch2 - self.average_ch2) / self.average_ch2) > self.threshold:
+                self.parent.auto_approach_on_boolean = False
+                return True
+            out_ch1 = self.store_ch1.pop(0)
+            out_ch2 = self.store_ch2.pop(0)
+            self.store_ch1.append(curr_ch1)
+            self.store_ch2.append(curr_ch2)
+            self.average_ch1 = (self.average_ch1 * self.counts - out_ch1 + curr_ch1) / self.counts
+            self.average_ch2 = (self.average_ch2 * self.counts - out_ch2 + curr_ch2) / self.counts
+        return False
 
 
 class SaveTiffFile(QObject):

@@ -372,6 +372,7 @@ class SPMController(QWidget):
     def toggle_auto_approach_button(self):
         if self.auto_approach_on_boolean:
             self.auto_approach_on_boolean = not self.auto_approach_on_boolean
+
             self.pushButton_approach_auto_start.setText("START Auto Approach")
         else:
             self.auto_approach_on_boolean = not self.auto_approach_on_boolean
@@ -481,24 +482,33 @@ class SPMController(QWidget):
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
-    def goto_position_z(self, target, auto_approach = False, parent_finished_signal = None,
-                        parent_finishedAfterApproach_signal = None):
+    def goto_position_z(self, target):
         self.thread = QThread()
-        self.move = MoveToTargetZ(self, target, auto_approach, parent_finished_signal, parent_finishedAfterApproach_signal)
+        self.move = MoveToTargetZ(self, target)
         self.move.moveToThread(self.thread)
         self.thread.started.connect(self.move.move)
-        self.move.started.connect(lambda: self.pushButton_z_goto.setDisabled(True))
-        self.move.started.connect(lambda: self.pushButton_z_goto0.setDisabled(True))
-        self.move.started.connect(lambda: self.doubleSpinBox_z.setDisabled(True))
-        self.move.started.connect(lambda: self.doubleSpinBox_z_goto.setDisabled(True))
-        self.move.finished.connect(lambda: self.pushButton_z_goto.setEnabled(True))
-        self.move.finished.connect(lambda: self.pushButton_z_goto0.setEnabled(True))
-        self.move.finished.connect(lambda: self.doubleSpinBox_z.setEnabled(True))
-        self.move.finished.connect(lambda: self.doubleSpinBox_z_goto.setEnabled(True))
+        self.move.started.connect(self.goto_position_z_buttons_off)
+        self.move.finished.connect(self.goto_position_z_buttons_on)
+
         self.move.finished.connect(self.move.deleteLater)
         self.move.finished.connect(self.thread.exit)
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
+
+    def goto_position_z_buttons_off(self):
+        self.pushButton_z_goto.setDisabled(True)
+        self.pushButton_z_goto0.setDisabled(True)
+        self.doubleSpinBox_z.setDisabled(True)
+        self.doubleSpinBox_z_goto.setDisabled(True)
+        self.pushButton_positioner_move.setDisabled(True)
+
+    def goto_position_z_buttons_on(self):
+        self.pushButton_z_goto.setEnabled(True)
+        self.pushButton_z_goto0.setEnabled(True)
+        self.doubleSpinBox_z.setEnabled(True)
+        self.doubleSpinBox_z_goto.setEnabled(True)
+        self.pushButton_positioner_move.setEnabled(True)
+
 
     def auto_approach(self):
         self.thread_approach = QThread()
@@ -507,7 +517,7 @@ class SPMController(QWidget):
         self.thread_approach.started.connect(self.approach_auto.move)
         self.approach_auto.finished.connect(self.approach_auto.deleteLater)
         self.approach_auto.finished.connect(self.thread_approach.exit)
-        self.approach_auto.finishedAfterApproach.connect(self.toggle_auto_approach_button)
+        # self.approach_auto.finishedAfterApproach.connect(self.toggle_auto_approach_button)
         self.thread_approach.finished.connect(self.thread_approach.deleteLater)
         self.thread_approach.start()
 
@@ -672,6 +682,8 @@ class SPMController(QWidget):
                 self.label_positioner_running.setText("Moving...")
             except:
                 self.label_positioner_running.setText("🚫 Error: Positioner Off")
+                # to stop auto approach when Moving positioner is excuted in AutoApproach module
+                self.auto_approach_on_boolean = False
                 self.checkBox_positioner_up.setDisabled(False)
                 self.checkBox_positioner_down.setDisabled(False)
                 self.pushButton_positioner_move.setText("Move")

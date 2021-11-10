@@ -499,6 +499,9 @@
       <property name="decimals">
        <number>6</number>
       </property>
+      <property name="maximum">
+       <double>60.000000000000000</double>
+      </property>
       <property name="singleStep">
        <double>0.100000000000000</double>
       </property>
@@ -569,6 +572,9 @@
       </property>
       <property name="decimals">
        <number>2</number>
+      </property>
+      <property name="maximum">
+       <double>60.000000000000000</double>
       </property>
       <property name="singleStep">
        <double>0.100000000000000</double>
@@ -700,8 +706,11 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="maximum">
+       <double>60.000000000000000</double>
+      </property>
       <property name="value">
-       <double>45.000000000000000</double>
+       <double>5.000000000000000</double>
       </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_positioner_time_per_turn">
@@ -717,7 +726,7 @@
        <double>0.100000000000000</double>
       </property>
       <property name="value">
-       <double>6.000000000000000</double>
+       <double>5.000000000000000</double>
       </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_approach_scanner_speed">
@@ -2197,6 +2206,9 @@ Recommended: 50</string>
        <height>22</height>
       </rect>
      </property>
+     <property name="maximum">
+      <double>60.000000000000000</double>
+     </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_y_max">
      <property name="geometry">
@@ -2495,6 +2507,9 @@ Recommended: 50</string>
        <width>62</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <double>60.000000000000000</double>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_directory">
