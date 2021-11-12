@@ -2,6 +2,7 @@
 Created by Xuejian Ma at 10/2/2021.
 All rights reserved.
 """
+from PyQt5.QtMultimedia import QSound
 from pyqtgraph import mkPen
 
 from pyparktiff import SaveParkTiff
@@ -347,7 +348,8 @@ class MoveToTargetZ(QObject):
         self.started.emit()
         for val in self.array:
             if self.auto_approach_obj is not None:
-                self.auto_approach_obj.check_approached()
+                if self.auto_approach_obj.check_approached():
+                    self.auto_approach_obj.approached.emit()
             if self.auto_approach and not self.parent.auto_approach_on_boolean:
                 break
             # print(val)
@@ -366,14 +368,18 @@ class MoveToTargetZ(QObject):
 class AutoApproach(QObject):
     finished = pyqtSignal()
     finishedAfterApproach = pyqtSignal()
+    approached = pyqtSignal()
     def __init__(self, parent):
         super(AutoApproach, self).__init__()
         self.parent = parent
         self.store_ch1 = []
         self.store_ch2 = []
-        self.average = 0.0
-        self.threshold = 0.5
+        self.max_placeholder = 1e6
+        self.average_ch1 = self.max_placeholder
+        self.average_ch2 = self.max_placeholder
+        self.threshold = 0.15
         self.counts = 10
+
 
     def move(self):
         # print("auto start")
@@ -383,6 +389,10 @@ class AutoApproach(QObject):
         self.parent.goto_position_z_buttons_off()
         self.parent.pushButton_approach_monitor.setDisabled(True)
         while self.parent.auto_approach_on_boolean:
+            self.store_ch1 = []
+            self.store_ch2 = []
+            self.average_ch1 = self.max_placeholder
+            self.average_ch2 = self.max_placeholder
             #scanner z moving up
             self.move = MoveToTargetZ(self.parent, self.parent.doubleSpinBox_scanner_voltage_per_turn.value(),
                                       auto_approach = True, parent_finished_signal = self.finished,
@@ -391,6 +401,7 @@ class AutoApproach(QObject):
             # self.finishedAfterApproach.connect(self.parent.toggle_auto_approach_button)
             self.move.move()
             #scanner z moving down
+            time.sleep(0.2)
             if not self.parent.auto_approach_on_boolean:
                 break
             self.move = MoveToTargetZ(self.parent, 0.0,
@@ -407,15 +418,16 @@ class AutoApproach(QObject):
                 break
             time.sleep(self.parent.doubleSpinBox_positioner_time_per_turn.value())
             self.parent.move_positioner_toggle()
-            # positioner z moving down
-            if not self.parent.auto_approach_on_boolean:
-                break
-            self.parent.checkBox_positioner_down.setChecked(True)
-            self.parent.move_positioner_toggle()
-            if not self.parent.auto_approach_on_boolean:
-                break
-            time.sleep(self.parent.doubleSpinBox_positioner_time_per_turn.value())
-            self.parent.move_positioner_toggle()
+            time.sleep(0.2)
+            # # positioner z moving down
+            # if not self.parent.auto_approach_on_boolean:
+            #     break
+            # self.parent.checkBox_positioner_down.setChecked(True)
+            # self.parent.move_positioner_toggle()
+            # if not self.parent.auto_approach_on_boolean:
+            #     break
+            # time.sleep(self.parent.doubleSpinBox_positioner_time_per_turn.value())
+            # self.parent.move_positioner_toggle()
 
 
         self.parent.goto_position_z_buttons_on()
@@ -423,15 +435,20 @@ class AutoApproach(QObject):
             self.parent.auto_approach_on_boolean = True
             self.parent.toggle_auto_approach_button()
         self.parent.pushButton_approach_monitor.setEnabled(True)
+
         self.finished.emit()
 
+
     def check_approached(self):
+
         if len(self.parent.display_list_ch1) == 0:
             return False
         curr_ch1 = self.parent.display_list_ch1[-1]
         curr_ch2 = self.parent.display_list_ch2[-1]
-        print(curr_ch1)
-        if len(self.store_ch1) > self.counts:
+
+        # print(self.average_ch1, self.average_ch2, np.abs((curr_ch1 - self.average_ch1) / self.average_ch1), np.abs((curr_ch2 - self.average_ch2) / self.average_ch2))
+        # print(curr_ch1)
+        if len(self.store_ch1) >= self.counts:
             if np.abs((curr_ch1 - self.average_ch1) / self.average_ch1) > self.threshold or \
                     np.abs((curr_ch2 - self.average_ch2) / self.average_ch2) > self.threshold:
                 self.parent.auto_approach_on_boolean = False
@@ -442,6 +459,16 @@ class AutoApproach(QObject):
             self.store_ch2.append(curr_ch2)
             self.average_ch1 = (self.average_ch1 * self.counts - out_ch1 + curr_ch1) / self.counts
             self.average_ch2 = (self.average_ch2 * self.counts - out_ch2 + curr_ch2) / self.counts
+        else:
+            self.store_ch1.append(curr_ch1)
+            self.store_ch2.append(curr_ch2)
+            if self.average_ch1 == self.max_placeholder:
+                self.average_ch1 = curr_ch1
+                self.average_ch2 = curr_ch2
+            else:
+                self.average_ch1 = (self.average_ch1 * (len(self.store_ch1) - 1) + curr_ch1) / len(self.store_ch1)
+                self.average_ch2 = (self.average_ch2 * (len(self.store_ch2) - 1) + curr_ch2) / len(self.store_ch2)
+
         return False
 
 

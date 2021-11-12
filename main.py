@@ -7,6 +7,7 @@ All rights reserved.
 import sys
 import os
 
+from PyQt5.QtMultimedia import QSound
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 from pyqtgraph import mkPen
 from PyQt5 import uic
@@ -78,6 +79,8 @@ class SPMController(QWidget):
         self.line_trace = {'X': [], 'ch1': [], 'ch2': []}
         self.line_retrace = {'X': [], 'ch1': [], 'ch2': []}
         self.hardware_io()
+        self.approached_sound = QSound("57806__guitarguy1985__aircraftalarm.wav")
+
         # self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
         # self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
         # self.output_voltage_z = OutputVoltage(port='z', label_error=self.label_error)
@@ -515,6 +518,7 @@ class SPMController(QWidget):
         self.approach_auto = AutoApproach(self)
         self.approach_auto.moveToThread(self.thread_approach)
         self.thread_approach.started.connect(self.approach_auto.move)
+        self.approach_auto.approached.connect(self.approached_sound.play)
         self.approach_auto.finished.connect(self.approach_auto.deleteLater)
         self.approach_auto.finished.connect(self.thread_approach.exit)
         # self.approach_auto.finishedAfterApproach.connect(self.toggle_auto_approach_button)
