@@ -662,7 +662,7 @@
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>50</y>
+        <y>60</y>
         <width>141</width>
         <height>51</height>
        </rect>
@@ -812,6 +812,44 @@
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Please manually check whether &lt;br/&gt;Positioner is switched to Z before START&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_auto_approach_tracking_ch1">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>120</y>
+        <width>121</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Tracking Channel 1</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">buttonGroup_9</string>
+      </attribute>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_auto_approach_tracking_ch2">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>140</y>
+        <width>121</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Tracking Channel 2</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">buttonGroup_9</string>
+      </attribute>
      </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_lockin">
@@ -2833,5 +2871,6 @@ trace and retrace</string>
   <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_9"/>
  </buttongroups>
 </ui>

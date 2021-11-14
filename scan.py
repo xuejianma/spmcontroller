@@ -449,8 +449,10 @@ class AutoApproach(QObject):
         # print(self.average_ch1, self.average_ch2, np.abs((curr_ch1 - self.average_ch1) / self.average_ch1), np.abs((curr_ch2 - self.average_ch2) / self.average_ch2))
         # print(curr_ch1)
         if len(self.store_ch1) >= self.counts:
-            if np.abs((curr_ch1 - self.average_ch1) / self.average_ch1) > self.threshold or \
-                    np.abs((curr_ch2 - self.average_ch2) / self.average_ch2) > self.threshold:
+            if (self.parent.checkBox_auto_approach_tracking_ch1.isChecked() and
+                np.abs((curr_ch1 - self.average_ch1) / self.average_ch1) > self.threshold) or \
+                (self.parent.checkBox_auto_approach_tracking_ch2.isChecked() and
+                 np.abs((curr_ch2 - self.average_ch2) / self.average_ch2) > self.threshold):
                 self.parent.auto_approach_on_boolean = False
                 return True
             out_ch1 = self.store_ch1.pop(0)

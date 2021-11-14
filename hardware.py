@@ -1,6 +1,6 @@
 import nidaqmx
 from PyQt5.QtCore import QObject, pyqtSignal
-from nidaqmx.stream_readers import AnalogMultiChannelReader
+from nidaqmx.stream_readers import AnalogMultiChannelReader, AnalogSingleChannelReader
 import time
 
 
@@ -29,6 +29,8 @@ class OutputVoltage:
 class InputVoltage:
     def __init__(self, label_error):
         self.label_error = label_error
+        self.pre_ch1 = 0.0
+        self.pre_ch2 = 0.0
         try:
             self.ports = {'ch1': "NIdevice/ai1", 'ch2': "NIdevice/ai2", 'encoder' : "NIdevice/ai3"}
             self.task = nidaqmx.Task()
@@ -40,7 +42,9 @@ class InputVoltage:
     def getVoltage(self):
         try:
             # t1 = time.time()
-            return self.task.read()
+            vals = self.task.read()
+            self.pre_ch1, self.pre_ch2 = vals
+            return vals
             # print(time.time() - t1)
             # return val
             # return 0
@@ -48,7 +52,8 @@ class InputVoltage:
             # return self.reader.read_one_sample()
         except:
             self.label_error.setText(label_error_text)
-            return 0.0
+            print("Missing data point due to conflict of ch1_ch2 and encoder reading at the same time.")
+            return [self.pre_ch1, self.pre_ch2]
     def close(self):
         try:
             self.task.close()
@@ -69,7 +74,7 @@ class InputVoltageEncoder(QObject):
             self.ports = {'encoder' : "NIdevice/ai3"}
             self.task = nidaqmx.Task()
             self.task.ai_channels.add_ai_voltage_chan(self.ports['encoder'])
-            self.reader = AnalogMultiChannelReader(self.task.in_stream)
+            self.reader = AnalogSingleChannelReader(self.task.in_stream)
         except:
             self.label_error.setText(label_error_text)
     def getVoltage(self):
