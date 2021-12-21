@@ -19,7 +19,8 @@ from anc300 import ANC300
 from sr830 import SR830
 from hardware import OutputVoltage, InputVoltage, InputVoltageEncoder
 from os.path import isdir
-from pyvisa import ResourceManager
+# from pyvisa import ResourceManager
+from planefit import PlaneFit
 import numpy as np
 
 
@@ -60,6 +61,17 @@ class SPMController(QWidget):
 
         self.initialize_formats()
         self.determine_scan_window()
+        self.plane_fit_list = [
+            [self.doubleSpinBox_plane_fit_x, self.doubleSpinBox_plane_fit_x_2, self.doubleSpinBox_plane_fit_x_3,
+             self.doubleSpinBox_plane_fit_x_4, self.doubleSpinBox_plane_fit_x_5],
+            [self.doubleSpinBox_plane_fit_y, self.doubleSpinBox_plane_fit_y_2, self.doubleSpinBox_plane_fit_y_3,
+             self.doubleSpinBox_plane_fit_y_4, self.doubleSpinBox_plane_fit_y_5],
+            [self.doubleSpinBox_plane_fit_delta_z, self.doubleSpinBox_plane_fit_delta_z_2,
+             self.doubleSpinBox_plane_fit_delta_z_3,
+             self.doubleSpinBox_plane_fit_delta_z_4, self.doubleSpinBox_plane_fit_delta_z_5],
+            [self.checkBox_plane_fit, self.checkBox_plane_fit_2, self.checkBox_plane_fit_3,
+             self.checkBox_plane_fit_4, self.checkBox_plane_fit_5]
+        ]
         self.connect_all()
         self.curr_coords = [0, 0]
         self.on_off_spinbox_list = [self.doubleSpinBox_x_min, self.doubleSpinBox_x_max, self.doubleSpinBox_y_min,
@@ -76,11 +88,12 @@ class SPMController(QWidget):
         self.on_off_button_list = [self.pushButton_scan, self.pushButton_image,
                                    # self.doubleSpinBox_goto_x, self.doubleSpinBox_goto_y,
                                    ]
+
         self.line_trace = {'X': [], 'ch1': [], 'ch2': []}
         self.line_retrace = {'X': [], 'ch1': [], 'ch2': []}
         self.hardware_io()
         self.approached_sound = QSound("57806__guitarguy1985__aircraftalarm.wav")
-
+        self.plane_fit = PlaneFit()
         # self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
         # self.output_voltage_y = OutputVoltage(port='y', label_error=self.label_error)
         # self.output_voltage_z = OutputVoltage(port='z', label_error=self.label_error)
@@ -299,6 +312,13 @@ class SPMController(QWidget):
 
         self.pushButton_approach_auto_start.clicked.connect(self.toggle_auto_approach_button)
 
+        for i in range(len(self.plane_fit_list[0])):
+            plane_fit_x, plane_fit_y, plane_fit_z, plane_fit_checked = self.plane_fit_list[0][i],\
+            self.plane_fit_list[1][i], self.plane_fit_list[2][i], self.plane_fit_list[3][i]
+            plane_fit_x.valueChanged.connect(self.update_plane_fit)
+            plane_fit_y.valueChanged.connect(self.update_plane_fit)
+            plane_fit_z.valueChanged.connect(self.update_plane_fit)
+            plane_fit_checked.toggled.connect(self.update_plane_fit)
 
     def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
         plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max)
@@ -432,10 +452,14 @@ class SPMController(QWidget):
     def output_voltage(self):
         self.output_voltage_x.outputVoltage(self.curr_coords[0])
         self.output_voltage_y.outputVoltage(self.curr_coords[1])
-
+        self.output_voltage_z.outputVoltage(self.curr_coord_z +
+                                            self.plane_fit.get_delta_z_plane_fitted(self.curr_coords[0],
+                                                                                    self.curr_coords[1]))
     def output_voltage_z_direction(self):
         self.curr_coord_z = np.round(self.doubleSpinBox_z.value(), 6)
-        self.output_voltage_z.outputVoltage(self.curr_coord_z)
+        self.output_voltage_z.outputVoltage(self.curr_coord_z +
+                                            self.plane_fit.get_delta_z_plane_fitted(self.curr_coords[0],
+                                                                                    self.curr_coords[1]))
 
     def get_voltage_ch1_ch2(self):
         # return (np.random.random() + 1, np.random.random() + 2)
@@ -694,7 +718,15 @@ class SPMController(QWidget):
                 self.positioner_moving = False
             self.pushButton_positioner_move.setDisabled(False)
 
-
+    def update_plane_fit(self):
+        points = []
+        for i in range(len(self.plane_fit_list[0])):
+            plane_fit_x, plane_fit_y, plane_fit_z, plane_fit_checked = self.plane_fit_list[0][i],\
+            self.plane_fit_list[1][i], self.plane_fit_list[2][i], self.plane_fit_list[3][i]
+            if plane_fit_checked.isChecked():
+                points.append([plane_fit_x.value(), plane_fit_y.value(), plane_fit_z.value()])
+        print(points, self.plane_fit.p1, self.plane_fit.p2)
+        self.plane_fit.fit(points)
 
 
 '''

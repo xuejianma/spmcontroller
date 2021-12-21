@@ -142,6 +142,7 @@ class Map(QObject):
             self.move_to_p_start()
         row_num = 0
         while self.parent.map_on_boolean and row_num < self.parent.XX.shape[0]:
+            self.parent.label_lines.setText("Current Line: {} / {}".format(row_num + 1, self.parent.XX.shape[0]))
             self.x_array = self.parent.XX[row_num]
             self.y_array = self.parent.YY[row_num]
             self.parent.line_trace['X'].clear()
