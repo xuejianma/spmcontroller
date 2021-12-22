@@ -52,7 +52,7 @@ class InputVoltage:
             # return self.reader.read_one_sample()
         except:
             self.label_error.setText(label_error_text)
-            print("Missing data point due to conflict of ch1_ch2 and encoder reading at the same time.")
+            print("Hardware not loaded / Missing data point due to conflict of ch1_ch2 and encoder reading at the same time.")
             return [self.pre_ch1, self.pre_ch2]
     def close(self):
         try:
