@@ -596,28 +596,28 @@ class SPMController(QWidget):
             'doubleSpinBox_approach_scanner_speed': self.doubleSpinBox_approach_scanner_speed,
         }
         self.settings = QSettings('SPMController', 'App1')
-        # try:
-        self.doubleSpinBox_x_min.setValue(float(self.settings.value('doubleSpinBox_x_min')))
-        self.doubleSpinBox_x_max.setValue(float(self.settings.value('doubleSpinBox_x_max')))
-        self.doubleSpinBox_y_min.setValue(float(self.settings.value('doubleSpinBox_y_min')))
-        self.doubleSpinBox_y_max.setValue(float(self.settings.value('doubleSpinBox_y_max')))
-        self.spinBox_x_pixels.setValue(self.settings.value('spinBox_x_pixels'))
-        self.spinBox_y_pixels.setValue(self.settings.value('spinBox_y_pixels'))
-        self.doubleSpinBox_frequency.setValue(float(self.settings.value('doubleSpinBox_frequency')))
-        self.doubleSpinBox_rotation.setValue(float(self.settings.value('doubleSpinBox_rotation')))
-        self.lineEdit_directory.setText(self.settings.value('lineEdit_directory'))
-        self.lineEdit_filename_trace_ch1.setText(self.settings.value('lineEdit_filename_trace_ch1'))
-        self.lineEdit_filename_retrace_ch1.setText(self.settings.value('lineEdit_filename_retrace_ch1'))
-        self.lineEdit_filename_trace_ch2.setText(self.settings.value('lineEdit_filename_trace_ch2'))
-        self.lineEdit_filename_retrace_ch2.setText(self.settings.value('lineEdit_filename_retrace_ch2'))
-        self.doubleSpinBox_piezo_limit_x.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_x')))
-        self.doubleSpinBox_piezo_limit_y.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_y')))
-        for key in self.approach_attributes_float:
-            self.approach_attributes_float[key].setValue(float(self.settings.value(key)))
-        for key in self.approach_attributes_int:
-            self.approach_attributes_int[key].setValue(self.settings.value(key))
-        # except:
-        #     print("preload error ignored")
+        try:
+            self.doubleSpinBox_x_min.setValue(float(self.settings.value('doubleSpinBox_x_min')))
+            self.doubleSpinBox_x_max.setValue(float(self.settings.value('doubleSpinBox_x_max')))
+            self.doubleSpinBox_y_min.setValue(float(self.settings.value('doubleSpinBox_y_min')))
+            self.doubleSpinBox_y_max.setValue(float(self.settings.value('doubleSpinBox_y_max')))
+            self.spinBox_x_pixels.setValue(self.settings.value('spinBox_x_pixels'))
+            self.spinBox_y_pixels.setValue(self.settings.value('spinBox_y_pixels'))
+            self.doubleSpinBox_frequency.setValue(float(self.settings.value('doubleSpinBox_frequency')))
+            self.doubleSpinBox_rotation.setValue(float(self.settings.value('doubleSpinBox_rotation')))
+            self.lineEdit_directory.setText(self.settings.value('lineEdit_directory'))
+            self.lineEdit_filename_trace_ch1.setText(self.settings.value('lineEdit_filename_trace_ch1'))
+            self.lineEdit_filename_retrace_ch1.setText(self.settings.value('lineEdit_filename_retrace_ch1'))
+            self.lineEdit_filename_trace_ch2.setText(self.settings.value('lineEdit_filename_trace_ch2'))
+            self.lineEdit_filename_retrace_ch2.setText(self.settings.value('lineEdit_filename_retrace_ch2'))
+            self.doubleSpinBox_piezo_limit_x.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_x')))
+            self.doubleSpinBox_piezo_limit_y.setValue(float(self.settings.value('doubleSpinBox_piezo_limit_y')))
+            for key in self.approach_attributes_float:
+                self.approach_attributes_float[key].setValue(float(self.settings.value(key)))
+            for key in self.approach_attributes_int:
+                self.approach_attributes_int[key].setValue(self.settings.value(key))
+        except:
+            print("preload error ignored")
 
     def closeEvent(self, event):
 
