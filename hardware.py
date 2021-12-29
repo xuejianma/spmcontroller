@@ -3,14 +3,22 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from nidaqmx.stream_readers import AnalogMultiChannelReader, AnalogSingleChannelReader
 import time
 
-
+nidevice_port_name_substitute = "NIdevice"
+try:
+    with open('../nidevice_port_name_substitute.txt') as f:
+        lines = f.readlines()
+    nidevice_port_name_substitute = lines[0].strip()
+    print("nidevice_port_name_substitute changed to {}".format(nidevice_port_name_substitute))
+except:
+    print("No nidevice_port_name_substitute.txt found in ../")
 label_error_text = "🚫 Hardware not connected properly"
 class OutputVoltage:
     def __init__(self, port, label_error, ratio = 15):
         self.label_error = label_error
         self.ratio = ratio
         try:
-            self.ports = {'encoder': "NIdevice/ao0", 'x': "NIdevice/ao1", 'y': "NIdevice/ao2", 'z': "NIdevice/ao3"}
+            self.ports = {'encoder': nidevice_port_name_substitute + "/ao0", 'x': nidevice_port_name_substitute + "/ao1",
+                          'y': nidevice_port_name_substitute + "/ao2", 'z': nidevice_port_name_substitute + "/ao3"}
             self.task = nidaqmx.Task()
             self.task.ao_channels.add_ao_voltage_chan(self.ports[port])
         except:
@@ -20,6 +28,7 @@ class OutputVoltage:
             self.task.write(voltage / self.ratio)
         except:
             self.label_error.setText(label_error_text)
+
     def close(self):
         try:
             self.task.close()
@@ -32,7 +41,8 @@ class InputVoltage:
         self.pre_ch1 = 0.0
         self.pre_ch2 = 0.0
         try:
-            self.ports = {'ch1': "NIdevice/ai1", 'ch2': "NIdevice/ai2", 'encoder' : "NIdevice/ai3"}
+            self.ports = {'ch1': nidevice_port_name_substitute + "/ai1", 'ch2': nidevice_port_name_substitute + "/ai2",
+                          'encoder' : nidevice_port_name_substitute + "/ai3"}
             self.task = nidaqmx.Task()
             self.task.ai_channels.add_ai_voltage_chan(self.ports['ch1'])
             self.task.ai_channels.add_ai_voltage_chan(self.ports['ch2'])
@@ -71,7 +81,7 @@ class InputVoltageEncoder(QObject):
         self.lcdNumber_encoder_reading = lcdNumber_encoder_reading
         self.checkBox_encoder_reading = checkBox_encoder_reading
         try:
-            self.ports = {'encoder' : "NIdevice/ai3"}
+            self.ports = {'encoder' : nidevice_port_name_substitute + "/ai3"}
             self.task = nidaqmx.Task()
             self.task.ai_channels.add_ai_voltage_chan(self.ports['encoder'])
             self.reader = AnalogSingleChannelReader(self.task.in_stream)

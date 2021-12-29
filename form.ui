@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_approach">
     <attribute name="title">
@@ -446,7 +446,7 @@
        <double>70.000000000000000</double>
       </property>
       <property name="value">
-       <double>10.000000000000000</double>
+       <double>30.000000000000000</double>
       </property>
      </widget>
      <widget class="QSpinBox" name="spinBox_positioner_frequency">
@@ -1364,7 +1364,6 @@
       <property name="font">
        <font>
         <pointsize>8</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -3293,13 +3292,13 @@ trace and retrace</string>
  <connections/>
  <buttongroups>
   <buttongroup name="buttonGroup_8"/>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_9"/>
-  <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_7"/>
+  <buttongroup name="buttonGroup_9"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_6"/>
+  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_5"/>
  </buttongroups>
 </ui>

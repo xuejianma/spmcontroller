@@ -53,8 +53,8 @@ class SPMController(QWidget):
         self.colorbar_manual_ch1 = False
         self.colorbar_manual_ch2 = False
         self.load_ui()
-        self.preload()
         self.reconnect_anc300()
+        self.preload()
         self.reconnect_lockin()
 
         # self.list_resources()
@@ -616,8 +616,11 @@ class SPMController(QWidget):
                 self.approach_attributes_float[key].setValue(float(self.settings.value(key)))
             for key in self.approach_attributes_int:
                 self.approach_attributes_int[key].setValue(self.settings.value(key))
-        except:
+            self.anc_controller.setf(4, self.spinBox_positioner_frequency.value())
+            self.anc_controller.setv(4, self.doubleSpinBox_positioner_amplitude.value())
+        except Exception as e:
             print("preload error ignored")
+            print(e)
 
     def closeEvent(self, event):
 
@@ -673,6 +676,7 @@ class SPMController(QWidget):
         except:
             self.lockin_bottom = None
             self.label_error_lockin_bottom.setText("🚫 SR830 (Bottom) hardware not detected!")
+
     def initialize_lockin_top(self):
         self.lockin_top.set_reference_source(self.spinBox_lockin_top_reference.value())
         self.lockin_top.set_frequency(self.doubleSpinBox_lockin_top_reference_internal_frequency.value())
