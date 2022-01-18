@@ -12,7 +12,10 @@ from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 from pyqtgraph import mkPen
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLabel, QVBoxLayout, QSizePolicy
-from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings
+from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings, QTimer, QThreadPool
+
+from ndfiltercontroller import NDFilterController, NDFilterChange
+from powermeter import PowerMeterRead
 from scan import Scan, MoveToTarget, Map, ApproachDisplay, MoveToTargetZ, AutoApproach
 from plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
 from anc300 import ANC300
@@ -22,6 +25,8 @@ from os.path import isdir
 # from pyvisa import ResourceManager
 from planefit import PlaneFit
 import numpy as np
+
+from topas4 import Topas4, LaserWavelengthChange
 
 
 class SPMController(QWidget):
@@ -54,6 +59,8 @@ class SPMController(QWidget):
         self.colorbar_manual_ch2 = False
         self.load_ui()
         self.reconnect_anc300()
+        self.reconnect_opa()
+        self.reconnect_ndfilter()
         self.preload()
         self.reconnect_lockin()
 
@@ -320,6 +327,15 @@ class SPMController(QWidget):
             plane_fit_z.valueChanged.connect(self.update_plane_fit)
             plane_fit_checked.toggled.connect(self.update_plane_fit)
 
+        self.checkBox_read_power.stateChanged.connect(self.real_time_power)
+        self.pushButton_laser_controller.clicked.connect(self.reconnect_opa)
+        self.pushButton_laser_set_wavelength.clicked.connect(
+            lambda: self.opa_set_wavelength(self.doubleSpinBox_laser_set_wavelength.value()))
+        self.pushButton_ndfilter.clicked.connect(
+            lambda: self.ndfilter_set_angle(self.doubleSpinBox_ndfilter.value())
+        )
+
+
     def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
         plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max)
 
@@ -408,40 +424,40 @@ class SPMController(QWidget):
         self.update_voltage()
 
     def start_scan(self):
-        self.thread = QThread()
+        self.thread_scan = QThread()
         self.scan = Scan(
             self)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
-        self.scan.moveToThread(self.thread)
-        self.thread.started.connect(self.scan.run)
+        self.scan.moveToThread(self.thread_scan)
+        self.thread_scan.started.connect(self.scan.run)
         self.scan.finished.connect(self.scan.deleteLater)
-        self.scan.finished.connect(self.thread.exit)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.scan.finished.connect(self.thread_scan.exit)
+        self.thread_scan.finished.connect(self.thread_scan.deleteLater)
+        self.thread_scan.start()
 
     def start_map(self):
-        self.thread = QThread()
+        self.thread_map = QThread()
         self.map = Map(
             self)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
-        self.map.moveToThread(self.thread)
-        self.thread.started.connect(self.map.run)
-        self.thread.started.connect(self.update_graphs)
+        self.map.moveToThread(self.thread_map)
+        self.thread_map.started.connect(self.map.run)
+        self.thread_map.started.connect(self.update_graphs)
         self.map.finishedAfterMapping.connect(self.toggle_map_button)
         # self.map.finished.connect(self.on_off_spinbox_list_turn_on)
         self.map.finished.connect(self.map.deleteLater)
-        self.map.finished.connect(self.thread.exit)
+        self.map.finished.connect(self.thread_map.exit)
         self.map.lineFinished.connect(self.update_graphs)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.thread_map.finished.connect(self.thread_map.deleteLater)
+        self.thread_map.start()
 
     def start_display_approach(self):
-        self.thread = QThread()
+        self.thread_display_approach = QThread()
         self.approach_display = ApproachDisplay(self)
-        self.approach_display.moveToThread(self.thread)
-        self.thread.started.connect(self.approach_display.run)
+        self.approach_display.moveToThread(self.thread_display_approach)
+        self.thread_display_approach.started.connect(self.approach_display.run)
         self.approach_display.finished.connect(self.approach_display.deleteLater)
-        self.approach_display.finished.connect(self.thread.exit)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.approach_display.finished.connect(self.thread_display_approach.exit)
+        self.thread_display_approach.finished.connect(self.thread_display_approach.deleteLater)
+        self.thread_display_approach.start()
 
     def update_voltage(self):
         # print("Updated voltage: x = ", self.curr_coords[0], ", y = ", self.curr_coords[1])
@@ -467,10 +483,11 @@ class SPMController(QWidget):
         return self.input_voltage_ch1_ch2.getVoltage()
 
     def real_time_encoder(self):
+        print(self.checkBox_encoder_reading.isChecked())
         if self.checkBox_encoder_reading.isChecked():
             self.thread_encoder = QThread()
             self.input_voltage_encoder = InputVoltageEncoder(
-                label_error=self.label_error, lcdNumber_encoder_reading = self.lcdNumber_encoder_reading,
+                label_error=self.label_error_encoder, lcdNumber_encoder_reading = self.lcdNumber_encoder_reading,
                 checkBox_encoder_reading = self.checkBox_encoder_reading)
             self.input_voltage_encoder.moveToThread(self.thread_encoder)
             self.thread_encoder.started.connect(self.input_voltage_encoder.run)
@@ -480,6 +497,13 @@ class SPMController(QWidget):
             self.input_voltage_encoder.finished.connect(self.thread_encoder.exit)
             self.thread_encoder.finished.connect(self.thread_encoder.deleteLater)
             self.thread_encoder.start()
+        else:
+            self.checkBox_encoder_reading.setEnabled(False)
+            # the 1100ms delay (disable checkbox) makes sure the self.input_voltage_encoder.run function does not crash
+            # as time.sleep(1) in it is lower than 1.05 second, such that
+            # "while self.checkBox_encoder_reading.isChecked()" can be checked without a problem when someone try to
+            # check and uncheck the checkbox in a very high frequency.
+            QTimer.singleShot(1100, lambda: self.checkBox_encoder_reading.setEnabled(True))
 
 
     def update_line_graph(self):
@@ -495,32 +519,32 @@ class SPMController(QWidget):
 
 
     def goto_position(self, p):
-        self.thread = QThread()
+        self.thread_goto_position = QThread()
         self.move = MoveToTarget(self, p,
                                  manual_move=True)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
-        self.move.moveToThread(self.thread)
-        self.thread.started.connect(self.move.move)
+        self.move.moveToThread(self.thread_goto_position)
+        self.thread_goto_position.started.connect(self.move.move)
         self.move.started.connect(self.on_off_button_list_turn_off)
         self.move.started.connect(self.on_off_spinbox_list_turn_off)
         self.move.finished.connect(self.move.deleteLater)
         self.move.finished.connect(self.on_off_button_list_turn_on)
         self.move.finished.connect(self.on_off_spinbox_list_turn_on)
-        self.move.finished.connect(self.thread.exit)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.move.finished.connect(self.thread_goto_position.exit)
+        self.thread_goto_position.finished.connect(self.thread_goto_position.deleteLater)
+        self.thread_goto_position.start()
 
     def goto_position_z(self, target):
-        self.thread = QThread()
+        self.thread_goto_position_z = QThread()
         self.move = MoveToTargetZ(self, target)
-        self.move.moveToThread(self.thread)
-        self.thread.started.connect(self.move.move)
+        self.move.moveToThread(self.thread_goto_position_z)
+        self.thread_goto_position_z.started.connect(self.move.move)
         self.move.started.connect(self.goto_position_z_buttons_off)
         self.move.finished.connect(self.goto_position_z_buttons_on)
 
         self.move.finished.connect(self.move.deleteLater)
-        self.move.finished.connect(self.thread.exit)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.move.finished.connect(self.thread_goto_position_z.exit)
+        self.thread_goto_position_z.finished.connect(self.thread_goto_position_z.deleteLater)
+        self.thread_goto_position_z.start()
 
     def goto_position_z_buttons_off(self):
         self.pushButton_z_goto.setDisabled(True)
@@ -652,6 +676,9 @@ class SPMController(QWidget):
         self.output_voltage_encoder.close()
         # self.input_voltage_encoder.close()
 
+
+
+
     def reconnect_anc300(self):
         try:
             self.anc_controller = ANC300(3)
@@ -659,6 +686,26 @@ class SPMController(QWidget):
         except:
             self.anc_controller = None
             self.label_error_approach.setText("🚫 Error: ANC300 hardware not detected!")
+
+    def reconnect_opa(self):
+        try:
+            self.laser_controller = Topas4()
+            # self.laser_wavelength_change = None
+            self.laser_wavelength_changing = False
+            self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength())
+            self.label_error_wavelength.setText("")
+            self.progressBar_wavelength.setValue(100)
+        except:
+            self.laser_controller = None
+            self.label_error_wavelength.setText("🚫 Error: Laser OPA not detected!")
+
+    def reconnect_ndfilter(self):
+        try:
+            self.ndfilter_controller = NDFilterController()
+            self.ndfilter_controller.get_angle()
+        except:
+            self.label_error_ndfilter.setText("🚫 Error: ND Filter Controller not detected!")
+
 
     def reconnect_lockin(self):
         try:
@@ -731,6 +778,102 @@ class SPMController(QWidget):
                 points.append([plane_fit_x.value(), plane_fit_y.value(), plane_fit_z.value()])
         print(points, self.plane_fit.p1, self.plane_fit.p2)
         self.plane_fit.fit(points)
+
+
+    def real_time_power(self):
+        if self.checkBox_read_power.isChecked():
+            self.thread_powermeter = QThread()
+            self.power_meter_read = PowerMeterRead(
+                label_power_error=self.label_power_error, lcdNumber_laser_power=self.lcdNumber_laser_power,
+                lcdNumber_laser_power_uW = self.lcdNumber_laser_power_uW, checkBox_read_power=self.checkBox_read_power)
+            self.power_meter_read.moveToThread(self.thread_powermeter)
+            self.thread_powermeter.started.connect(self.power_meter_read.run)
+            # self.input_voltage_encoder.update.connect(
+            #     lambda: self.lcdNumber_encoder_reading.display(self.input_voltage_encoder.curr_value))
+            self.power_meter_read.finished.connect(self.power_meter_read.deleteLater)
+            self.power_meter_read.finished.connect(self.thread_powermeter.exit)
+            self.thread_powermeter.finished.connect(self.thread_powermeter.deleteLater)
+            self.thread_powermeter.start()
+        else:
+            self.checkBox_read_power.setEnabled(False)
+            # the 105ms delay (disable checkbox) makes sure the run function does not crash
+            # as time.sleep(0.1) in it is lower than 0.11 second, such that
+            # "while self.checkBox_....isChecked()" can be checked without a problem when someone try to
+            # check and uncheck the checkbox in a very high frequency.
+            QTimer.singleShot(110, lambda: self.checkBox_read_power.setEnabled(True))
+
+    def opa_set_wavelength(self, wavelength):
+        if self.laser_controller is None:
+            return
+        self.label_error_wavelength.setText("")
+        try:
+            self.thread_set_wavelength = QThread()
+            self.laser_wavelength_changing = True
+            self.laser_wavelength_change = LaserWavelengthChange(self, self.laser_controller, wavelength)
+            self.laser_wavelength_change.progress_update.connect(lambda: self.progressBar_wavelength.setValue(
+                self.laser_wavelength_change.progress if self.laser_wavelength_change is not None else 100
+            ))
+            self.laser_wavelength_change.moveToThread(self.thread_set_wavelength)
+            def turnoff():
+
+                self.doubleSpinBox_laser_set_wavelength.setEnabled(
+                    False)
+                self.pushButton_laser_set_wavelength.setEnabled(False),
+                # print("started")
+            self.thread_set_wavelength.started.connect(turnoff)
+            self.thread_set_wavelength.started.connect(self.laser_wavelength_change.setWavelength)
+            def turnon():
+
+                self.doubleSpinBox_laser_set_wavelength.setEnabled(True)
+                self.pushButton_laser_set_wavelength.setEnabled(True)
+                # print(self.pushButton_laser_set_wavelength.isEnabled())
+                self.lcdNumber_laser_wavelength.display(
+                    self.laser_controller.getWavelength())
+                self.laser_wavelength_changing = False
+
+            self.laser_wavelength_change.finished.connect(self.laser_wavelength_change.deleteLater)
+            self.laser_wavelength_change.finished.connect(self.thread_set_wavelength.exit)
+            self.laser_wavelength_change.finished.connect(turnon)
+            self.thread_set_wavelength.finished.connect(self.thread_set_wavelength.deleteLater)
+            self.thread_set_wavelength.start()
+
+            # self.thread_set_wavelength = QThread()
+            # self.laser_wavelength_change = LaserWavelengthChange(self.laser_controller, wavelength,
+            #                                                      progressBar_wavelength=self.progressBar_wavelength)
+        except Exception as e:
+            print(e)
+            self.label_error_wavelength.setText("🚫 Error: Laser OPA not detected!")
+
+    def ndfilter_set_angle(self, angle):
+        if self.ndfilter_controller is None:
+            return
+        self.label_error_wavelength.setText("")
+        try:
+            self.thread_set_angle = QThread()
+            self.ndfilter_change = NDFilterChange(self, self.ndfilter_controller, angle)
+            self.ndfilter_change.moveToThread(self.thread_set_angle)
+            def turnoff():
+                self.doubleSpinBox_ndfilter.setEnabled(False)
+                self.pushButton_ndfilter.setEnabled(False),
+            self.thread_set_angle.started.connect(turnoff)
+            self.thread_set_angle.started.connect(self.ndfilter_change.set_angle)
+            def turnon():
+                self.doubleSpinBox_ndfilter.setEnabled(True)
+                self.pushButton_ndfilter.setEnabled(True)
+                self.lcdNumber_ndfilter.display(self.ndfilter_controller.get_angle())
+
+            self.ndfilter_change.finished.connect(self.ndfilter_change.deleteLater)
+            self.ndfilter_change.finished.connect(self.thread_set_angle.exit)
+            self.ndfilter_change.finished.connect(turnon)
+            self.thread_set_angle.finished.connect(self.thread_set_angle.deleteLater)
+            self.thread_set_angle.start()
+
+        except Exception as e:
+            print(e)
+            self.label_error_wavelength.setText("🚫 Error: ND Filter Controller not detected!")
+
+
+
 
 
 '''

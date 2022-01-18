@@ -73,13 +73,14 @@ class InputVoltage:
 
 class InputVoltageEncoder(QObject):
     finished = pyqtSignal()
-    update = pyqtSignal()
+    # update = pyqtSignal()
     def __init__(self, label_error, lcdNumber_encoder_reading, checkBox_encoder_reading):
         super(InputVoltageEncoder, self).__init__()
         self.label_error = label_error
         self.curr_value = 0.0
         self.lcdNumber_encoder_reading = lcdNumber_encoder_reading
         self.checkBox_encoder_reading = checkBox_encoder_reading
+        self.label_error.setText("")
         try:
             self.ports = {'encoder' : nidevice_port_name_substitute + "/ai3"}
             self.task = nidaqmx.Task()
@@ -88,19 +89,21 @@ class InputVoltageEncoder(QObject):
         except:
             self.label_error.setText(label_error_text)
     def getVoltage(self):
-        try:
-            self.curr_value = self.task.read() * 1000
-            # print(self.curr_value)
-            self.lcdNumber_encoder_reading.display(self.curr_value)
-            self.update.emit()
-        except:
-            self.label_error.setText(label_error_text)
-            # return 0.0
+        self.curr_value = self.task.read() * 1000
+        # print(self.curr_value)
+        self.lcdNumber_encoder_reading.display(self.curr_value)
+        # self.update.emit()
+
 
     def run(self):
         while self.checkBox_encoder_reading.isChecked():
-            self.getVoltage()
-            time.sleep(1)
+            try:
+                self.getVoltage()
+                time.sleep(1)
+            except:
+                self.label_error.setText(label_error_text)
+                self.checkBox_encoder_reading.setChecked(False)
+                break
         self.close()
         self.finished.emit()
 
