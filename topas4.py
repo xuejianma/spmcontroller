@@ -60,13 +60,9 @@ class LaserWavelengthChange(QObject):
         return self.laser_controller.get(url)
 
     def setWavelength(self):
-    # def run(self):
         self._mutex.lock()
         self.put('/Optical/WavelengthControl/SetWavelengthUsingAnyInteraction', self.wavelength)
-        # print(QThreadPool.globalInstance().activeThreadCount())
-
         self.waitTillWavelengthIsSet()
-
         self._mutex.unlock()
         self.finished.emit()
 
@@ -76,14 +72,7 @@ class LaserWavelengthChange(QObject):
         Waits till wavelength setting is finished.  If user needs to do any manual
         operations (e.g.  change wavelength separator), inform him/her and wait for confirmation.
         """
-        # tprev = time.time()
-        # if self.progressBar_wavelength is not None:
-        #     self.progressBar_wavelength.setValue(100)
-        pass
         while (True):
-            # t = time.time()
-            # print(t - tprev)
-            # tprev = t
             if not self.parent.laser_wavelength_changing:
                 self.progress = 100
                 self.progress_update.emit()

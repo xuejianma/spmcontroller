@@ -3456,7 +3456,7 @@ trace and retrace</string>
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:700;&quot;&gt;Power:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_wavelength_start">
+    <widget class="QSpinBox" name="spinBox_laser_calibration_wavelength_start">
      <property name="geometry">
       <rect>
        <x>210</x>
@@ -3466,13 +3466,13 @@ trace and retrace</string>
       </rect>
      </property>
      <property name="maximum">
-      <double>9999.989999999999782</double>
+      <number>9999</number>
      </property>
      <property name="value">
-      <double>400.000000000000000</double>
+      <number>400</number>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_wavelength_end">
+    <widget class="QSpinBox" name="spinBox_laser_calibration_wavelength_end">
      <property name="geometry">
       <rect>
        <x>210</x>
@@ -3482,10 +3482,10 @@ trace and retrace</string>
       </rect>
      </property>
      <property name="maximum">
-      <double>9999.989999999999782</double>
+      <number>99999999</number>
      </property>
      <property name="value">
-      <double>900.000000000000000</double>
+      <number>700</number>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_target_power">
@@ -3559,7 +3559,7 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_target_lowest_current">
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>540</x>
        <y>310</y>
        <width>111</width>
        <height>20</height>
@@ -3572,7 +3572,7 @@ trace and retrace</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_lowest_current">
      <property name="geometry">
       <rect>
-       <x>550</x>
+       <x>650</x>
        <y>310</y>
        <width>111</width>
        <height>22</height>
@@ -3588,7 +3588,7 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_target_highest_current">
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>540</x>
        <y>280</y>
        <width>111</width>
        <height>20</height>
@@ -3601,7 +3601,7 @@ trace and retrace</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_highest_current">
      <property name="geometry">
       <rect>
-       <x>550</x>
+       <x>650</x>
        <y>280</y>
        <width>111</width>
        <height>22</height>
@@ -3757,7 +3757,7 @@ trace and retrace</string>
       <double>400.000000000000000</double>
      </property>
     </widget>
-    <widget class="QWidget" name="widget_laser_measurement" native="true">
+    <widget class="PlotWidget" name="widget_laser_measurement" native="true">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -4088,6 +4088,9 @@ trace and retrace</string>
      </property>
     </widget>
     <widget class="QCheckBox" name="checkBox_read_power">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>820</x>
@@ -4103,9 +4106,9 @@ trace and retrace</string>
     <widget class="QLabel" name="label_power_error">
      <property name="geometry">
       <rect>
-       <x>820</x>
-       <y>20</y>
-       <width>211</width>
+       <x>940</x>
+       <y>0</y>
+       <width>201</width>
        <height>16</height>
       </rect>
      </property>
@@ -4262,15 +4265,15 @@ Filter Controller</string>
       <string/>
      </property>
     </widget>
-    <widget class="QProgressBar" name="progressBar_wavelength_ndfilter">
+    <widget class="QProgressBar" name="progressBar_ndfilter">
      <property name="enabled">
       <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>751</x>
+       <x>670</x>
        <y>200</y>
-       <width>20</width>
+       <width>101</width>
        <height>20</height>
       </rect>
      </property>
@@ -4281,6 +4284,72 @@ Filter Controller</string>
       <bool>false</bool>
      </property>
      <property name="format">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_power">
+     <property name="geometry">
+      <rect>
+       <x>820</x>
+       <y>0</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reconnect ND
+Filter Controller</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_laser_calibration_step">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>280</y>
+       <width>71</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>1</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_calibration_step">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>280</y>
+       <width>31</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Step:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_calibration_number">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>310</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string># Data Point:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_calibration_number_2">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>310</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
       <string/>
      </property>
     </widget>
@@ -4298,15 +4367,15 @@ Filter Controller</string>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_10"/>
+  <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_9"/>
+  <buttongroup name="buttonGroup_6"/>
+  <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup_8"/>
   <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup_7"/>
-  <buttongroup name="buttonGroup_10"/>
-  <buttongroup name="buttonGroup_9"/>
-  <buttongroup name="buttonGroup_6"/>
-  <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

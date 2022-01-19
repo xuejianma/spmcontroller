@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLa
 from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings, QTimer, QThreadPool
 
 from ndfiltercontroller import NDFilterController, NDFilterChange
-from powermeter import PowerMeterRead
+from powermeter import PowerMeterRead, PowerMeter
 from scan import Scan, MoveToTarget, Map, ApproachDisplay, MoveToTargetZ, AutoApproach
 from plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
 from anc300 import ANC300
@@ -61,6 +61,7 @@ class SPMController(QWidget):
         self.reconnect_anc300()
         self.reconnect_opa()
         self.reconnect_ndfilter()
+        self.reconnect_power()
         self.preload()
         self.reconnect_lockin()
 
@@ -146,6 +147,8 @@ class SPMController(QWidget):
 
         self.widget_linescan_approach_ch1.setBackground("w")
         self.widget_linescan_approach_ch2.setBackground("w")
+
+        self.widget_laser_measurement.setBackground("w")
 
     def determine_scan_window(self):
         self.piezo_limit_x = self.doubleSpinBox_piezo_limit_x.value()
@@ -331,9 +334,12 @@ class SPMController(QWidget):
         self.pushButton_laser_controller.clicked.connect(self.reconnect_opa)
         self.pushButton_laser_set_wavelength.clicked.connect(
             lambda: self.opa_set_wavelength(self.doubleSpinBox_laser_set_wavelength.value()))
+        self.pushButton_ndfilter_controller.clicked.connect(self.reconnect_ndfilter)
         self.pushButton_ndfilter.clicked.connect(
             lambda: self.ndfilter_set_angle(self.doubleSpinBox_ndfilter.value())
         )
+        self.pushButton_power.clicked.connect(self.reconnect_power)
+
 
 
     def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
@@ -701,11 +707,29 @@ class SPMController(QWidget):
 
     def reconnect_ndfilter(self):
         try:
+            self.laser_ndfilter_changing = False
             self.ndfilter_controller = NDFilterController()
-            self.ndfilter_controller.get_angle()
+            self.lcdNumber_ndfilter.display(self.ndfilter_controller.get_angle())
+            self.label_error_ndfilter.setText("")
+            self.progressBar_ndfilter.setValue(100)
+
         except:
+            self.ndfilter_controller = None
             self.label_error_ndfilter.setText("🚫 Error: ND Filter Controller not detected!")
 
+    def reconnect_power(self):
+        try:
+            self.power_reading = False
+            self.powermeter = PowerMeter(self)
+            self.lcdNumber_laser_power.display(0)
+            self.lcdNumber_laser_power_uW.display(0)
+            self.label_power_error.setText("")
+            self.checkBox_read_power.setEnabled(True)
+        except:
+            self.powermeter = None
+            self.label_power_error.setText("🚫 Error: Power Meter not detected!")
+            self.checkBox_read_power.setChecked(False)
+            self.checkBox_read_power.setEnabled(False)
 
     def reconnect_lockin(self):
         try:
@@ -781,26 +805,35 @@ class SPMController(QWidget):
 
 
     def real_time_power(self):
-        if self.checkBox_read_power.isChecked():
-            self.thread_powermeter = QThread()
-            self.power_meter_read = PowerMeterRead(
-                label_power_error=self.label_power_error, lcdNumber_laser_power=self.lcdNumber_laser_power,
-                lcdNumber_laser_power_uW = self.lcdNumber_laser_power_uW, checkBox_read_power=self.checkBox_read_power)
-            self.power_meter_read.moveToThread(self.thread_powermeter)
-            self.thread_powermeter.started.connect(self.power_meter_read.run)
-            # self.input_voltage_encoder.update.connect(
-            #     lambda: self.lcdNumber_encoder_reading.display(self.input_voltage_encoder.curr_value))
-            self.power_meter_read.finished.connect(self.power_meter_read.deleteLater)
-            self.power_meter_read.finished.connect(self.thread_powermeter.exit)
-            self.thread_powermeter.finished.connect(self.thread_powermeter.deleteLater)
-            self.thread_powermeter.start()
-        else:
+        if self.powermeter is None:
+            return
+        try:
+            if self.checkBox_read_power.isChecked():
+                self.thread_powermeter = QThread()
+                self.power_meter_read = PowerMeterRead(#self,
+                    powermeter = self.powermeter,
+                    label_power_error=self.label_power_error, lcdNumber_laser_power=self.lcdNumber_laser_power,
+                    lcdNumber_laser_power_uW = self.lcdNumber_laser_power_uW, checkBox_read_power=self.checkBox_read_power)
+                self.power_meter_read.moveToThread(self.thread_powermeter)
+                self.thread_powermeter.started.connect(self.power_meter_read.run)
+                # self.input_voltage_encoder.update.connect(
+                #     lambda: self.lcdNumber_encoder_reading.display(self.input_voltage_encoder.curr_value))
+                self.power_meter_read.finished.connect(self.power_meter_read.deleteLater)
+                self.power_meter_read.finished.connect(self.thread_powermeter.exit)
+                self.thread_powermeter.finished.connect(self.thread_powermeter.deleteLater)
+                self.thread_powermeter.start()
+            else:
+                self.checkBox_read_power.setEnabled(False)
+                # the 105ms delay (disable checkbox) makes sure the run function does not crash
+                # as time.sleep(0.1) in it is lower than 0.11 second, such that
+                # "while self.checkBox_....isChecked()" can be checked without a problem when someone try to
+                # check and uncheck the checkbox in a very high frequency.
+                QTimer.singleShot(110, lambda: self.checkBox_read_power.setEnabled(True))
+        except Exception as e:
+            print(e)
+            self.label_power_error.setText("🚫 Error: Power Meter not detected!")
+            self.checkBox_read_power.setState(False)
             self.checkBox_read_power.setEnabled(False)
-            # the 105ms delay (disable checkbox) makes sure the run function does not crash
-            # as time.sleep(0.1) in it is lower than 0.11 second, such that
-            # "while self.checkBox_....isChecked()" can be checked without a problem when someone try to
-            # check and uncheck the checkbox in a very high frequency.
-            QTimer.singleShot(110, lambda: self.checkBox_read_power.setEnabled(True))
 
     def opa_set_wavelength(self, wavelength):
         if self.laser_controller is None:
@@ -850,8 +883,12 @@ class SPMController(QWidget):
         self.label_error_wavelength.setText("")
         try:
             self.thread_set_angle = QThread()
+            self.laser_ndfilter_changing = True
             self.ndfilter_change = NDFilterChange(self, self.ndfilter_controller, angle)
             self.ndfilter_change.moveToThread(self.thread_set_angle)
+            self.ndfilter_change.progress_update.connect(lambda: self.progressBar_ndfilter.setValue(
+                self.ndfilter_change.progress if self.ndfilter_change is not None else 100
+            ))
             def turnoff():
                 self.doubleSpinBox_ndfilter.setEnabled(False)
                 self.pushButton_ndfilter.setEnabled(False),
@@ -861,6 +898,7 @@ class SPMController(QWidget):
                 self.doubleSpinBox_ndfilter.setEnabled(True)
                 self.pushButton_ndfilter.setEnabled(True)
                 self.lcdNumber_ndfilter.display(self.ndfilter_controller.get_angle())
+                self.laser_ndfilter_changing = False
 
             self.ndfilter_change.finished.connect(self.ndfilter_change.deleteLater)
             self.ndfilter_change.finished.connect(self.thread_set_angle.exit)
