@@ -1,3 +1,5 @@
+from time import sleep
+
 import requests
 import sys
 
@@ -44,7 +46,7 @@ class LaserWavelengthChange(QObject):
     finished = pyqtSignal()
     progress_update = pyqtSignal()
     def __init__(self, parent, laser_controller, wavelength):
-        self._mutex = QMutex()
+        # self._mutex = QMutex()
         # self._mutex.lock()
         super(LaserWavelengthChange, self).__init__()
         self.laser_controller = laser_controller
@@ -60,10 +62,10 @@ class LaserWavelengthChange(QObject):
         return self.laser_controller.get(url)
 
     def setWavelength(self):
-        self._mutex.lock()
+        # self._mutex.lock()
         self.put('/Optical/WavelengthControl/SetWavelengthUsingAnyInteraction', self.wavelength)
         self.waitTillWavelengthIsSet()
-        self._mutex.unlock()
+        # self._mutex.unlock()
         self.finished.emit()
 
 
@@ -73,6 +75,7 @@ class LaserWavelengthChange(QObject):
         operations (e.g.  change wavelength separator), inform him/her and wait for confirmation.
         """
         while (True):
+            sleep(0.1)  # to avoid too fast http requests
             if not self.parent.laser_wavelength_changing:
                 self.progress = 100
                 self.progress_update.emit()

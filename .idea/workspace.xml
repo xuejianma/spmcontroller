@@ -20,13 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c1566c47-c141-4d43-bc0f-7d1af85bcb6d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/powercalibration.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/form.ui" beforeDir="false" afterPath="$PROJECT_DIR$/form.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/form.ui.autosave" beforeDir="false" afterPath="$PROJECT_DIR$/form.ui.autosave" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/form.ui.autosave" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ndfiltercontroller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ndfiltercontroller.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/powermeter.py" beforeDir="false" afterPath="$PROJECT_DIR$/powermeter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/powercalibration.py" beforeDir="false" afterPath="$PROJECT_DIR$/powercalibration.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/topas4.py" beforeDir="false" afterPath="$PROJECT_DIR$/topas4.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

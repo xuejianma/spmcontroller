@@ -3485,7 +3485,7 @@ trace and retrace</string>
       <number>99999999</number>
      </property>
      <property name="value">
-      <number>700</number>
+      <number>410</number>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_target_power">
@@ -3501,7 +3501,7 @@ trace and retrace</string>
       <double>9999.989999999999782</double>
      </property>
      <property name="value">
-      <double>0.200000000000000</double>
+      <double>200.000000000000000</double>
      </property>
     </widget>
     <widget class="QLabel" name="label_laser_calibration">
@@ -3546,14 +3546,14 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_target_power">
      <property name="geometry">
       <rect>
-       <x>800</x>
+       <x>790</x>
        <y>310</y>
        <width>111</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Target Power (W):</string>
+      <string>Target Power (μW):</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_laser_calibration_target_lowest_current">
@@ -3663,14 +3663,15 @@ trace and retrace</string>
     <widget class="QPushButton" name="pushButton_laser_calibration">
      <property name="geometry">
       <rect>
-       <x>970</x>
+       <x>950</x>
        <y>390</y>
-       <width>121</width>
+       <width>101</width>
        <height>51</height>
       </rect>
      </property>
      <property name="text">
-      <string>Start Calibration</string>
+      <string>Start/Continue
+Calibration</string>
      </property>
     </widget>
     <widget class="Line" name="line_laser_2">
@@ -4353,6 +4354,42 @@ Filter Controller</string>
       <string/>
      </property>
     </widget>
+    <widget class="QProgressBar" name="progressBar_power_calibration">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>1040</x>
+       <y>280</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>100</number>
+     </property>
+     <property name="textVisible">
+      <bool>false</bool>
+     </property>
+     <property name="format">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_laser_calibration_abort">
+     <property name="geometry">
+      <rect>
+       <x>1060</x>
+       <y>390</y>
+       <width>101</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ABORT
+Calibration</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
@@ -4367,15 +4404,15 @@ Filter Controller</string>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_10"/>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_9"/>
   <buttongroup name="buttonGroup_6"/>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_8"/>
   <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup_7"/>
+  <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_10"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_8"/>
  </buttongroups>
 </ui>

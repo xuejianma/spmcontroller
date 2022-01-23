@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLa
 from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings, QTimer, QThreadPool
 
 from ndfiltercontroller import NDFilterController, NDFilterChange
+from powercalibration import PowerCalibration
 from powermeter import PowerMeterRead, PowerMeter
 from scan import Scan, MoveToTarget, Map, ApproachDisplay, MoveToTargetZ, AutoApproach
 from plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
@@ -38,7 +39,7 @@ class SPMController(QWidget):
         super(SPMController, self).__init__()
         # self.anc_controller = ANC300(3)
         # self.rm = ResourceManager()
-
+        self.mainThread = QThread.currentThread()
         self.curr_coord_z = 0.0
         self.error_lock = False
         self.positioner_moving = False
@@ -57,6 +58,7 @@ class SPMController(QWidget):
         self.colorbar_manual_main = False
         self.colorbar_manual_ch1 = False
         self.colorbar_manual_ch2 = False
+        self.calibration_on = False
         self.load_ui()
         self.reconnect_anc300()
         self.reconnect_opa()
@@ -339,6 +341,9 @@ class SPMController(QWidget):
             lambda: self.ndfilter_set_angle(self.doubleSpinBox_ndfilter.value())
         )
         self.pushButton_power.clicked.connect(self.reconnect_power)
+        self.pushButton_laser_calibration.clicked.connect(self.toggle_calibration)
+
+        self.pushButton_laser_calibration_abort.clicked.connect(self.abort_calibration)
 
 
 
@@ -910,8 +915,71 @@ class SPMController(QWidget):
             print(e)
             self.label_error_wavelength.setText("🚫 Error: ND Filter Controller not detected!")
 
+    def start_calibration(self):
+
+        try:
+            print(self.power_calibration, self.power_calibration.i, self.thread_calibration)
+        except:
+            print('wrong')
+        self.thread_calibration = QThread()
+        if not hasattr(self, 'power_calibration') or self.power_calibration is None:
+            self.power_calibration = PowerCalibration(self, self.laser_controller, self.ndfilter_controller, self.powermeter)
+        try:
+            self.power_calibration.halted.disconnect()
+            self.power_calibration.finished.disconnect()
+        except:
+            print("disconnect error")
+        def update_wavelength():
+            self.progressBar_power_calibration.setValue(self.power_calibration.progress)
+            self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength())
 
 
+
+        self.power_calibration.progress_update.connect(update_wavelength)
+        self.power_calibration.moveToThread(self.thread_calibration)
+        self.thread_calibration.started.connect(self.power_calibration.sweep_wavelength)
+        # self.power_calibration.finishedAfterSweeping.connect(self.power_calibration.deleteLater)
+        self.power_calibration.halted.connect(self.thread_calibration.exit)
+        self.power_calibration.finished.connect(self.thread_calibration.exit)
+        self.thread_calibration.finished.connect(self.thread_calibration.deleteLater)
+        # def tmp():
+        #     self.thread_calibration = None
+
+
+        def none_power_calibration():
+            self.power_calibration = None
+        # self.thread_calibration.finished.connect(none_power_calibration)
+        self.power_calibration.finished.connect(self.toggle_calibration)
+        self.power_calibration.finished.connect(none_power_calibration)
+
+        # self.power_calibration.destroyed.connect(none_power_calibration)
+        self.thread_calibration.start()
+
+
+
+    def toggle_calibration(self):
+        self.pushButton_laser_calibration.setEnabled(False)
+        self.pushButton_laser_calibration_abort.setEnabled(False)
+        QTimer.singleShot(200, lambda: self.pushButton_laser_calibration.setEnabled(True))
+        QTimer.singleShot(200, lambda: self.pushButton_laser_calibration_abort.setEnabled(True))
+
+        if self.calibration_on:
+            self.calibration_on = False
+            self.pushButton_laser_calibration.setText("Start/Continue\nCalibration")
+        else:
+            self.calibration_on = True
+            self.pushButton_laser_calibration.setText("Halt Calibration")
+            # if not hasattr(self, 'power_calibration') or self.power_calibration is None:
+            self.start_calibration()
+            # else:
+            #     self.power_calibration.sweep_wavelength()
+
+    def abort_calibration(self):
+        if self.calibration_on:
+            self.toggle_calibration()
+        # self.calibration_on = False
+        self.power_calibration = None
+        self.progressBar_power_calibration.setValue(100)
 
 
 '''
