@@ -896,7 +896,7 @@ class SPMController(QWidget):
             ))
             def turnoff():
                 self.doubleSpinBox_ndfilter.setEnabled(False)
-                self.pushButton_ndfilter.setEnabled(False),
+                self.pushButton_ndfilter.setEnabled(False)
             self.thread_set_angle.started.connect(turnoff)
             self.thread_set_angle.started.connect(self.ndfilter_change.set_angle)
             def turnon():
@@ -928,14 +928,23 @@ class SPMController(QWidget):
             self.power_calibration.halted.disconnect()
             self.power_calibration.finished.disconnect()
         except:
-            print("disconnect error")
+            pass
         def update_wavelength():
             self.progressBar_power_calibration.setValue(self.power_calibration.progress)
             self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength())
 
 
+        self.power_calibration.progress_finished_wavelength.connect(update_wavelength)
+        self.power_calibration.progress_finished_angle.connect(lambda: self.lcdNumber_ndfilter.display(
+            self.ndfilter_controller.angle
+        ))
+        self.power_calibration.progress_update_wavelength.connect(lambda: self.progressBar_wavelength.setValue(
+            self.power_calibration.progress_wavelength
+        ))
+        self.power_calibration.progress_update_angle.connect(lambda: self.progressBar_ndfilter.setValue(
+            self.power_calibration.progress_angle
+        ))
 
-        self.power_calibration.progress_update.connect(update_wavelength)
         self.power_calibration.moveToThread(self.thread_calibration)
         self.thread_calibration.started.connect(self.power_calibration.sweep_wavelength)
         # self.power_calibration.finishedAfterSweeping.connect(self.power_calibration.deleteLater)

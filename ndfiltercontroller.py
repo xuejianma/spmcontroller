@@ -34,4 +34,5 @@ class NDFilterChange(QObject):
         # if not self.parent.ndfilter_controller_changing:
         #   return
         self.ndfilter_controller.angle = self.angle
+
         self.finished.emit()
