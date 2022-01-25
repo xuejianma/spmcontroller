@@ -3459,8 +3459,8 @@ trace and retrace</string>
     <widget class="QSpinBox" name="spinBox_laser_calibration_wavelength_start">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>280</y>
+       <x>700</x>
+       <y>310</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3475,8 +3475,8 @@ trace and retrace</string>
     <widget class="QSpinBox" name="spinBox_laser_calibration_wavelength_end">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>310</y>
+       <x>700</x>
+       <y>340</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3491,8 +3491,8 @@ trace and retrace</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_target_power_uW">
      <property name="geometry">
       <rect>
-       <x>900</x>
-       <y>310</y>
+       <x>1010</x>
+       <y>340</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3520,8 +3520,8 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_wavelength_start">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>280</y>
+       <x>550</x>
+       <y>310</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -3533,8 +3533,8 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_wavelength_end">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>310</y>
+       <x>550</x>
+       <y>340</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -3546,8 +3546,8 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_target_power">
      <property name="geometry">
       <rect>
-       <x>790</x>
-       <y>310</y>
+       <x>900</x>
+       <y>340</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -3559,8 +3559,8 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_target_lowest_current">
      <property name="geometry">
       <rect>
-       <x>540</x>
-       <y>310</y>
+       <x>900</x>
+       <y>410</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -3572,8 +3572,8 @@ trace and retrace</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_lowest_current">
      <property name="geometry">
       <rect>
-       <x>650</x>
-       <y>310</y>
+       <x>1010</x>
+       <y>410</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3588,8 +3588,8 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_target_highest_current">
      <property name="geometry">
       <rect>
-       <x>540</x>
-       <y>280</y>
+       <x>900</x>
+       <y>380</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -3601,8 +3601,8 @@ trace and retrace</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_highest_current">
      <property name="geometry">
       <rect>
-       <x>650</x>
-       <y>280</y>
+       <x>1010</x>
+       <y>380</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3617,8 +3617,8 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_save">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>340</y>
+       <x>560</x>
+       <y>450</y>
        <width>131</width>
        <height>20</height>
       </rect>
@@ -3630,9 +3630,9 @@ trace and retrace</string>
     <widget class="QLineEdit" name="lineEdit_laser_calibration_save">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>340</y>
-       <width>731</width>
+       <x>560</x>
+       <y>480</y>
+       <width>571</width>
        <height>21</height>
       </rect>
      </property>
@@ -3640,8 +3640,8 @@ trace and retrace</string>
     <widget class="QPushButton" name="pushButton_laser_calibration_save">
      <property name="geometry">
       <rect>
-       <x>970</x>
-       <y>340</y>
+       <x>1010</x>
+       <y>450</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -3653,18 +3653,39 @@ trace and retrace</string>
     <widget class="QTableWidget" name="tableWidget">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>380</y>
-       <width>881</width>
-       <height>71</height>
+       <x>40</x>
+       <y>280</y>
+       <width>361</width>
+       <height>231</height>
       </rect>
      </property>
+     <property name="columnCount">
+      <number>3</number>
+     </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Wavelength (nm)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Filter Angle (°)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Power (μW)</string>
+      </property>
+     </column>
     </widget>
     <widget class="QPushButton" name="pushButton_laser_calibration">
      <property name="geometry">
       <rect>
-       <x>950</x>
-       <y>390</y>
+       <x>420</x>
+       <y>310</y>
        <width>101</width>
        <height>51</height>
       </rect>
@@ -3678,7 +3699,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>470</y>
+       <y>530</y>
        <width>1161</width>
        <height>16</height>
       </rect>
@@ -3691,7 +3712,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>460</y>
+       <y>520</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -3704,7 +3725,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>750</y>
+       <y>780</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -3717,7 +3738,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>780</y>
+       <y>810</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -3730,7 +3751,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>780</y>
+       <y>810</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3746,7 +3767,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>750</y>
+       <y>780</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3762,9 +3783,9 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>440</x>
-       <y>500</y>
+       <y>560</y>
        <width>701</width>
-       <height>401</height>
+       <height>341</height>
       </rect>
      </property>
     </widget>
@@ -3772,7 +3793,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>820</y>
+       <y>850</y>
        <width>121</width>
        <height>51</height>
       </rect>
@@ -3785,7 +3806,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>310</x>
-       <y>490</y>
+       <y>550</y>
        <width>101</width>
        <height>31</height>
       </rect>
@@ -3798,7 +3819,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>500</y>
+       <y>560</y>
        <width>251</width>
        <height>21</height>
       </rect>
@@ -3808,7 +3829,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>480</y>
+       <y>540</y>
        <width>251</width>
        <height>20</height>
       </rect>
@@ -3827,7 +3848,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>530</y>
+       <y>590</y>
        <width>261</width>
        <height>20</height>
       </rect>
@@ -3846,7 +3867,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>550</y>
+       <y>610</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3862,7 +3883,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>280</x>
-       <y>690</y>
+       <y>750</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -3875,7 +3896,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>690</y>
+       <y>750</y>
        <width>241</width>
        <height>21</height>
       </rect>
@@ -3885,7 +3906,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>620</y>
+       <y>680</y>
        <width>91</width>
        <height>20</height>
       </rect>
@@ -3898,7 +3919,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>640</y>
+       <y>700</y>
        <width>241</width>
        <height>21</height>
       </rect>
@@ -3911,7 +3932,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>670</y>
+       <y>730</y>
        <width>91</width>
        <height>20</height>
       </rect>
@@ -3924,7 +3945,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>280</x>
-       <y>640</y>
+       <y>700</y>
        <width>91</width>
        <height>20</height>
       </rect>
@@ -3936,8 +3957,8 @@ Calibration</string>
     <widget class="QLabel" name="label_laser_calibration_time">
      <property name="geometry">
       <rect>
-       <x>800</x>
-       <y>280</y>
+       <x>910</x>
+       <y>310</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -3949,8 +3970,8 @@ Calibration</string>
     <widget class="QSpinBox" name="spinBox_laser_calibration_time">
      <property name="geometry">
       <rect>
-       <x>900</x>
-       <y>280</y>
+       <x>1010</x>
+       <y>310</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3966,7 +3987,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>590</y>
+       <y>650</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3982,7 +4003,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>590</y>
+       <y>650</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -3995,7 +4016,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>220</x>
-       <y>820</y>
+       <y>850</y>
        <width>121</width>
        <height>51</height>
       </rect>
@@ -4305,8 +4326,8 @@ Filter Controller</string>
     <widget class="QSpinBox" name="spinBox_laser_calibration_step">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>280</y>
+       <x>700</x>
+       <y>390</y>
        <width>71</width>
        <height>22</height>
       </rect>
@@ -4318,8 +4339,8 @@ Filter Controller</string>
     <widget class="QLabel" name="label_laser_calibration_step">
      <property name="geometry">
       <rect>
-       <x>380</x>
-       <y>280</y>
+       <x>660</x>
+       <y>390</y>
        <width>31</width>
        <height>20</height>
       </rect>
@@ -4331,8 +4352,8 @@ Filter Controller</string>
     <widget class="QLabel" name="label_laser_calibration_number">
      <property name="geometry">
       <rect>
-       <x>340</x>
-       <y>310</y>
+       <x>620</x>
+       <y>420</y>
        <width>91</width>
        <height>20</height>
       </rect>
@@ -4344,8 +4365,8 @@ Filter Controller</string>
     <widget class="QLabel" name="label_laser_calibration_number_2">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>310</y>
+       <x>700</x>
+       <y>420</y>
        <width>71</width>
        <height>16</height>
       </rect>
@@ -4360,8 +4381,8 @@ Filter Controller</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>1040</x>
-       <y>280</y>
+       <x>420</x>
+       <y>360</y>
        <width>101</width>
        <height>20</height>
       </rect>
@@ -4379,8 +4400,8 @@ Filter Controller</string>
     <widget class="QPushButton" name="pushButton_laser_calibration_abort">
      <property name="geometry">
       <rect>
-       <x>1060</x>
-       <y>390</y>
+       <x>420</x>
+       <y>420</y>
        <width>101</width>
        <height>51</height>
       </rect>

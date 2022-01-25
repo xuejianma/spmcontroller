@@ -11,7 +11,8 @@ from PyQt5.QtMultimedia import QSound
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 from pyqtgraph import mkPen
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLabel, QVBoxLayout, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLabel, QVBoxLayout, QSizePolicy, \
+    QTableWidgetItem
 from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings, QTimer, QThreadPool
 
 from ndfiltercontroller import NDFilterController, NDFilterChange
@@ -924,13 +925,19 @@ class SPMController(QWidget):
         self.thread_calibration = QThread()
         if not hasattr(self, 'power_calibration') or self.power_calibration is None:
             self.power_calibration = PowerCalibration(self, self.laser_controller, self.ndfilter_controller, self.powermeter)
+            self.reset_calibration_form()
         try:
             self.power_calibration.halted.disconnect()
             self.power_calibration.finished.disconnect()
-        except:
-            pass
+            self.power_calibration.progress_finished_wavelength.disconnect()
+            self.power_calibration.progress_finished_angle.disconnect()
+            self.power_calibration.progress_update_wavelength.disconnect()
+            self.power_calibration.progress_update_angle.disconnect()
+        except Exception as e:
+            print(e)
         def update_wavelength():
-            self.progressBar_power_calibration.setValue(self.power_calibration.progress)
+
+            self.progressBar_power_calibration.setValue(self.power_calibration.progress if self.power_calibration is not None else 100)
             self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength())
 
 
@@ -939,15 +946,15 @@ class SPMController(QWidget):
             self.ndfilter_controller.angle
         ))
         self.power_calibration.progress_update_wavelength.connect(lambda: self.progressBar_wavelength.setValue(
-            self.power_calibration.progress_wavelength
+            self.power_calibration.progress_wavelength if self.power_calibration is not None else 100
         ))
         self.power_calibration.progress_update_angle.connect(lambda: self.progressBar_ndfilter.setValue(
-            self.power_calibration.progress_angle
+            self.power_calibration.progress_angle if self.power_calibration is not None else 100
         ))
 
         self.power_calibration.moveToThread(self.thread_calibration)
         self.thread_calibration.started.connect(self.power_calibration.sweep_wavelength)
-        # self.power_calibration.finishedAfterSweeping.connect(self.power_calibration.deleteLater)
+        self.power_calibration.finished.connect(self.power_calibration.deleteLater)
         self.power_calibration.halted.connect(self.thread_calibration.exit)
         self.power_calibration.finished.connect(self.thread_calibration.exit)
         self.thread_calibration.finished.connect(self.thread_calibration.deleteLater)
@@ -958,8 +965,11 @@ class SPMController(QWidget):
         def none_power_calibration():
             self.power_calibration = None
         # self.thread_calibration.finished.connect(none_power_calibration)
-        self.power_calibration.finished.connect(self.toggle_calibration)
+        self.power_calibration.finished.connect(lambda: self.toggle_calibration() if self.calibration_on else None)
         self.power_calibration.finished.connect(none_power_calibration)
+
+
+        self.power_calibration.progress_finished_wavelength.connect(self.update_calibration_form)
 
         # self.power_calibration.destroyed.connect(none_power_calibration)
         self.thread_calibration.start()
@@ -986,9 +996,20 @@ class SPMController(QWidget):
     def abort_calibration(self):
         if self.calibration_on:
             self.toggle_calibration()
-        # self.calibration_on = False
+        self.calibration_on = False
+        # self.power_calibration.deleteLater()
         self.power_calibration = None
         self.progressBar_power_calibration.setValue(100)
+
+    def reset_calibration_form(self):
+        self.tableWidget.setRowCount(0)
+
+    def update_calibration_form(self):
+        self.tableWidget.insertRow(0)
+        # print(self.main.tableWidget.columnCount(), self.main.tableWidget.rowCount() - 1)
+        self.tableWidget.setItem(0, 0, QTableWidgetItem(str(self.laser_controller.getWavelength())))
+        self.tableWidget.setItem(0, 1, QTableWidgetItem(str(self.ndfilter_controller.get_angle())))
+        self.tableWidget.setItem(0, 2, QTableWidgetItem(str(np.round(self.powermeter.get_power() * 1e6, 2))))
 
 
 '''

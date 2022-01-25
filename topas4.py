@@ -99,4 +99,4 @@ class LaserWavelengthChange(QObject):
             # sys.stdin.read(1)  # wait for user confirmation
             # tell the device that required actions have been performed.  If shutter was open before setting wavelength it will be opened again
             self.put('/Optical/WavelengthControl/FinishWavelengthSettingAfterUserActions', {'RestoreShutter': True})
-        print("Done setting wavelength")
+        print("Done setting wavelength ", self.wavelength)

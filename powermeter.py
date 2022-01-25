@@ -59,7 +59,7 @@ label_error_text = "🚫 Error: Power Meter not detected!"
 class PowerMeter:
     def __init__(self, parent):
         self.parent = parent
-    def getPower(self):
+    def get_power(self):
         # return float(self.instrument.query('Measure:Scalar:POWer?'))
         return self.simulate_power(self.parent.laser_controller.getWavelength(), self.parent.ndfilter_controller.get_angle())
     def simulate_power(self, wavelength, angle):
@@ -78,7 +78,7 @@ class PowerMeterRead(QObject):
         self.powermeter = powermeter
 
     def updatePower(self):
-        self.curr_value = self.powermeter.getPower()
+        self.curr_value = self.powermeter.get_power()
         self.lcdNumber_laser_power.display(self.curr_value)
         self.lcdNumber_laser_power_uW.display(self.curr_value * 1e6)
 
