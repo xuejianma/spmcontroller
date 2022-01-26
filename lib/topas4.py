@@ -5,7 +5,7 @@ import sys
 
 from PyQt5.QtCore import QObject, pyqtSignal, QThreadPool, QRunnable, QMutex
 
-from Topas4Locator import Topas4Locator
+from .Topas4Locator import Topas4Locator
 # from time import sleep
 
 class Topas4():

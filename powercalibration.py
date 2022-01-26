@@ -1,16 +1,17 @@
 from time import sleep
 
 import numpy as np
-from PyQt5.QtCore import QObject, pyqtSignal, QThread
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtCore import QObject, pyqtSignal
 
-from ndfiltercontroller import NDFilterChange
-from topas4 import LaserWavelengthChange
+from lib.ndfiltercontroller import NDFilterChange
+from lib.topas4 import LaserWavelengthChange
+from util.powerconverge import power_converge
 
 
 class PowerCalibration(QObject):
     halted = pyqtSignal()
     finished = pyqtSignal()
+    fresh_new_start = pyqtSignal()
     progress_finished_wavelength = pyqtSignal()
     progress_finished_angle = pyqtSignal()
     progress_update_wavelength = pyqtSignal()
@@ -27,13 +28,14 @@ class PowerCalibration(QObject):
         self.ending_wavelength = self.main.spinBox_laser_calibration_wavelength_end.value()
         self.target_power = self.main.doubleSpinBox_laser_calibration_target_power_uW.value()
         self.step = self.main.spinBox_laser_calibration_step.value()
-        self.number = (self.ending_wavelength - self.starting_wavelength) // self.step
+        self.number = (self.ending_wavelength - self.starting_wavelength) // self.step + 1
         self.i = 0
         self.curr_wavelength = 0
-        self.curr_angle = self.main.doubleSpinBox_laser_calibration_highest_current.value()
+        self.curr_angle = 0 #self.main.doubleSpinBox_laser_calibration_highest_current.value()
         self.progress = 0
         self.progress_wavelength = 100
         self.progress_angle = 100
+
 
 
     def sweep_wavelength(self):
@@ -41,6 +43,8 @@ class PowerCalibration(QObject):
         # self.reset_form()
         # self.progress_finished_wavelength.emit()
         # print("finnaly it works!", self.parent.mainThread)
+        if self.i == 0:
+            self.fresh_new_start.emit()
         while self.i < self.number and self.main.calibration_on:
 
             self.curr_wavelength = self.starting_wavelength + self.i * self.step
@@ -54,7 +58,12 @@ class PowerCalibration(QObject):
             self.main.laser_wavelength_changing = False
             while self.main.calibration_on:
                 # print('angle changing')
-                ndfilter_change = NDFilterChange(self.main, self.ndfilter_controller, 1)
+                next_angle = np.round(power_converge(self.ndfilter_controller.get_angle(),
+                                                     self.powermeter.get_power_uW(), self.target_power), 2)
+                # print(next_angle)
+                if abs(self.powermeter.get_power_uW() - self.target_power) < 0.05 * self.target_power:
+                    break
+                ndfilter_change = NDFilterChange(self.main, self.ndfilter_controller, next_angle)
                 def progress_angle_update():
                     self.progress_angle = ndfilter_change.progress
                     self.progress_update_angle.emit()
@@ -66,7 +75,7 @@ class PowerCalibration(QObject):
                 self.main.laser_ndfilter_changing = True
                 ndfilter_change.set_angle()
                 self.main.laser_ndfilter_changing = False
-                break
+                # break
             # self.update_form()
             self.progress = int((self.i + 1) * 100 / self.number)
             print(self.laser_controller.getWavelength())
@@ -75,15 +84,16 @@ class PowerCalibration(QObject):
             self.i += 1
 
         if self.main.calibration_on:
-            self.curr_wavelength = self.ending_wavelength
-            laserwavelength_change = LaserWavelengthChange(self.main, self.laser_controller, self.curr_wavelength)
-            self.progress_wavelength = laserwavelength_change.progress
-            laserwavelength_change.progress_update.connect(self.progress_update_wavelength.emit)
-            self.main.laser_wavelength_changing = True
-            laserwavelength_change.setWavelength()
-            self.main.laser_wavelength_changing = False
+            if self.curr_wavelength != self.ending_wavelength:
+                self.curr_wavelength = self.ending_wavelength
+                laserwavelength_change = LaserWavelengthChange(self.main, self.laser_controller, self.curr_wavelength)
+                self.progress_wavelength = laserwavelength_change.progress
+                laserwavelength_change.progress_update.connect(self.progress_update_wavelength.emit)
+                self.main.laser_wavelength_changing = True
+                laserwavelength_change.setWavelength()
+                self.main.laser_wavelength_changing = False
             # print(laserwavelength_change.wavelength)
-            self.progress_finished_wavelength.emit()
+                self.progress_finished_wavelength.emit()
             self.finished.emit()
             # return
         self.moveToThread(self.main.mainThread)

@@ -17,8 +17,10 @@ label_error_text = "🚫 Error: Power Meter not detected!"
 #             self.error()
 #     def error(self):
 #         raise ValueError()
-#     def getPower(self):
+#     def get_power(self):
 #         return float(self.instrument.query('Measure:Scalar:POWer?'))
+#     def get_power_uW(self):
+#         return self.get_power() * 1e6
 #
 # class PowerMeterRead(QObject):
 #     finished = pyqtSignal()
@@ -62,6 +64,9 @@ class PowerMeter:
     def get_power(self):
         # return float(self.instrument.query('Measure:Scalar:POWer?'))
         return self.simulate_power(self.parent.laser_controller.getWavelength(), self.parent.ndfilter_controller.get_angle())
+
+    def get_power_uW(self):
+        return self.get_power() * 1e6
     def simulate_power(self, wavelength, angle):
         return 1.0e-4 * (1.0e-4 * (wavelength - 500) ** 2 + 1) * (360 - angle)/360
 

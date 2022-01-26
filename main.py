@@ -6,29 +6,30 @@ All rights reserved.
 # This Python file uses the following encoding: utf-8
 import sys
 import os
+from datetime import datetime
 
 from PyQt5.QtMultimedia import QSound
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 from pyqtgraph import mkPen
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGridLayout, QLabel, QVBoxLayout, QSizePolicy, \
-    QTableWidgetItem
-from PyQt5.QtCore import QFile, Qt, QSize, QObject, QThread, pyqtSignal, QSettings, QTimer, QThreadPool
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QTableWidgetItem
+from PyQt5.QtCore import QThread, pyqtSignal, QSettings, QTimer
 
-from ndfiltercontroller import NDFilterController, NDFilterChange
+from lib.ndfiltercontroller import NDFilterController, NDFilterChange
 from powercalibration import PowerCalibration
-from powermeter import PowerMeterRead, PowerMeter
+from lib.powermeter import PowerMeterRead, PowerMeter
 from scan import Scan, MoveToTarget, Map, ApproachDisplay, MoveToTargetZ, AutoApproach
-from plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
-from anc300 import ANC300
-from sr830 import SR830
-from hardware import OutputVoltage, InputVoltage, InputVoltageEncoder
+from util.plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
+from lib.anc300 import ANC300
+from lib.sr830 import SR830
+from lib.niboard import OutputVoltage, InputVoltage, InputVoltageEncoder
 from os.path import isdir
 # from pyvisa import ResourceManager
-from planefit import PlaneFit
+from util.planefit import PlaneFit
 import numpy as np
+import pandas as pd
 
-from topas4 import Topas4, LaserWavelengthChange
+from lib.topas4 import Topas4, LaserWavelengthChange
 
 
 class SPMController(QWidget):
@@ -324,6 +325,7 @@ class SPMController(QWidget):
             lambda: self.goto_position_z(0.0))
 
         self.pushButton_approach_auto_start.clicked.connect(self.toggle_auto_approach_button)
+        self.pushButton_laser_calibration_load.clicked.connect(self.load_calibration_form)
 
         for i in range(len(self.plane_fit_list[0])):
             plane_fit_x, plane_fit_y, plane_fit_z, plane_fit_checked = self.plane_fit_list[0][i],\
@@ -345,6 +347,8 @@ class SPMController(QWidget):
         self.pushButton_laser_calibration.clicked.connect(self.toggle_calibration)
 
         self.pushButton_laser_calibration_abort.clicked.connect(self.abort_calibration)
+
+        self.pushButton_laser_calibration_save.clicked.connect(self.save_calibration_form)
 
 
 
@@ -940,7 +944,7 @@ class SPMController(QWidget):
             self.progressBar_power_calibration.setValue(self.power_calibration.progress if self.power_calibration is not None else 100)
             self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength())
 
-
+        self.power_calibration.fresh_new_start.connect(lambda: self.progressBar_power_calibration.setValue(0))
         self.power_calibration.progress_finished_wavelength.connect(update_wavelength)
         self.power_calibration.progress_finished_angle.connect(lambda: self.lcdNumber_ndfilter.display(
             self.ndfilter_controller.angle
@@ -1002,15 +1006,50 @@ class SPMController(QWidget):
         self.progressBar_power_calibration.setValue(100)
 
     def reset_calibration_form(self):
-        self.tableWidget.setRowCount(0)
+        self.tableWidget_laser_calibration.setRowCount(0)
 
     def update_calibration_form(self):
-        self.tableWidget.insertRow(0)
-        # print(self.main.tableWidget.columnCount(), self.main.tableWidget.rowCount() - 1)
-        self.tableWidget.setItem(0, 0, QTableWidgetItem(str(self.laser_controller.getWavelength())))
-        self.tableWidget.setItem(0, 1, QTableWidgetItem(str(self.ndfilter_controller.get_angle())))
-        self.tableWidget.setItem(0, 2, QTableWidgetItem(str(np.round(self.powermeter.get_power() * 1e6, 2))))
+        self.tableWidget_laser_calibration.insertRow(0)
+        # print(self.main.tableWidget_laser_calibration.columnCount(), self.main.tableWidget_laser_calibration.rowCount() - 1)
+        self.tableWidget_laser_calibration.setItem(0, 0, QTableWidgetItem(str(float(self.laser_controller.getWavelength()))))
+        self.tableWidget_laser_calibration.setItem(0, 1, QTableWidgetItem(str(self.ndfilter_controller.get_angle())))
+        self.tableWidget_laser_calibration.setItem(0, 2, QTableWidgetItem(str(np.round(self.powermeter.get_power() * 1e6, 2))))
 
+    def save_calibration_form(self):
+        now = datetime.now()
+        file_path, _ = QFileDialog.getSaveFileName(self,"Save Calibration As:",
+                                                   self.lineEdit_laser_calibration_directory.text()+'/' +
+                                                   self.lineEdit_laser_calibration_default_filename.text().
+                                                   replace("{d}", now.strftime("%Y%m%d")).
+                                                   replace("{t}", now.strftime("%H%M%S")),
+                                                   "CSV Files (*.csv);;All Files (*)")
+        if file_path == '':
+            return
+        column_headers = ['Wavelength (nm)', 'ND Filter Angle (degree)', 'Power (uW)']
+        # for j in range(self.tableWidget_laser_calibration.model().columnCount()):
+        #     column_headers.append(self.tableWidget_laser_calibration.horizontalHeaderItem(j).text())
+        df = pd.DataFrame(columns = column_headers)
+        for row in range(self.tableWidget_laser_calibration.rowCount()):
+            for col in range(self.tableWidget_laser_calibration.columnCount()):
+                df.at[row, column_headers[col]] = self.tableWidget_laser_calibration.item(row, col).text()
+        df.to_csv(file_path, index = False)
+
+    def load_calibration_form(self):
+        file_path, _ = QFileDialog.getOpenFileName(self,"Load Calibration File:",
+                                                   self.lineEdit_laser_calibration_directory.text(),
+                                                   "CSV Files (*.csv);;All Files (*)")
+        if file_path == '':
+            return
+        df = pd.read_csv(file_path, index_col=None)
+        file_wavelength_list = df.iloc[:, 0].values
+        file_angle_list = df.iloc[:, 1].values
+        file_power_list = df.iloc[:, 2].values
+        self.tableWidget_laser_calibration.setRowCount(0)
+        self.tableWidget_laser_calibration.setRowCount(len(file_wavelength_list))
+        for ind in range(len(file_wavelength_list)):
+            self.tableWidget_laser_calibration.setItem(ind, 0, QTableWidgetItem(str(float(file_wavelength_list[ind]))))
+            self.tableWidget_laser_calibration.setItem(ind, 1, QTableWidgetItem(str(float(file_angle_list[ind]))))
+            self.tableWidget_laser_calibration.setItem(ind, 2, QTableWidgetItem(str(float(file_power_list[ind]))))
 
 '''
 TODO: load current position based on values
