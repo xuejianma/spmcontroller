@@ -1537,7 +1537,7 @@ trace and retrace</string>
        </rect>
       </property>
       <property name="text">
-       <string>x (V)</string>
+       <string>y (V)</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_plane_fit_z_delta">
@@ -3456,23 +3456,7 @@ trace and retrace</string>
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:700;&quot;&gt;Power:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="spinBox_laser_calibration_wavelength_start">
-     <property name="geometry">
-      <rect>
-       <x>700</x>
-       <y>310</y>
-       <width>111</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="maximum">
-      <number>9999</number>
-     </property>
-     <property name="value">
-      <number>400</number>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="spinBox_laser_calibration_wavelength_end">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_wavelength_start">
      <property name="geometry">
       <rect>
        <x>700</x>
@@ -3481,11 +3465,33 @@ trace and retrace</string>
        <height>22</height>
       </rect>
      </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
      <property name="maximum">
-      <number>99999999</number>
+      <double>100000.000000000000000</double>
      </property>
      <property name="value">
-      <number>410</number>
+      <double>400.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_wavelength_end">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>370</y>
+       <width>111</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>410.000000000000000</double>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_target_power_uW">
@@ -3521,7 +3527,7 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>550</x>
-       <y>310</y>
+       <y>340</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -3534,7 +3540,7 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>550</x>
-       <y>340</y>
+       <y>370</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -3546,7 +3552,7 @@ trace and retrace</string>
     <widget class="QLabel" name="label_laser_calibration_target_power">
      <property name="geometry">
       <rect>
-       <x>900</x>
+       <x>890</x>
        <y>310</y>
        <width>111</width>
        <height>20</height>
@@ -3556,24 +3562,24 @@ trace and retrace</string>
       <string>Target Power (μW):</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_laser_calibration_target_lowest_current">
+    <widget class="QLabel" name="label_laser_calibration_target_highest_angle">
      <property name="geometry">
       <rect>
        <x>900</x>
-       <y>410</y>
+       <y>400</y>
        <width>111</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Lowest Current (A):</string>
+      <string>Highest Angle (°):</string>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_lowest_current">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_highest_angle">
      <property name="geometry">
       <rect>
        <x>1010</x>
-       <y>410</y>
+       <y>400</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3582,27 +3588,27 @@ trace and retrace</string>
       <double>9999.989999999999782</double>
      </property>
      <property name="value">
-      <double>0.070000000000000</double>
+      <double>360.000000000000000</double>
      </property>
     </widget>
-    <widget class="QLabel" name="label_laser_calibration_target_highest_current">
+    <widget class="QLabel" name="label_laser_calibration_target_lowest_angle">
      <property name="geometry">
       <rect>
        <x>900</x>
-       <y>380</y>
+       <y>370</y>
        <width>111</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Lowest Current (A):</string>
+      <string>Lowest Angle (°):</string>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_highest_current">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_lowest_angle">
      <property name="geometry">
       <rect>
        <x>1010</x>
-       <y>380</y>
+       <y>370</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3702,7 +3708,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>530</y>
+       <y>540</y>
        <width>1161</width>
        <height>16</height>
       </rect>
@@ -3715,7 +3721,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>520</y>
+       <y>530</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -3727,8 +3733,8 @@ Calibration</string>
     <widget class="QLabel" name="label_laser_measurement_wavelength_start">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>780</y>
+       <x>70</x>
+       <y>730</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -3740,8 +3746,8 @@ Calibration</string>
     <widget class="QLabel" name="label_laser_measurement_wavelength_end">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>810</y>
+       <x>70</x>
+       <y>760</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -3753,14 +3759,17 @@ Calibration</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_measurement_wavelength_end">
      <property name="geometry">
       <rect>
-       <x>230</x>
-       <y>810</y>
-       <width>111</width>
+       <x>220</x>
+       <y>760</y>
+       <width>121</width>
        <height>22</height>
       </rect>
      </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
      <property name="maximum">
-      <double>9999.989999999999782</double>
+      <double>100000.000000000000000</double>
      </property>
      <property name="value">
       <double>900.000000000000000</double>
@@ -3769,14 +3778,17 @@ Calibration</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_measurement_wavelength_start">
      <property name="geometry">
       <rect>
-       <x>230</x>
-       <y>780</y>
-       <width>111</width>
+       <x>220</x>
+       <y>730</y>
+       <width>121</width>
        <height>22</height>
       </rect>
      </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
      <property name="maximum">
-      <double>9999.989999999999782</double>
+      <double>100000.000000000000000</double>
      </property>
      <property name="value">
       <double>400.000000000000000</double>
@@ -3802,91 +3814,47 @@ Calibration</string>
       </rect>
      </property>
      <property name="text">
-      <string>Start Measurement</string>
+      <string>Start/Continue
+Measurement</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_laser_calibration_load2">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>550</y>
-       <width>101</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Select File</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_laser_calibration_load">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>560</y>
-       <width>251</width>
-       <height>21</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="checkBox_laser_measurement_constant_power">
+    <widget class="QRadioButton" name="radioButton_laser_measurement_constant_power">
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>540</y>
-       <width>251</width>
+       <y>560</y>
+       <width>331</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Constant Power. Load calibration from:</string>
+      <string>(Mode 1) Constant Power (Load Calibration Above)</string>
      </property>
      <property name="checked">
       <bool>true</bool>
      </property>
-     <attribute name="buttonGroup">
-      <string notr="true">buttonGroup_10</string>
-     </attribute>
     </widget>
-    <widget class="QCheckBox" name="checkBox_laser_measurement_constant_current">
+    <widget class="QRadioButton" name="radioButton_laser_measurement_constant_angle">
      <property name="geometry">
       <rect>
        <x>30</x>
        <y>590</y>
-       <width>261</width>
+       <width>331</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Constant Current (A) (varying power):</string>
+      <string>(Mode 2) Constant Angle (Varying Power)</string>
      </property>
      <property name="checked">
       <bool>false</bool>
-     </property>
-     <attribute name="buttonGroup">
-      <string notr="true">buttonGroup_10</string>
-     </attribute>
-    </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_measurement_constant_current">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>610</y>
-       <width>111</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="maximum">
-      <double>9999.989999999999782</double>
-     </property>
-     <property name="value">
-      <double>0.000000000000000</double>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton_laser_measurement_data_save_directory">
      <property name="geometry">
       <rect>
        <x>280</x>
-       <y>750</y>
+       <y>640</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -3899,75 +3867,36 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>750</y>
+       <y>640</y>
        <width>241</width>
        <height>21</height>
       </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_laser_measurement_data_save">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>680</y>
-       <width>91</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Data saved as: </string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_laser_measurement_data_save_filename">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>700</y>
-       <width>241</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>{d}_{t}_sweep_{s}</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_laser_measurement_data_save_directory">
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>730</y>
-       <width>91</width>
+       <y>620</y>
+       <width>171</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Data saved at:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_laser_measurement_data_save_csv">
-     <property name="geometry">
-      <rect>
-       <x>280</x>
-       <y>700</y>
-       <width>91</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>.csv</string>
+      <string>Default Sweeping Directory:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_laser_calibration_time">
      <property name="geometry">
       <rect>
-       <x>910</x>
+       <x>880</x>
        <y>340</y>
-       <width>111</width>
+       <width>121</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Sweep time (s):</string>
+      <string>Step Waiting Time (s):</string>
      </property>
     </widget>
     <widget class="QSpinBox" name="spinBox_laser_calibration_time">
@@ -3983,15 +3912,15 @@ Calibration</string>
       <number>99999</number>
      </property>
      <property name="value">
-      <number>120</number>
+      <number>0</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="spinBox_laser_measurement_time">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>650</y>
-       <width>111</width>
+       <x>220</x>
+       <y>790</y>
+       <width>71</width>
        <height>22</height>
       </rect>
      </property>
@@ -3999,20 +3928,20 @@ Calibration</string>
       <number>99999</number>
      </property>
      <property name="value">
-      <number>120</number>
+      <number>0</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_laser_measurement_time">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>650</y>
-       <width>111</width>
+       <x>90</x>
+       <y>790</y>
+       <width>121</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Sweep time (s):</string>
+      <string>Step Waiting Time (s):</string>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton_laser_measurement_abort">
@@ -4025,7 +3954,8 @@ Calibration</string>
       </rect>
      </property>
      <property name="text">
-      <string>Abort Measurement</string>
+      <string>ABORT
+Measurement</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_laser_set_wavelength">
@@ -4080,7 +4010,7 @@ Calibration</string>
       </rect>
      </property>
      <property name="maximum">
-      <double>9999.989999999999782</double>
+      <double>360.000000000000000</double>
      </property>
      <property name="value">
       <double>0.000000000000000</double>
@@ -4326,62 +4256,39 @@ Filter Controller</string>
 Filter Controller</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="spinBox_laser_calibration_step">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_step">
      <property name="geometry">
       <rect>
-       <x>700</x>
-       <y>390</y>
+       <x>590</x>
+       <y>400</y>
        <width>71</width>
        <height>22</height>
       </rect>
      </property>
-     <property name="minimum">
+     <property name="decimals">
       <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>0.100000000000000</double>
      </property>
      <property name="maximum">
-      <number>99999</number>
+      <double>10000.000000000000000</double>
      </property>
      <property name="value">
-      <number>1</number>
+      <double>1.000000000000000</double>
      </property>
     </widget>
     <widget class="QLabel" name="label_laser_calibration_step">
      <property name="geometry">
       <rect>
-       <x>660</x>
-       <y>390</y>
+       <x>550</x>
+       <y>400</y>
        <width>31</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>Step:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_laser_calibration_number">
-     <property name="geometry">
-      <rect>
-       <x>620</x>
-       <y>420</y>
-       <width>91</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string># Data Point:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_laser_calibration_number_2">
-     <property name="geometry">
-      <rect>
-       <x>700</x>
-       <y>420</y>
-       <width>71</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
      </property>
     </widget>
     <widget class="QProgressBar" name="progressBar_power_calibration">
@@ -4391,7 +4298,7 @@ Filter Controller</string>
      <property name="geometry">
       <rect>
        <x>550</x>
-       <y>280</y>
+       <y>300</y>
        <width>261</width>
        <height>20</height>
       </rect>
@@ -4465,12 +4372,121 @@ as .csv file</string>
       <rect>
        <x>550</x>
        <y>510</y>
-       <width>211</width>
+       <width>101</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>Default Filename:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_laser_measurement_data_save_filename">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>690</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>{d}_{t}_sweep_{m}.csv</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_measurement_data_save">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>670</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Default Filename:</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_calibration_tolerance">
+     <property name="geometry">
+      <rect>
+       <x>740</x>
+       <y>400</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>0.100000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>5.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_calibration_tolerance">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>400</y>
+       <width>61</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Tolerance:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_calibration_tolerance_percentage_symbol">
+     <property name="geometry">
+      <rect>
+       <x>800</x>
+       <y>400</y>
+       <width>16</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>%</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_measurement_step">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>820</y>
+       <width>31</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Step:</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_laser_measurement_step">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>820</y>
+       <width>71</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>0.100000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
      </property>
     </widget>
    </widget>

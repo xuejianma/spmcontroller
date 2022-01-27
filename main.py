@@ -30,6 +30,7 @@ import numpy as np
 import pandas as pd
 
 from lib.topas4 import Topas4, LaserWavelengthChange
+from wavelengthsweep import WavelengthSweep
 
 
 class SPMController(QWidget):
@@ -61,6 +62,7 @@ class SPMController(QWidget):
         self.colorbar_manual_ch1 = False
         self.colorbar_manual_ch2 = False
         self.calibration_on = False
+        self.laser_measurement_on = False
         self.load_ui()
         self.reconnect_anc300()
         self.reconnect_opa()
@@ -349,6 +351,8 @@ class SPMController(QWidget):
         self.pushButton_laser_calibration_abort.clicked.connect(self.abort_calibration)
 
         self.pushButton_laser_calibration_save.clicked.connect(self.save_calibration_form)
+
+        self.pushButton_laser_measurement.clicked.connect(self.start_laser_measurement)
 
 
 
@@ -939,13 +943,14 @@ class SPMController(QWidget):
             self.power_calibration.progress_update_angle.disconnect()
         except Exception as e:
             print(e)
-        def update_wavelength():
-
-            self.progressBar_power_calibration.setValue(self.power_calibration.progress if self.power_calibration is not None else 100)
-            self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength())
+        # def update_wavelength():
+        #
+        #     self.progressBar_power_calibration.setValue(self.power_calibration.progress if self.power_calibration is not None else 100)
+        #     self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength())
 
         self.power_calibration.fresh_new_start.connect(lambda: self.progressBar_power_calibration.setValue(0))
-        self.power_calibration.progress_finished_wavelength.connect(update_wavelength)
+        self.power_calibration.progress_finished_wavelength_but_waiting_for_angle.connect(lambda: self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength()))
+        self.power_calibration.progress_finished_wavelength.connect(lambda: self.progressBar_power_calibration.setValue(self.power_calibration.progress if self.power_calibration is not None else 100))
         self.power_calibration.progress_finished_angle.connect(lambda: self.lcdNumber_ndfilter.display(
             self.ndfilter_controller.angle
         ))
@@ -1050,6 +1055,19 @@ class SPMController(QWidget):
             self.tableWidget_laser_calibration.setItem(ind, 0, QTableWidgetItem(str(float(file_wavelength_list[ind]))))
             self.tableWidget_laser_calibration.setItem(ind, 1, QTableWidgetItem(str(float(file_angle_list[ind]))))
             self.tableWidget_laser_calibration.setItem(ind, 2, QTableWidgetItem(str(float(file_power_list[ind]))))
+
+    def start_laser_measurement(self):
+        self.laser_measurement_thread = QThread()
+        self.wavelength_sweep = WavelengthSweep(self, self.laser_controller, self.ndfilter_controller, self.powermeter)
+        self.wavelength_sweep.moveToThread(self.laser_measurement_thread)
+        self.laser_measurement_thread.started.connect(self.wavelength_sweep.sweep_wavelength)
+        self.wavelength_sweep.finished.connect(self.wavelength_sweep.deleteLater)
+        self.wavelength_sweep.finished.connect(self.laser_measurement_thread.exit)
+        self.laser_measurement_thread.finished.connect(self.laser_measurement_thread.deleteLater)
+        self.laser_measurement_thread.start()
+
+    # def
+
 
 '''
 TODO: load current position based on values
