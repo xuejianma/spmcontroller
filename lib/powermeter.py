@@ -98,7 +98,6 @@ class PowerMeterRead(QObject):
                 self.powermeter = None
                 self.label_power_error.setText(label_error_text)
                 self.checkBox_read_power.setEnabled(False)
-                #
                 self.checkBox_read_power.blockSignals(True)
                 self.checkBox_read_power.setChecked(False)
                 self.checkBox_read_power.blockSignals(False)

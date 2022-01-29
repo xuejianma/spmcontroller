@@ -154,7 +154,8 @@ class SPMController(QWidget):
         self.widget_linescan_approach_ch1.setBackground("w")
         self.widget_linescan_approach_ch2.setBackground("w")
 
-        self.widget_laser_measurement.setBackground("w")
+        self.widget_laser_measurement_ch1.setBackground("w")
+        self.widget_laser_measurement_ch2.setBackground("w")
 
     def determine_scan_window(self):
         self.piezo_limit_x = self.doubleSpinBox_piezo_limit_x.value()
@@ -727,7 +728,8 @@ class SPMController(QWidget):
             self.label_error_ndfilter.setText("")
             self.progressBar_ndfilter.setValue(100)
 
-        except:
+        except Exception as e:
+            print(e)
             self.ndfilter_controller = None
             self.label_error_ndfilter.setText("🚫 Error: ND Filter Controller not detected!")
 
@@ -903,6 +905,8 @@ class SPMController(QWidget):
             self.ndfilter_change.progress_update.connect(lambda: self.progressBar_ndfilter.setValue(
                 self.ndfilter_change.progress if self.ndfilter_change is not None else 100
             ))
+            self.ndfilter_change.progress_update.connect(lambda: self.lcdNumber_ndfilter.display(
+                self.ndfilter_controller.get_angle()))
             def turnoff():
                 self.doubleSpinBox_ndfilter.setEnabled(False)
                 self.pushButton_ndfilter.setEnabled(False)
@@ -952,13 +956,16 @@ class SPMController(QWidget):
         self.power_calibration.progress_finished_wavelength_but_waiting_for_angle.connect(lambda: self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength()))
         self.power_calibration.progress_finished_wavelength.connect(lambda: self.progressBar_power_calibration.setValue(self.power_calibration.progress if self.power_calibration is not None else 100))
         self.power_calibration.progress_finished_angle.connect(lambda: self.lcdNumber_ndfilter.display(
-            self.ndfilter_controller.angle
+            self.ndfilter_controller.get_angle()
         ))
         self.power_calibration.progress_update_wavelength.connect(lambda: self.progressBar_wavelength.setValue(
             self.power_calibration.progress_wavelength if self.power_calibration is not None else 100
         ))
         self.power_calibration.progress_update_angle.connect(lambda: self.progressBar_ndfilter.setValue(
             self.power_calibration.progress_angle if self.power_calibration is not None else 100
+        ))
+        self.power_calibration.progress_update_angle.connect(lambda: self.lcdNumber_ndfilter.display(
+            self.ndfilter_controller.get_angle()
         ))
 
         self.power_calibration.moveToThread(self.thread_calibration)

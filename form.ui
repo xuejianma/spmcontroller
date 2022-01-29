@@ -3794,13 +3794,13 @@ Calibration</string>
       <double>400.000000000000000</double>
      </property>
     </widget>
-    <widget class="PlotWidget" name="widget_laser_measurement" native="true">
+    <widget class="PlotWidget" name="widget_laser_measurement_ch1" native="true">
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>460</x>
        <y>560</y>
        <width>701</width>
-       <height>341</height>
+       <height>171</height>
       </rect>
      </property>
     </widget>
@@ -3823,12 +3823,12 @@ Measurement</string>
       <rect>
        <x>30</x>
        <y>560</y>
-       <width>331</width>
+       <width>401</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>(Mode 1) Constant Power (Load Calibration Above)</string>
+      <string>(Mode 1) Sweep Wavelength, Constant Power (Load Calibration Above)</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -3839,12 +3839,12 @@ Measurement</string>
       <rect>
        <x>30</x>
        <y>590</y>
-       <width>331</width>
+       <width>401</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>(Mode 2) Constant Angle (Varying Power)</string>
+      <string>(Mode 2) Sweep Wavelength, Constant Angle (Uncontrolled Power)</string>
      </property>
      <property name="checked">
       <bool>false</bool>
@@ -3854,7 +3854,7 @@ Measurement</string>
      <property name="geometry">
       <rect>
        <x>280</x>
-       <y>640</y>
+       <y>660</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -3867,7 +3867,7 @@ Measurement</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>640</y>
+       <y>660</y>
        <width>241</width>
        <height>21</height>
       </rect>
@@ -3877,7 +3877,7 @@ Measurement</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>620</y>
+       <y>640</y>
        <width>171</width>
        <height>20</height>
       </rect>
@@ -4384,7 +4384,7 @@ as .csv file</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>690</y>
+       <y>700</y>
        <width>241</width>
        <height>21</height>
       </rect>
@@ -4397,7 +4397,7 @@ as .csv file</string>
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>670</y>
+       <y>680</y>
        <width>121</width>
        <height>20</height>
       </rect>
@@ -4487,6 +4487,32 @@ as .csv file</string>
      </property>
      <property name="value">
       <double>1.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_laser_measurement_constant_wavelength">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>620</y>
+       <width>401</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>(Mode 3) Sweep Power (Angle), Constant Wavelength</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="PlotWidget" name="widget_laser_measurement_ch2" native="true">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>740</y>
+       <width>701</width>
+       <height>171</height>
+      </rect>
      </property>
     </widget>
    </widget>
