@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 
 from lib.topas4 import Topas4, LaserWavelengthChange
-from wavelengthsweep import WavelengthSweep
+from lasermeasurement import LaserMeasurement
 
 
 class SPMController(QWidget):
@@ -105,6 +105,7 @@ class SPMController(QWidget):
 
         self.line_trace = {'X': [], 'ch1': [], 'ch2': []}
         self.line_retrace = {'X': [], 'ch1': [], 'ch2': []}
+        self.laser_measurement_line_trace = {'wavelength': [], 'power': [], 'ch1': [], 'ch2': []}
         self.hardware_io()
         self.approached_sound = QSound("57806__guitarguy1985__aircraftalarm.wav")
         self.plane_fit = PlaneFit()
@@ -353,7 +354,8 @@ class SPMController(QWidget):
 
         self.pushButton_laser_calibration_save.clicked.connect(self.save_calibration_form)
 
-        self.pushButton_laser_measurement.clicked.connect(self.start_laser_measurement)
+        self.pushButton_laser_measurement.clicked.connect(self.toggle_laser_measurement)
+        self.pushButton_laser_measurement_abort.clicked.connect(self.abort_laser_measurement)
 
 
 
@@ -536,7 +538,15 @@ class SPMController(QWidget):
         self.widget_linescan_ch2.plot(self.line_retrace['X'], self.line_retrace['ch2'], pen=mkPen(color=(180, 0, 0)))
 
     # def update_map_graph(self):
-
+    def update_line_graph_laser_measurement(self):
+        self.widget_laser_measurement_ch1.clear()
+        self.widget_laser_measurement_ch2.clear()
+        self.widget_laser_measurement_ch1.plot(self.laser_measurement_line_trace['wavelength'],
+                                               self.laser_measurement_line_trace['ch1'],
+                                               pen=mkPen(color=(0, 180, 0)), symbol='o', symbolBrush =(0, 180, 0))
+        self.widget_laser_measurement_ch2.plot(self.laser_measurement_line_trace['wavelength'],
+                                               self.laser_measurement_line_trace['ch2'],
+                                               pen=mkPen(color=(180, 0, 0)), symbol='o', symbolBrush =(180, 0, 0))
 
 
     def goto_position(self, p):
@@ -930,10 +940,10 @@ class SPMController(QWidget):
 
     def start_calibration(self):
 
-        try:
-            print(self.power_calibration, self.power_calibration.i, self.thread_calibration)
-        except:
-            print('wrong')
+        # try:
+        #     print(self.power_calibration, self.power_calibration.i, self.thread_calibration)
+        # except:
+        #     print('wrong')
         self.thread_calibration = QThread()
         if not hasattr(self, 'power_calibration') or self.power_calibration is None:
             self.power_calibration = PowerCalibration(self, self.laser_controller, self.ndfilter_controller, self.powermeter)
@@ -1023,8 +1033,8 @@ class SPMController(QWidget):
     def update_calibration_form(self):
         self.tableWidget_laser_calibration.insertRow(0)
         # print(self.main.tableWidget_laser_calibration.columnCount(), self.main.tableWidget_laser_calibration.rowCount() - 1)
-        self.tableWidget_laser_calibration.setItem(0, 0, QTableWidgetItem(str(float(self.laser_controller.getWavelength()))))
-        self.tableWidget_laser_calibration.setItem(0, 1, QTableWidgetItem(str(self.ndfilter_controller.get_angle())))
+        self.tableWidget_laser_calibration.setItem(0, 0, QTableWidgetItem(str(np.round(float(self.laser_controller.getWavelength()), 1))))
+        self.tableWidget_laser_calibration.setItem(0, 1, QTableWidgetItem(str(np.round(self.ndfilter_controller.get_angle(), 2))))
         self.tableWidget_laser_calibration.setItem(0, 2, QTableWidgetItem(str(np.round(self.powermeter.get_power() * 1e6, 2))))
 
     def save_calibration_form(self):
@@ -1033,7 +1043,9 @@ class SPMController(QWidget):
                                                    self.lineEdit_laser_calibration_directory.text()+'/' +
                                                    self.lineEdit_laser_calibration_default_filename.text().
                                                    replace("{d}", now.strftime("%Y%m%d")).
-                                                   replace("{t}", now.strftime("%H%M%S")),
+                                                   replace("{t}", now.strftime("%H%M%S")).
+                                                   replace("{m}", str('A' if self.radioButton_laser_calibration_mode_A.isChecked() else 'B')).
+                                                   replace("{l}", self.lineEdit_laser_calibration_default_filename_label.text()),
                                                    "CSV Files (*.csv);;All Files (*)")
         if file_path == '':
             return
@@ -1065,16 +1077,81 @@ class SPMController(QWidget):
 
     def start_laser_measurement(self):
         self.laser_measurement_thread = QThread()
-        self.wavelength_sweep = WavelengthSweep(self, self.laser_controller, self.ndfilter_controller, self.powermeter)
-        self.wavelength_sweep.moveToThread(self.laser_measurement_thread)
-        self.laser_measurement_thread.started.connect(self.wavelength_sweep.sweep_wavelength)
-        self.wavelength_sweep.finished.connect(self.wavelength_sweep.deleteLater)
-        self.wavelength_sweep.finished.connect(self.laser_measurement_thread.exit)
+        if not hasattr(self, 'laser_measurement') or self.laser_measurement is None:
+            self.label_warning_laser_measurement.setText('')
+            self.laser_measurement = LaserMeasurement(self, self.laser_controller, self.ndfilter_controller,
+                                                      self.powermeter)
+            self.laser_measurement_line_trace['wavelength'].clear()
+            self.laser_measurement_line_trace['power'].clear()
+            self.laser_measurement_line_trace['ch1'].clear()
+            self.laser_measurement_line_trace['ch2'].clear()
+            # self.reset_calibration_form()
+        try:
+            self.laser_measurement.halted.disconnect()
+            self.laser_measurement.finished.disconnect()
+            self.laser_measurement.progress_finished_wavelength.disconnect()
+            self.laser_measurement.progress_finished_angle.disconnect()
+            self.laser_measurement.progress_update_wavelength.disconnect()
+            self.laser_measurement.progress_update_angle.disconnect()
+        except Exception as e:
+            print(e)
+        # self.laser_measurement.moveToThread(self.laser_measurement_thread)
+        # self.laser_measurement_thread.started.connect(self.laser_measurement.laser_measuement)
+        # self.laser_measurement.finished.connect(self.laser_measurement.deleteLater)
+        # self.laser_measurement.finished.connect(self.laser_measurement_thread.exit)
+        # self.laser_measurement_thread.finished.connect(self.laser_measurement_thread.deleteLater)
+        # self.laser_measurement_thread.start()
+        self.laser_measurement.fresh_new_start.connect(lambda: self.progressBar_laser_measurement.setValue(0))
+        self.laser_measurement.progress_finished_wavelength_but_waiting_for_angle.connect(lambda: self.lcdNumber_laser_wavelength.display(self.laser_controller.getWavelength()))
+        self.laser_measurement.progress_finished_wavelength.connect(lambda: self.progressBar_laser_measurement.setValue(self.laser_measurement.progress if self.laser_measurement is not None else 100))
+        self.laser_measurement.progress_finished_angle.connect(lambda: self.lcdNumber_ndfilter.display(
+            self.ndfilter_controller.get_angle()
+        ))
+        self.laser_measurement.progress_update_wavelength.connect(lambda: self.progressBar_wavelength.setValue(
+            self.laser_measurement.progress_wavelength if self.laser_measurement is not None else 100
+        ))
+        self.laser_measurement.progress_update_angle.connect(lambda: self.progressBar_ndfilter.setValue(
+            self.laser_measurement.progress_angle if self.laser_measurement is not None else 100
+        ))
+        self.laser_measurement.progress_update_angle.connect(lambda: self.lcdNumber_ndfilter.display(
+            self.ndfilter_controller.get_angle()
+        ))
+        self.laser_measurement.progress_update_wavelength.connect(self.update_line_graph_laser_measurement)
+        self.laser_measurement.moveToThread(self.laser_measurement_thread)
+        self.laser_measurement_thread.started.connect(self.laser_measurement.laser_measuement)
+        self.laser_measurement.finished.connect(self.laser_measurement.deleteLater)
+        self.laser_measurement.halted.connect(self.laser_measurement_thread.exit)
+        self.laser_measurement.finished.connect(self.laser_measurement_thread.exit)
         self.laser_measurement_thread.finished.connect(self.laser_measurement_thread.deleteLater)
+        def none_laser_measurement():
+            self.laser_measurement = None
+        self.laser_measurement.finished.connect(lambda: self.toggle_laser_measurement() if self.laser_measurement_on else None)
+        self.laser_measurement.finished.connect(none_laser_measurement)
+        # self.laser_measurement.progress_finished_wavelength.connect(self.update_calibration_form)
         self.laser_measurement_thread.start()
 
-    # def
 
+    def toggle_laser_measurement(self):
+        self.pushButton_laser_measurement.setEnabled(False)
+        self.pushButton_laser_measurement_abort.setEnabled(False)
+        QTimer.singleShot(200, lambda: self.pushButton_laser_measurement.setEnabled(True))
+        QTimer.singleShot(200, lambda: self.pushButton_laser_measurement_abort.setEnabled(True))
+        if self.laser_measurement_on:
+            self.laser_measurement_on = False
+            self.pushButton_laser_measurement.setText("Start/Continue\nMeasurement")
+        else:
+            self.laser_measurement_on = True
+            self.pushButton_laser_measurement.setText("Halt Measurement")
+            # if not hasattr(self, 'power_calibration') or self.power_calibration is None:
+            self.start_laser_measurement()
+
+    def abort_laser_measurement(self):
+        if self.laser_measurement_on:
+            self.toggle_laser_measurement()
+        self.laser_measurement_on = False
+        self.laser_measurement = None
+        self.progressBar_laser_measurement.setValue(100)
+        self.label_warning_laser_measurement.setText('')
 
 '''
 TODO: load current position based on values

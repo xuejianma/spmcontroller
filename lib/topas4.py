@@ -10,7 +10,7 @@ from .Topas4Locator import Topas4Locator
 
 class Topas4():
 
-    def __init__(self, serialNumber="Orpheus-F-Demo-9302"):
+    def __init__(self, serialNumber = "Orpheus-F-Demo-9302"):
         super(Topas4, self).__init__()
         locator = Topas4Locator()
         availableDevices = locator.locate()
