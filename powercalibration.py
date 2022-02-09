@@ -28,7 +28,9 @@ class PowerCalibration(QObject):
         self.starting_wavelength = self.main.doubleSpinBox_laser_calibration_wavelength_start.value()
         self.ending_wavelength = self.main.doubleSpinBox_laser_calibration_wavelength_end.value()
         self.target_power = self.main.doubleSpinBox_laser_calibration_target_power_uW.value()
-        self.step = self.main.doubleSpinBox_laser_calibration_step.value()
+        self.mode = 'A' if self.main.tabWidget_laser_calibration.currentIndex() == 0 else 'B'
+        self.step = self.main.doubleSpinBox_laser_calibration_step.value() if self.mode == 'A' \
+            else self.main.doubleSpinBox_laser_calibration_step_sweep_power.value()
         self.lowest_angle = self.main.doubleSpinBox_laser_calibration_lowest_angle.value()
         self.highest_angle = self.main.doubleSpinBox_laser_calibration_highest_angle.value()
         self.starting_angle = self.main.doubleSpinBox_laser_calibration_starting_angle.value()
@@ -41,7 +43,7 @@ class PowerCalibration(QObject):
         self.progress = 0
         self.progress_wavelength = 100
         self.progress_angle = 100
-        self.mode = 'A' if self.main.tabWidget_laser_calibration.currentIndex() == 0 else 'B'
+
         # print("tab status: ", self.main.tabWidget_laser_calibration.currentIndex())
 
     def sweep_wavelength(self):
@@ -58,7 +60,7 @@ class PowerCalibration(QObject):
         if self.i == 0:
             self.fresh_new_start.emit()
         while self.i <= self.number and self.main.calibration_on:
-            sleep(self.main.spinBox_laser_calibration_time.value())
+            sleep(self.main.doubleSpinBox_laser_calibration_time.value())
             if self.i < self.number:
                 self.curr_wavelength = self.starting_wavelength + self.i * self.step
             else:
@@ -124,7 +126,7 @@ class PowerCalibration(QObject):
         if self.i == 0:
             self.fresh_new_start.emit()
         while self.i <= self.number_angle and self.main.calibration_on:
-            sleep(self.main.spinBox_laser_calibration_time.value())
+            sleep(self.main.doubleSpinBox_laser_calibration_time.value())
             if self.i < self.number_angle:
                 self.curr_angle = self.starting_angle + self.i * self.step
             else:
