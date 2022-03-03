@@ -26,7 +26,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_scan">
     <attribute name="title">
@@ -2211,7 +2211,7 @@ trace and retrace</string>
     <widget class="QGroupBox" name="groupBox_positioner">
      <property name="geometry">
       <rect>
-       <x>580</x>
+       <x>590</x>
        <y>560</y>
        <width>221</width>
        <height>341</height>
@@ -2503,7 +2503,7 @@ trace and retrace</string>
     <widget class="QPushButton" name="pushButton_approach_monitor">
      <property name="geometry">
       <rect>
-       <x>500</x>
+       <x>380</x>
        <y>130</y>
        <width>251</width>
        <height>51</height>
@@ -2525,24 +2525,11 @@ trace and retrace</string>
      <property name="title">
       <string>Auto Approach</string>
      </property>
-     <widget class="QPushButton" name="pushButton_approach_auto_start">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>60</y>
-        <width>141</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>START Auto Approach</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_positioner_time_per_turn">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>170</y>
+        <y>100</y>
         <width>181</width>
         <height>16</height>
        </rect>
@@ -2555,7 +2542,7 @@ trace and retrace</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>220</y>
+        <y>150</y>
         <width>201</width>
         <height>16</height>
        </rect>
@@ -2568,7 +2555,7 @@ trace and retrace</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>240</y>
+        <y>170</y>
         <width>71</width>
         <height>22</height>
        </rect>
@@ -2577,14 +2564,14 @@ trace and retrace</string>
        <double>60.000000000000000</double>
       </property>
       <property name="value">
-       <double>5.000000000000000</double>
+       <double>45.000000000000000</double>
       </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_positioner_time_per_turn">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>190</y>
+        <y>120</y>
         <width>71</width>
         <height>22</height>
        </rect>
@@ -2603,7 +2590,7 @@ trace and retrace</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>290</y>
+        <y>220</y>
         <width>71</width>
         <height>22</height>
        </rect>
@@ -2619,7 +2606,7 @@ trace and retrace</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>270</y>
+        <y>200</y>
         <width>201</width>
         <height>16</height>
        </rect>
@@ -2632,7 +2619,7 @@ trace and retrace</string>
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>190</y>
+        <y>120</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -2645,7 +2632,7 @@ trace and retrace</string>
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>240</y>
+        <y>170</y>
         <width>81</width>
         <height>16</height>
        </rect>
@@ -2658,7 +2645,7 @@ trace and retrace</string>
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>290</y>
+        <y>220</y>
         <width>91</width>
         <height>16</height>
        </rect>
@@ -2683,8 +2670,8 @@ trace and retrace</string>
      <widget class="QCheckBox" name="checkBox_auto_approach_tracking_ch1">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>120</y>
+        <x>20</x>
+        <y>50</y>
         <width>121</width>
         <height>20</height>
        </rect>
@@ -2702,8 +2689,8 @@ trace and retrace</string>
      <widget class="QCheckBox" name="checkBox_auto_approach_tracking_ch2">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>140</y>
+        <x>20</x>
+        <y>70</y>
         <width>121</width>
         <height>20</height>
        </rect>
@@ -2716,6 +2703,60 @@ trace and retrace</string>
       </property>
       <attribute name="buttonGroup">
        <string notr="true">buttonGroup_9</string>
+      </attribute>
+     </widget>
+     <widget class="QPushButton" name="pushButton_approach_auto_start">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>250</y>
+        <width>161</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>START Auto Approach</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radioButton_auto_approach_up">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>50</y>
+        <width>61</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Up</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">buttonGroup_12</string>
+      </attribute>
+     </widget>
+     <widget class="QRadioButton" name="radioButton_auto_approach_down">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>70</y>
+        <width>61</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Down</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">buttonGroup_12</string>
       </attribute>
      </widget>
     </widget>
@@ -2839,6 +2880,9 @@ trace and retrace</string>
       <property name="keyboardTracking">
        <bool>false</bool>
       </property>
+      <property name="minimum">
+       <number>-2</number>
+      </property>
       <property name="maximum">
        <number>19</number>
       </property>
@@ -2859,7 +2903,7 @@ trace and retrace</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0: 10 µs&lt;br/&gt;1: 30 µs&lt;br/&gt;2: 100 µs&lt;br/&gt;3: 300 µs&lt;br/&gt;4: 1 ms&lt;br/&gt;5: 3 ms&lt;br/&gt;6: 10 ms&lt;br/&gt;7: 30 ms&lt;br/&gt;8: 100 ms&lt;br/&gt;9: 300 ms&lt;br/&gt;10: 1 s&lt;br/&gt;11: 3 s&lt;br/&gt;12: 10 s&lt;br/&gt;13: 30 s&lt;br/&gt;14: 100 s&lt;br/&gt;15: 300 s&lt;br/&gt;16: 1 ks&lt;br/&gt;17: 3 ks&lt;br/&gt;18: 10 ks&lt;br/&gt;19: 30 ks&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-2: 1 µs (only for SR860)&lt;br/&gt;-1: 3 µs (only for SR860)&lt;br/&gt;0: 10 µs&lt;br/&gt;1: 30 µs&lt;br/&gt;2: 100 µs&lt;br/&gt;3: 300 µs&lt;br/&gt;4: 1 ms&lt;br/&gt;5: 3 ms&lt;br/&gt;6: 10 ms&lt;br/&gt;7: 30 ms&lt;br/&gt;8: 100 ms&lt;br/&gt;9: 300 ms&lt;br/&gt;10: 1 s&lt;br/&gt;11: 3 s&lt;br/&gt;12: 10 s&lt;br/&gt;13: 30 s&lt;br/&gt;14: 100 s&lt;br/&gt;15: 300 s&lt;br/&gt;16: 1 ks&lt;br/&gt;17: 3 ks&lt;br/&gt;18: 10 ks&lt;br/&gt;19: 30 ks&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Time Constant (?):</string>
@@ -2878,7 +2922,7 @@ trace and retrace</string>
        <bool>false</bool>
       </property>
       <property name="maximum">
-       <number>4</number>
+       <number>1</number>
       </property>
       <property name="singleStep">
        <number>1</number>
@@ -2897,10 +2941,10 @@ trace and retrace</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0:  X&lt;br/&gt;1:  R&lt;br/&gt;2:  X Noise&lt;br/&gt;3:  Aux In 1&lt;br/&gt;4:  Aux In 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0: X&lt;br/&gt;1: R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>X Display (?):</string>
+       <string>Display (?):</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_lockin_top_output_mode">
@@ -2913,10 +2957,10 @@ trace and retrace</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0:  CH1 Display&lt;br/&gt;1:  X&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;(No Applicable to SR860)&lt;br/&gt;0: CH1 Display&lt;br/&gt;1: X&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>X Output Mode (?):</string>
+       <string>Output Mode (?):</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="spinBox_lockin_top_output_mode">
@@ -2977,10 +3021,10 @@ trace and retrace</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0:  X&lt;br/&gt;1:  R&lt;br/&gt;2:  X Noise&lt;br/&gt;3:  Aux In 1&lt;br/&gt;4:  Aux In 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0: X&lt;br/&gt;1: R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>X Display (?):</string>
+       <string>Display (?):</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_lockin_bottom_output_mode">
@@ -2993,10 +3037,10 @@ trace and retrace</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0:  CH1 Display&lt;br/&gt;1:  X&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;(No Applicable to SR860)&lt;br/&gt;0: CH1 Display&lt;br/&gt;1: X&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>X Output Mode (?):</string>
+       <string>Output Mode (?):</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="spinBox_lockin_bottom_output_mode">
@@ -3032,6 +3076,9 @@ trace and retrace</string>
       </property>
       <property name="keyboardTracking">
        <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <number>-2</number>
       </property>
       <property name="maximum">
        <number>19</number>
@@ -3075,7 +3122,7 @@ trace and retrace</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0: 10 µs&lt;br/&gt;1: 30 µs&lt;br/&gt;2: 100 µs&lt;br/&gt;3: 300 µs&lt;br/&gt;4: 1 ms&lt;br/&gt;5: 3 ms&lt;br/&gt;6: 10 ms&lt;br/&gt;7: 30 ms&lt;br/&gt;8: 100 ms&lt;br/&gt;9: 300 ms&lt;br/&gt;10: 1 s&lt;br/&gt;11: 3 s&lt;br/&gt;12: 10 s&lt;br/&gt;13: 30 s&lt;br/&gt;14: 100 s&lt;br/&gt;15: 300 s&lt;br/&gt;16: 1 ks&lt;br/&gt;17: 3 ks&lt;br/&gt;18: 10 ks&lt;br/&gt;19: 30 ks&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-2: 1 µs (only for SR860)&lt;br/&gt;-1: 3 µs (only for SR860)&lt;br/&gt;0: 10 µs&lt;br/&gt;1: 30 µs&lt;br/&gt;2: 100 µs&lt;br/&gt;3: 300 µs&lt;br/&gt;4: 1 ms&lt;br/&gt;5: 3 ms&lt;br/&gt;6: 10 ms&lt;br/&gt;7: 30 ms&lt;br/&gt;8: 100 ms&lt;br/&gt;9: 300 ms&lt;br/&gt;10: 1 s&lt;br/&gt;11: 3 s&lt;br/&gt;12: 10 s&lt;br/&gt;13: 30 s&lt;br/&gt;14: 100 s&lt;br/&gt;15: 300 s&lt;br/&gt;16: 1 ks&lt;br/&gt;17: 3 ks&lt;br/&gt;18: 10 ks&lt;br/&gt;19: 30 ks&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Time Constant (?):</string>
@@ -3113,7 +3160,7 @@ trace and retrace</string>
        <bool>false</bool>
       </property>
       <property name="maximum">
-       <number>4</number>
+       <number>1</number>
       </property>
       <property name="singleStep">
        <number>1</number>
@@ -3157,12 +3204,12 @@ trace and retrace</string>
       <rect>
        <x>120</x>
        <y>520</y>
-       <width>151</width>
+       <width>191</width>
        <height>32</height>
       </rect>
      </property>
      <property name="text">
-      <string>Reconnect SR830 Lock-in's</string>
+      <string>Reconnect SR830/860 Lock-in's</string>
      </property>
     </widget>
     <widget class="QGroupBox" name="groupBox_encoder">
@@ -3170,7 +3217,7 @@ trace and retrace</string>
       <rect>
        <x>400</x>
        <y>580</y>
-       <width>151</width>
+       <width>161</width>
        <height>301</height>
       </rect>
      </property>
@@ -3180,7 +3227,7 @@ trace and retrace</string>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_encoder">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>30</x>
         <y>140</y>
         <width>91</width>
         <height>22</height>
@@ -3196,7 +3243,7 @@ trace and retrace</string>
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>30</x>
         <y>100</y>
         <width>101</width>
         <height>31</height>
@@ -3209,7 +3256,7 @@ trace and retrace</string>
      <widget class="QLabel" name="label_encoder_reading">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>30</x>
         <y>190</y>
         <width>111</width>
         <height>16</height>
@@ -3222,7 +3269,7 @@ trace and retrace</string>
      <widget class="QLCDNumber" name="lcdNumber_encoder_reading">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>30</x>
         <y>210</y>
         <width>101</width>
         <height>23</height>
@@ -3244,7 +3291,7 @@ trace and retrace</string>
      <widget class="QCheckBox" name="checkBox_encoder_reading">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>30</x>
         <y>240</y>
         <width>101</width>
         <height>20</height>
@@ -3257,7 +3304,7 @@ trace and retrace</string>
      <widget class="QLabel" name="label_encoder_notice">
       <property name="geometry">
        <rect>
-        <x>-10</x>
+        <x>0</x>
         <y>20</y>
         <width>171</width>
         <height>61</height>
@@ -3272,7 +3319,7 @@ trace and retrace</string>
        <rect>
         <x>10</x>
         <y>260</y>
-        <width>131</width>
+        <width>141</width>
         <height>31</height>
        </rect>
       </property>
@@ -3292,6 +3339,19 @@ trace and retrace</string>
      </property>
      <property name="text">
       <string>STOP Auto Approach</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_approach_monitor_clear">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>130</y>
+       <width>141</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Clear Display Data</string>
      </property>
     </widget>
    </widget>
@@ -4592,20 +4652,6 @@ as .csv file</string>
       </widget>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>360</y>
-       <width>551</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>connect abort_... to ...finished
-(remember to kill mode A object when clicking mode B, in case it was halted but not abort)</string>
-     </property>
-    </widget>
     <widget class="QTabWidget" name="tabWidget_laser_measurement">
      <property name="geometry">
       <rect>
@@ -4909,6 +4955,19 @@ as .csv file</string>
       </widget>
      </widget>
     </widget>
+    <widget class="QLabel" name="label_ndfilter_notice">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>230</y>
+       <width>401</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Please make sure that angle increase corresponds to power decrease&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
@@ -4923,16 +4982,17 @@ as .csv file</string>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_11"/>
-  <buttongroup name="buttonGroup_5"/>
   <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_9"/>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_7"/>
-  <buttongroup name="buttonGroup_6"/>
-  <buttongroup name="buttonGroup_8"/>
+  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_12"/>
   <buttongroup name="buttonGroup_10"/>
+  <buttongroup name="buttonGroup_9"/>
+  <buttongroup name="buttonGroup_11"/>
+  <buttongroup name="buttonGroup_8"/>
+  <buttongroup name="buttonGroup_6"/>
+  <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_7"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

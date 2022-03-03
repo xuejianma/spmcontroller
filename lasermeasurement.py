@@ -40,10 +40,19 @@ class LaserMeasurement(QObject):
                 self.mode = 3
             else:
                 self.mode = 4
-        self.step = self.main.doubleSpinBox_laser_measurement_step.value() if self.mode != 3 \
-            else self.main.doubleSpinBox_laser_measurement_step_sweep_power.value()
-        self.number = (self.ending_wavelength - self.starting_wavelength) // self.step + 1
-        self.number_angle = (self.ending_angle - self.starting_angle) // self.step + 1
+        # self.step = self.main.doubleSpinBox_laser_measurement_step.value() if self.mode != 3 \
+        #     else self.main.doubleSpinBox_laser_measurement_step_sweep_power.value()
+        if self.mode == 1 or self.mode == 2:
+            self.step = self.main.doubleSpinBox_laser_measurement_step.value()
+            if self.starting_wavelength > self.ending_wavelength:
+                self.step = -self.step
+        else:
+            self.step = self.main.doubleSpinBox_laser_measurement_step_sweep_power.value()
+            if self.starting_angle > self.ending_angle:
+                self.step = -self.step
+
+        self.number = abs(self.ending_wavelength - self.starting_wavelength) // abs(self.step) + 1
+        self.number_angle = abs(self.ending_angle - self.starting_angle) // abs(self.step) + 1
         self.curr_wavelength = 0
         self.curr_angle = 0
         self.i = 0

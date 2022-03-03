@@ -383,7 +383,14 @@ class AutoApproach(QObject):
 
 
     def move(self):
+        if self.parent.radioButton_auto_approach_up.isChecked():
+            self.move_up()
+        else:
+            self.move_down()
+
+    def move_up(self):
         # print("auto start")
+        # self.parent.checkBox_positioner_up.setChecked(True)
         if not self.parent.display_approach_on:
             self.parent.toggle_display_approach_button()
 
@@ -439,6 +446,50 @@ class AutoApproach(QObject):
 
         self.finished.emit()
 
+
+    def move_down(self):
+        # self.parent.checkBox_positioner_down.setChecked(True)
+        if not self.parent.display_approach_on:
+            self.parent.toggle_display_approach_button()
+
+        self.parent.goto_position_z_buttons_off()
+        self.parent.pushButton_approach_monitor.setDisabled(True)
+        while self.parent.auto_approach_on_boolean:
+            self.store_ch1 = []
+            self.store_ch2 = []
+            self.average_ch1 = self.max_placeholder
+            self.average_ch2 = self.max_placeholder
+            #scanner z moving down
+            self.move = MoveToTargetZ(self.parent, 0.0,
+                                      auto_approach = True, parent_finished_signal = self.finished,
+                                      parent_finishedAfterApproach_signal = self.finishedAfterApproach,
+                                      auto_approach_obj = self)
+            self.move.move()
+            #scanner z moving up
+            time.sleep(0.2)
+            if not self.parent.auto_approach_on_boolean:
+                break
+            self.move = MoveToTargetZ(self.parent, self.parent.doubleSpinBox_scanner_voltage_per_turn.value(),
+                                      auto_approach=True, parent_finished_signal=self.finished,
+                                      parent_finishedAfterApproach_signal=self.finishedAfterApproach)
+            # self.finishedAfterApproach.connect(self.parent.toggle_auto_approach_button)
+            self.move.move()
+            #positioner z moving up
+            if not self.parent.auto_approach_on_boolean:
+                break
+            self.parent.checkBox_positioner_down.setChecked(True)
+            self.parent.move_positioner_toggle()
+            if not self.parent.auto_approach_on_boolean:
+                break
+            time.sleep(self.parent.doubleSpinBox_positioner_time_per_turn.value())
+            self.parent.move_positioner_toggle()
+            time.sleep(0.2)
+        self.parent.goto_position_z_buttons_on()
+        if not self.parent.auto_approach_on_boolean:
+            self.parent.auto_approach_on_boolean = True
+            self.parent.toggle_auto_approach_button()
+        self.parent.pushButton_approach_monitor.setEnabled(True)
+        self.finished.emit()
 
     def check_approached(self):
 

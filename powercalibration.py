@@ -29,14 +29,22 @@ class PowerCalibration(QObject):
         self.ending_wavelength = self.main.doubleSpinBox_laser_calibration_wavelength_end.value()
         self.target_power = self.main.doubleSpinBox_laser_calibration_target_power_uW.value()
         self.mode = 'A' if self.main.tabWidget_laser_calibration.currentIndex() == 0 else 'B'
-        self.step = self.main.doubleSpinBox_laser_calibration_step.value() if self.mode == 'A' \
-            else self.main.doubleSpinBox_laser_calibration_step_sweep_power.value()
+        # self.step = self.main.doubleSpinBox_laser_calibration_step.value() if self.mode == 'A' \
+        #     else self.main.doubleSpinBox_laser_calibration_step_sweep_power.value()
         self.lowest_angle = self.main.doubleSpinBox_laser_calibration_lowest_angle.value()
         self.highest_angle = self.main.doubleSpinBox_laser_calibration_highest_angle.value()
         self.starting_angle = self.main.doubleSpinBox_laser_calibration_starting_angle.value()
         self.ending_angle = self.main.doubleSpinBox_laser_calibration_ending_angle.value()
-        self.number = (self.ending_wavelength - self.starting_wavelength) // self.step + 1
-        self.number_angle = (self.ending_angle - self.starting_angle) // self.step + 1
+        if self.mode == 'A':
+            self.step = self.main.doubleSpinBox_laser_calibration_step.value()
+            if self.starting_wavelength > self.ending_wavelength:
+                self.step = -self.step
+        else:
+            self.step = self.main.doubleSpinBox_laser_calibration_step_sweep_power.value()
+            if self.starting_angle > self.ending_angle:
+                self.step = -self.step
+        self.number = abs(self.ending_wavelength - self.starting_wavelength) // abs(self.step) + 1
+        self.number_angle = abs(self.ending_angle - self.starting_angle) // abs(self.step) + 1
         self.i = 0
         self.curr_wavelength = 0
         self.curr_angle = 0 #self.main.doubleSpinBox_laser_calibration_highest_current.value()

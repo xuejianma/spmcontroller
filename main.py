@@ -21,7 +21,7 @@ from lib.powermeter import PowerMeterRead, PowerMeter
 from scan import Scan, MoveToTarget, Map, ApproachDisplay, MoveToTargetZ, AutoApproach
 from util.plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
 from lib.anc300 import ANC300
-from lib.sr830 import SR830
+from lib.sr8x0 import SR8x0
 from lib.niboard import OutputVoltage, InputVoltage, InputVoltageEncoder
 from os.path import isdir
 # from pyvisa import ResourceManager
@@ -309,6 +309,7 @@ class SPMController(QWidget):
         self.doubleSpinBox_positioner_amplitude.valueChanged.connect(
             lambda: self.anc_controller.setv(4, self.doubleSpinBox_positioner_amplitude.value()))
 
+        self.pushButton_reconnect_lockin.clicked.connect(self.reconnect_lockin)
         #SR830 Top:
         self.spinBox_lockin_top_reference.valueChanged.connect(
             lambda: self.lockin_top.set_reference_source(self.spinBox_lockin_top_reference.value()))
@@ -331,8 +332,11 @@ class SPMController(QWidget):
             lambda: self.lockin_bottom.set_display(1, self.spinBox_lockin_bottom_display.value()))
         self.spinBox_lockin_bottom_output_mode.valueChanged.connect(
             lambda: self.lockin_bottom.set_output(1, self.spinBox_lockin_bottom_output_mode.value()))
+
+        self.pushButton_reconnect_lockin.clicked.connect(self.reconnect_anc300)
         # start display for approach
         self.pushButton_approach_monitor.clicked.connect(self.toggle_display_approach_button)
+        self.pushButton_approach_monitor_clear.clicked.connect(self.clear_approach_monitor)
 
         self.update_display_approach_signal.connect(self.update_display_approach)
         self.doubleSpinBox_encoder.valueChanged.connect(
@@ -499,6 +503,10 @@ class SPMController(QWidget):
         self.thread_display_approach.finished.connect(self.thread_display_approach.deleteLater)
         self.thread_display_approach.start()
 
+    def clear_approach_monitor(self):
+        self.display_list_ch1.clear()
+        self.display_list_ch2.clear()
+
     def update_voltage(self):
         # print("Updated voltage: x = ", self.curr_coords[0], ", y = ", self.curr_coords[1])
         self.label_current_x.setText("Current x (V): " + str(self.curr_coords[0]))
@@ -609,6 +617,12 @@ class SPMController(QWidget):
         self.doubleSpinBox_z.setDisabled(True)
         self.doubleSpinBox_z_goto.setDisabled(True)
         self.pushButton_positioner_move.setDisabled(True)
+        # self.checkBox_positioner_up.setDisabled(True)
+        # self.checkBox_positioner_down.setDisabled(True)
+        self.checkBox_auto_approach_tracking_ch1.setDisabled(True)
+        self.checkBox_auto_approach_tracking_ch2.setDisabled(True)
+        self.radioButton_auto_approach_up.setDisabled(True)
+        self.radioButton_auto_approach_down.setDisabled(True)
 
     def goto_position_z_buttons_on(self):
         self.pushButton_z_goto.setEnabled(True)
@@ -616,6 +630,12 @@ class SPMController(QWidget):
         self.doubleSpinBox_z.setEnabled(True)
         self.doubleSpinBox_z_goto.setEnabled(True)
         self.pushButton_positioner_move.setEnabled(True)
+        # self.checkBox_positioner_up.setEnabled(True)
+        # self.checkBox_positioner_down.setEnabled(True)
+        self.checkBox_auto_approach_tracking_ch1.setEnabled(True)
+        self.checkBox_auto_approach_tracking_ch2.setEnabled(True)
+        self.radioButton_auto_approach_up.setEnabled(True)
+        self.radioButton_auto_approach_down.setEnabled(True)
 
 
     def auto_approach(self):
@@ -772,12 +792,13 @@ class SPMController(QWidget):
     def reconnect_power(self):
         try:
             self.power_reading = False
-            self.powermeter = PowerMeter(self)
+            self.powermeter = PowerMeter()
             self.lcdNumber_laser_power.display(0)
             self.lcdNumber_laser_power_uW.display(0)
             self.label_power_error.setText("")
             self.checkBox_read_power.setEnabled(True)
-        except:
+        except Exception as e:
+            print(e)
             self.powermeter = None
             self.label_power_error.setText("🚫 Error: Power Meter not detected!")
             self.checkBox_read_power.setChecked(False)
@@ -785,7 +806,7 @@ class SPMController(QWidget):
 
     def reconnect_lockin(self):
         try:
-            self.lockin_top = SR830(9)
+            self.lockin_top = SR8x0('up')
             self.label_error_lockin_top.setText("")
             self.initialize_lockin_top()
         except:
@@ -793,10 +814,11 @@ class SPMController(QWidget):
             self.label_error_lockin_top.setText("🚫 SR830 (Top) hardware not detected!")
 
         try:
-            self.lockin_bottom = SR830(8)
+            self.lockin_bottom = SR8x0('down')
             self.label_error_lockin_bottom.setText("")
             self.initialize_lockin_bottom()
-        except:
+        except Exception as e:
+            print(e)
             self.lockin_bottom = None
             self.label_error_lockin_bottom.setText("🚫 SR830 (Bottom) hardware not detected!")
 
