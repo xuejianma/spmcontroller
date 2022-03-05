@@ -361,6 +361,7 @@ class SPMController(QWidget):
             plane_fit_checked.toggled.connect(self.update_plane_fit)
 
         self.checkBox_read_power.stateChanged.connect(self.real_time_power)
+        self.checkBox_laser_shutter.stateChanged.connect(lambda: self.laser_controller.openShutter() if self.checkBox_laser_shutter.isChecked() else self.laser_controller.closeShutter())
         self.pushButton_laser_controller.clicked.connect(self.reconnect_opa)
         self.pushButton_laser_set_wavelength.clicked.connect(
             lambda: self.opa_set_wavelength(self.doubleSpinBox_laser_set_wavelength.value()))

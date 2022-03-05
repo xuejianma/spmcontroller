@@ -83,6 +83,10 @@ class PowerCalibration(QObject):
             laserwavelength_change.progress_update.connect(progress_wavelength_update)
             self.main.laser_wavelength_changing = True
             laserwavelength_change.setWavelength()
+            is_shutter_open = self.laser_controller.get('/ShutterInterlock/IsShutterOpen').json()
+            if not is_shutter_open:
+                self.main.checkBox_laser_shutter.setChecked(True)
+                sleep(1)
             self.progress_finished_wavelength_but_waiting_for_angle.emit()
             self.main.laser_wavelength_changing = False
             while self.main.calibration_on:

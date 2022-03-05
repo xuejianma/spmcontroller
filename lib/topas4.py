@@ -35,6 +35,7 @@ class Topas4():
         return self.get('/Optical/WavelengthControl/Output').json()["Wavelength"]
 
     def openShutter(self):
+        print('open shutter')
         self.put('/ShutterInterlock/OpenCloseShutter', True)
 
     def closeShutter(self):
@@ -66,6 +67,12 @@ class LaserWavelengthChange(QObject):
         self.put('/Optical/WavelengthControl/SetWavelengthUsingAnyInteraction', self.wavelength)
         self.waitTillWavelengthIsSet()
         # self._mutex.unlock()
+        is_shutter_open = self.laser_controller.get('/ShutterInterlock/IsShutterOpen').json()
+        if not is_shutter_open:
+            self.parent.checkBox_laser_shutter.blockSignals(True)
+            self.parent.checkBox_laser_shutter.setChecked(False)
+            self.parent.checkBox_laser_shutter.blockSignals(False)
+
         self.finished.emit()
 
 

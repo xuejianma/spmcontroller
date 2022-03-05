@@ -26,7 +26,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_scan">
     <attribute name="title">
@@ -3966,7 +3966,7 @@ Measurement</string>
       </rect>
      </property>
      <property name="text">
-      <string>Shutter OPEN</string>
+      <string>OPEN Shutter</string>
      </property>
     </widget>
     <widget class="QProgressBar" name="progressBar_wavelength">
@@ -4982,17 +4982,17 @@ as .csv file</string>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_12"/>
-  <buttongroup name="buttonGroup_10"/>
   <buttongroup name="buttonGroup_9"/>
-  <buttongroup name="buttonGroup_11"/>
-  <buttongroup name="buttonGroup_8"/>
-  <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_7"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_11"/>
+  <buttongroup name="buttonGroup_12"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_8"/>
+  <buttongroup name="buttonGroup_10"/>
+  <buttongroup name="buttonGroup_6"/>
  </buttongroups>
 </ui>
