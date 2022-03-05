@@ -12,7 +12,7 @@ try:
     nidevice_port_name = data['nidevice_port_name']
     print("nidevice_port_name_substitute changed to {}".format(nidevice_port_name))
 except:
-    print("No nidevice_port_name_substitute.txt found in ../")
+    print("No config.json found in ../")
 label_error_text = "🚫 Hardware not connected properly"
 class OutputVoltage:
     def __init__(self, port, label_error, ratio = 15):

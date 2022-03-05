@@ -20,16 +20,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c1566c47-c141-4d43-bc0f-7d1af85bcb6d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/form.ui" beforeDir="false" afterPath="$PROJECT_DIR$/form.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lasermeasurement.py" beforeDir="false" afterPath="$PROJECT_DIR$/lasermeasurement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/ndfiltercontroller.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ndfiltercontroller.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/powermeter.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/powermeter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/sr830.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/sr8x0.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.pyproject.user" beforeDir="false" afterPath="$PROJECT_DIR$/main.pyproject.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/powercalibration.py" beforeDir="false" afterPath="$PROJECT_DIR$/powercalibration.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scan.py" beforeDir="false" afterPath="$PROJECT_DIR$/scan.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/niboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/niboard.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -156,7 +150,7 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -180,6 +174,33 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="2094" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1646520233195">
+      <screen x="1680" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2094" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1646520233195" />
+    <state width="1899" height="143" key="GridCell.Tab.0.bottom" timestamp="1646520366912">
+      <screen x="1680" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="143" key="GridCell.Tab.0.bottom/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1646520366912" />
+    <state width="1899" height="143" key="GridCell.Tab.0.center" timestamp="1646520366912">
+      <screen x="1680" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="143" key="GridCell.Tab.0.center/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1646520366912" />
+    <state width="1899" height="143" key="GridCell.Tab.0.left" timestamp="1646520366911">
+      <screen x="1680" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="143" key="GridCell.Tab.0.left/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1646520366911" />
+    <state width="1899" height="143" key="GridCell.Tab.0.right" timestamp="1646520366912">
+      <screen x="1680" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="143" key="GridCell.Tab.0.right/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1646520366912" />
+    <state x="2347" y="253" width="585" height="534" key="find.popup" timestamp="1646520326983">
+      <screen x="1680" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2347" y="253" width="585" height="534" key="find.popup/0.0.1680.1010/1680.0.1920.1040@1680.0.1920.1040" timestamp="1646520326983" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

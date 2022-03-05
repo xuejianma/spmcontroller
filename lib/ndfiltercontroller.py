@@ -1,8 +1,10 @@
 """
 thorlab_apt package from https://github.com/qpit/thorlabs_apt
 """
-import thorlabs_apt as apt
-
+try:
+    import thorlabs_apt as apt
+except Exception as e:
+    print(e)
 from time import sleep
 
 from PyQt5.QtCore import QObject, pyqtSignal
