@@ -1,4 +1,4 @@
-import numpy as np
+
 
 def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
     widget.getFigure().clear()
@@ -116,51 +116,35 @@ def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
 def toggle_colorbar_main(self):
     if self.radioButton_colorbar_manual_main.isChecked():
         self.colorbar_manual_main = True
-        update_graphs(self, single='main')
+        self.update_graphs(single='main')
         self.doubleSpinBox_colorbar_manual_min_main.setDisabled(False)
         self.doubleSpinBox_colorbar_manual_max_main.setDisabled(False)
     else:
         self.colorbar_manual_main = False
-        update_graphs(self, single='main')
+        self.update_graphs(single='main')
         self.doubleSpinBox_colorbar_manual_min_main.setDisabled(True)
         self.doubleSpinBox_colorbar_manual_max_main.setDisabled(True)
 
 def toggle_colorbar_ch1(self):
     if self.radioButton_colorbar_manual_ch1.isChecked():
         self.colorbar_manual_ch1 = True
-        update_graphs(self, single='ch1')
+        self.update_graphs(single='ch1')
         self.doubleSpinBox_colorbar_manual_min_ch1.setDisabled(False)
         self.doubleSpinBox_colorbar_manual_max_ch1.setDisabled(False)
     else:
         self.colorbar_manual_ch1 = False
-        update_graphs(self, single='ch1')
+        self.update_graphs(single='ch1')
         self.doubleSpinBox_colorbar_manual_min_ch1.setDisabled(True)
         self.doubleSpinBox_colorbar_manual_max_ch1.setDisabled(True)
 
 def toggle_colorbar_ch2(self):
     if self.radioButton_colorbar_manual_ch2.isChecked():
         self.colorbar_manual_ch2 = True
-        update_graphs(self, single='ch2')
+        self.update_graphs(single='ch2')
         self.doubleSpinBox_colorbar_manual_min_ch2.setDisabled(False)
         self.doubleSpinBox_colorbar_manual_max_ch2.setDisabled(False)
     else:
         self.colorbar_manual_ch2 = False
-        update_graphs(self, single='ch2')
+        self.update_graphs(single='ch2')
         self.doubleSpinBox_colorbar_manual_min_ch2.setDisabled(True)
         self.doubleSpinBox_colorbar_manual_max_ch2.setDisabled(True)
-def update_graphs(self, single='all'):
-        xlim_min = np.min([self.p1[0], self.p2[0], self.p3[0], self.p4[0]])
-        xlim_max = np.max([self.p1[0], self.p2[0], self.p3[0], self.p4[0]])
-        ylim_min = np.min([self.p1[1], self.p2[1], self.p3[1], self.p4[1]])
-        ylim_max = np.max([self.p1[1], self.p2[1], self.p3[1], self.p4[1]])
-        if single == 'all' or single == 'main':
-                plot_scan_range(self, self.widget_display_piezo_limit, xlim_min=0, xlim_max=self.piezo_limit_x, ylim_min=0,
-                                        ylim_max=self.piezo_limit_y)
-        if single == 'all' or single == 'ch1':
-                plot_scan_range(self, self.widget_display_scan_window_ch1, xlim_min=xlim_min, xlim_max=xlim_max,
-                                        ylim_min=ylim_min,
-                                        ylim_max=ylim_max)
-        if single == 'all' or single == 'ch2':
-                plot_scan_range(self, self.widget_display_scan_window_ch2, xlim_min=xlim_min, xlim_max=xlim_max,
-                                        ylim_min=ylim_min,
-                                        ylim_max=ylim_max)

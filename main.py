@@ -19,7 +19,7 @@ from lib.ndfiltercontroller import NDFilterController, NDFilterChange
 from powercalibration import PowerCalibration
 from lib.powermeter import PowerMeterRead, PowerMeter
 from scan import Scan, MoveToTarget, Map, ApproachDisplay, MoveToTargetZ, AutoApproach
-from util.plotscanrange import plot_scan_range
+from util.plotscanrange import plot_scan_range, toggle_colorbar_main, toggle_colorbar_ch1, toggle_colorbar_ch2
 from lib.anc300 import ANC300
 from lib.sr8x0 import SR8x0
 from lib.niboard import OutputVoltage, InputVoltage, InputVoltageEncoder
@@ -31,8 +31,6 @@ import pandas as pd
 
 from lib.topas4 import Topas4, LaserWavelengthChange
 from lasermeasurement import LaserMeasurement
-from util.connect import connect_all
-from pages.scan_page import determine_scan_window, update_graphs
 
 
 class SPMController(QWidget):
@@ -77,7 +75,7 @@ class SPMController(QWidget):
         # self.list_resources()
 
         self.initialize_formats()
-        determine_scan_window(self)
+        self.determine_scan_window()
         self.plane_fit_list = [
             [self.doubleSpinBox_plane_fit_x, self.doubleSpinBox_plane_fit_x_2, self.doubleSpinBox_plane_fit_x_3,
              self.doubleSpinBox_plane_fit_x_4, self.doubleSpinBox_plane_fit_x_5],
@@ -89,7 +87,7 @@ class SPMController(QWidget):
             [self.checkBox_plane_fit, self.checkBox_plane_fit_2, self.checkBox_plane_fit_3,
              self.checkBox_plane_fit_4, self.checkBox_plane_fit_5]
         ]
-        connect_all(self)
+        self.connect_all()
         self.curr_coords = [0, 0]
         self.on_off_spinbox_list = [self.doubleSpinBox_x_min, self.doubleSpinBox_x_max, self.doubleSpinBox_y_min,
                                     self.doubleSpinBox_y_max, self.spinBox_x_pixels, self.spinBox_y_pixels,
@@ -125,7 +123,7 @@ class SPMController(QWidget):
         self.line_trace = {'X': [], 'ch1': [], 'ch2': []}
         self.line_retrace = {'X': [], 'ch1': [], 'ch2': []}
         self.laser_measurement_line_trace = {'mode': 1, 'wavelength': [], 'power': [], 'angle': [], 'ch1': [], 'ch2': []}
-        self.niboard_io()
+        self.hardware_io()
         self.approached_sound = QSound("57806__guitarguy1985__aircraftalarm.wav")
         self.plane_fit = PlaneFit()
         # self.output_voltage_x = OutputVoltage(port='x', label_error=self.label_error)
@@ -141,7 +139,7 @@ class SPMController(QWidget):
         # check_minmaxrotation_valid()
 
 
-    def niboard_io(self):
+    def hardware_io(self):
         try:
             self.output_voltage_x.close()
             self.output_voltage_y.close()
@@ -177,9 +175,223 @@ class SPMController(QWidget):
         self.widget_laser_measurement_ch1.setBackground("w")
         self.widget_laser_measurement_ch2.setBackground("w")
 
+    def determine_scan_window(self):
+        self.piezo_limit_x = self.doubleSpinBox_piezo_limit_x.value()
+        self.piezo_limit_y = self.doubleSpinBox_piezo_limit_y.value()
+        self.xmin_input = self.doubleSpinBox_x_min.value()
+        self.xmax_input = self.doubleSpinBox_x_max.value()
+        self.ymin_input = self.doubleSpinBox_y_min.value()
+        self.ymax_input = self.doubleSpinBox_y_max.value()
+        self.xpixels = self.spinBox_x_pixels.value()
+        self.ypixels = self.spinBox_y_pixels.value()
+        self.frequency = self.doubleSpinBox_frequency.value()
+        self.rotation_degree = self.doubleSpinBox_rotation.value()
+        self.rotation = self.rotation_degree / 180 * np.pi
+        center = np.array([[(self.xmin_input + self.xmax_input) / 2,
+                            (self.ymin_input + self.ymax_input) / 2]]).T
+        p1_input = np.array([self.xmin_input, self.ymin_input])
+        p2_input = np.array([self.xmax_input, self.ymin_input])
+        p3_input = np.array([self.xmax_input, self.ymax_input])
+        p4_input = np.array([self.xmin_input, self.ymax_input])
+        rotate_matrix = np.array([[np.cos(self.rotation), -np.sin(self.rotation)],
+                                  [np.sin(self.rotation), np.cos(self.rotation)]])
+        self.p1 = self.rotate_coord(p1_input, center, rotate_matrix)
+        self.p2 = self.rotate_coord(p2_input, center, rotate_matrix)
+        self.p3 = self.rotate_coord(p3_input, center, rotate_matrix)
+        self.p4 = self.rotate_coord(p4_input, center, rotate_matrix)
+
+        self.X_raw = np.round(np.linspace(0, self.xmax_input - self.xmin_input, self.xpixels), 6)
+        self.Y_raw = np.round(np.linspace(0, self.ymax_input - self.ymin_input, self.ypixels), 6)
+        XX_input, YY_input = np.meshgrid(self.X_raw + self.xmin_input, self.Y_raw + self.ymin_input)
+        xx_yy = np.array([np.array([xx, yy]) for xx, yy in zip(XX_input.reshape((1, -1)), YY_input.reshape((1, -1)))])
+        xx_yy_rot = self.rotate_coord(xx_yy, center, rotate_matrix)
+        self.XX = xx_yy_rot[0, :].reshape(XX_input.shape)
+        self.YY = xx_yy_rot[1, :].reshape(YY_input.shape)
+        self.update_graphs()
+
+    def update_graphs(self, single='all'):
+        xlim_min = np.min([self.p1[0], self.p2[0], self.p3[0], self.p4[0]])
+        xlim_max = np.max([self.p1[0], self.p2[0], self.p3[0], self.p4[0]])
+        ylim_min = np.min([self.p1[1], self.p2[1], self.p3[1], self.p4[1]])
+        ylim_max = np.max([self.p1[1], self.p2[1], self.p3[1], self.p4[1]])
+        if single == 'all' or single == 'main':
+            self.plot_scan_range(self.widget_display_piezo_limit, xlim_min=0, xlim_max=self.piezo_limit_x, ylim_min=0,
+                                 ylim_max=self.piezo_limit_y)
+        if single == 'all' or single == 'ch1':
+            self.plot_scan_range(self.widget_display_scan_window_ch1, xlim_min=xlim_min, xlim_max=xlim_max,
+                                 ylim_min=ylim_min,
+                                 ylim_max=ylim_max)
+        if single == 'all' or single == 'ch2':
+            self.plot_scan_range(self.widget_display_scan_window_ch2, xlim_min=xlim_min, xlim_max=xlim_max,
+                                 ylim_min=ylim_min,
+                                 ylim_max=ylim_max)
+
+    def update_display_approach(self):
+        self.widget_linescan_approach_ch1.clear()
+        self.widget_linescan_approach_ch2.clear()
+        self.widget_linescan_approach_ch1.plot(self.display_list_ch1, pen=mkPen(color=(0, 0, 0)))
+        self.widget_linescan_approach_ch2.plot(self.display_list_ch2, pen=mkPen(color=(0, 0, 0)))
+
+    def rotate_coord(self, p, center, rotate_matrix):
+        p = np.reshape(p, (2, -1))
+        if p.shape[1] == 1:
+            return np.round(np.reshape(np.matmul(rotate_matrix, (p - center)) + center, (-1, 2))[0], 6)
+        else:
+            return np.round(np.reshape(np.matmul(rotate_matrix, (p - center)) + center, (2, -1)), 6)
+
+    def connect_all(self):
+        '''
+        keyboardTracking of all edges has been set to False in form.ui. Thus valueChanged is only triggered after Enter.
+        '''
+        self.doubleSpinBox_piezo_limit_x.valueChanged.connect(self.determine_scan_window)
+        self.doubleSpinBox_piezo_limit_y.valueChanged.connect(self.determine_scan_window)
+        self.doubleSpinBox_x_min.valueChanged.connect(self.determine_scan_window)
+        self.doubleSpinBox_x_max.valueChanged.connect(self.determine_scan_window)
+        self.doubleSpinBox_y_min.valueChanged.connect(self.determine_scan_window)
+        self.doubleSpinBox_y_max.valueChanged.connect(self.determine_scan_window)
+        self.spinBox_x_pixels.valueChanged.connect(self.determine_scan_window)
+        self.spinBox_y_pixels.valueChanged.connect(self.determine_scan_window)
+        self.doubleSpinBox_frequency.valueChanged.connect(self.determine_scan_window)
+        self.doubleSpinBox_rotation.valueChanged.connect(self.determine_scan_window)
+        self.update_graphs_signal.connect(self.update_voltage)
+        # self.output_voltage_signal.connect(self.output_voltage)
+        self.pushButton_scan.clicked.connect(self.toggle_scan_button)
+        self.pushButton_goto0.clicked.connect(lambda: self.goto_position(np.array([0, 0])))
+        self.pushButton_goto.clicked.connect(lambda: self.goto_position(np.array([self.doubleSpinBox_goto_x.value(),
+                                                                                  self.doubleSpinBox_goto_y.value()])))
+        self.checkBox_maintenance.toggled.connect(self.toggle_maintenance)
+        self.doubleSpinBox_current_x.valueChanged.connect(self.update_voltage_maintenance)
+        self.doubleSpinBox_current_y.valueChanged.connect(self.update_voltage_maintenance)
+        self.pushButton_image.clicked.connect(self.toggle_map_button)
+        self.buttonGroup.buttonToggled.connect(lambda: self.update_graphs(single='main'))
+        self.buttonGroup_2.buttonToggled.connect(lambda: self.update_graphs(single='main'))
+        self.buttonGroup_3.buttonToggled.connect(lambda: self.update_graphs(single='ch1'))
+        self.buttonGroup_4.buttonToggled.connect(lambda: self.update_graphs(single='ch2'))
+
+        self.buttonGroup_5.buttonToggled.connect(self.toggle_colorbar_main)
+        self.doubleSpinBox_colorbar_manual_min_main.valueChanged.connect(self.toggle_colorbar_main)
+        self.doubleSpinBox_colorbar_manual_max_main.valueChanged.connect(self.toggle_colorbar_main)
+
+        self.buttonGroup_6.buttonToggled.connect(self.toggle_colorbar_ch1)
+        self.doubleSpinBox_colorbar_manual_min_ch1.valueChanged.connect(self.toggle_colorbar_ch1)
+        self.doubleSpinBox_colorbar_manual_max_ch1.valueChanged.connect(self.toggle_colorbar_ch1)
+
+        self.buttonGroup_7.buttonToggled.connect(self.toggle_colorbar_ch2)
+        self.doubleSpinBox_colorbar_manual_min_ch2.valueChanged.connect(self.toggle_colorbar_ch2)
+        self.doubleSpinBox_colorbar_manual_max_ch2.valueChanged.connect(self.toggle_colorbar_ch2)
+
+        self.pushButton_directory.clicked.connect(self.selectDirectory)
+        self.doubleSpinBox_z.valueChanged.connect(self.output_voltage_z_direction)
+        self.pushButton_reconnect_hardware.clicked.connect(self.hardware_io)
+
+        # self.comboBox_anc300.currentIndexChanged.connect(self.choose_anc300)
+        self.pushButton_reconnect_anc300.clicked.connect(self.reconnect_anc300)
+        self.pushButton_positioner_on.clicked.connect(lambda: self.anc_controller.setm(4, "stp"))
+        self.pushButton_positioner_off.clicked.connect(lambda: self.anc_controller.setm(4, "gnd"))
+        self.pushButton_positioner_off.clicked.connect(
+            lambda: self.move_positioner_toggle() if self.positioner_moving else None)
+        self.pushButton_scanner_x_dc_on.clicked.connect(lambda: self.anc_controller.setdci(1, "on"))
+        self.pushButton_scanner_x_dc_off.clicked.connect(lambda: self.anc_controller.setdci(1, "off"))
+        self.pushButton_scanner_y_dc_on.clicked.connect(lambda: self.anc_controller.setdci(2, "on"))
+        self.pushButton_scanner_y_dc_off.clicked.connect(lambda: self.anc_controller.setdci(2, "off"))
+        self.pushButton_scanner_z_dc_on.clicked.connect(lambda: self.anc_controller.setdci(3, "on"))
+        self.pushButton_scanner_z_dc_off.clicked.connect(lambda: self.anc_controller.setdci(3, "off"))
+        self.pushButton_scanner_x_ac_on.clicked.connect(lambda: self.anc_controller.setaci(1, "on"))
+        self.pushButton_scanner_x_ac_off.clicked.connect(lambda: self.anc_controller.setaci(1, "off"))
+        self.pushButton_scanner_y_ac_on.clicked.connect(lambda: self.anc_controller.setaci(2, "on"))
+        self.pushButton_scanner_y_ac_off.clicked.connect(lambda: self.anc_controller.setaci(2, "off"))
+        self.pushButton_scanner_z_ac_on.clicked.connect(lambda: self.anc_controller.setaci(3, "on"))
+        self.pushButton_scanner_z_ac_off.clicked.connect(lambda: self.anc_controller.setaci(3, "off"))
+
+        self.pushButton_positioner_move.clicked.connect(self.move_positioner_toggle)
+        self.spinBox_positioner_frequency.valueChanged.connect(
+            lambda: self.anc_controller.setf(4, self.spinBox_positioner_frequency.value()))
+        self.doubleSpinBox_positioner_amplitude.valueChanged.connect(
+            lambda: self.anc_controller.setv(4, self.doubleSpinBox_positioner_amplitude.value()))
+
+        self.pushButton_reconnect_lockin.clicked.connect(self.reconnect_lockin)
+        #SR830 Top:
+        self.spinBox_lockin_top_reference.valueChanged.connect(
+            lambda: self.lockin_top.set_reference_source(self.spinBox_lockin_top_reference.value()))
+        self.doubleSpinBox_lockin_top_reference_internal_frequency.valueChanged.connect(
+            lambda: self.lockin_top.set_frequency(self.doubleSpinBox_lockin_top_reference_internal_frequency.value()))
+        self.spinBox_lockin_top_time_constant.valueChanged.connect(
+            lambda: self.lockin_top.set_time_constant(self.spinBox_lockin_top_time_constant.value()))
+        self.spinBox_lockin_top_display.valueChanged.connect(
+            lambda: self.lockin_top.set_display(1, self.spinBox_lockin_top_display.value()))
+        self.spinBox_lockin_top_output_mode.valueChanged.connect(
+            lambda: self.lockin_top.set_output(1, self.spinBox_lockin_top_output_mode.value()))
+        #SR830 Bottom:
+        self.spinBox_lockin_bottom_reference.valueChanged.connect(
+            lambda: self.lockin_bottom.set_reference_source(self.spinBox_lockin_bottom_reference.value()))
+        self.doubleSpinBox_lockin_bottom_reference_internal_frequency.valueChanged.connect(
+            lambda: self.lockin_bottom.set_frequency(self.doubleSpinBox_lockin_bottom_reference_internal_frequency.value()))
+        self.spinBox_lockin_bottom_time_constant.valueChanged.connect(
+            lambda: self.lockin_bottom.set_time_constant(self.spinBox_lockin_bottom_time_constant.value()))
+        self.spinBox_lockin_bottom_display.valueChanged.connect(
+            lambda: self.lockin_bottom.set_display(1, self.spinBox_lockin_bottom_display.value()))
+        self.spinBox_lockin_bottom_output_mode.valueChanged.connect(
+            lambda: self.lockin_bottom.set_output(1, self.spinBox_lockin_bottom_output_mode.value()))
+
+        self.pushButton_reconnect_lockin.clicked.connect(self.reconnect_anc300)
+        # start display for approach
+        self.pushButton_approach_monitor.clicked.connect(self.toggle_display_approach_button)
+        self.pushButton_approach_monitor_clear.clicked.connect(self.clear_approach_monitor)
+
+        self.update_display_approach_signal.connect(self.update_display_approach)
+        self.doubleSpinBox_encoder.valueChanged.connect(
+            lambda: self.output_voltage_encoder.outputVoltage(self.doubleSpinBox_encoder.value()))
+
+        self.checkBox_encoder_reading.stateChanged.connect(self.real_time_encoder)
+
+        self.pushButton_z_goto.clicked.connect(
+            lambda: self.goto_position_z(self.doubleSpinBox_z_goto.value()))
+        self.pushButton_z_goto0.clicked.connect(
+            lambda: self.goto_position_z(0.0))
+
+        self.pushButton_approach_auto_start.clicked.connect(self.toggle_auto_approach_button)
+        self.pushButton_laser_calibration_load.clicked.connect(self.load_calibration_form)
+
+        for i in range(len(self.plane_fit_list[0])):
+            plane_fit_x, plane_fit_y, plane_fit_z, plane_fit_checked = self.plane_fit_list[0][i],\
+            self.plane_fit_list[1][i], self.plane_fit_list[2][i], self.plane_fit_list[3][i]
+            plane_fit_x.valueChanged.connect(self.update_plane_fit)
+            plane_fit_y.valueChanged.connect(self.update_plane_fit)
+            plane_fit_z.valueChanged.connect(self.update_plane_fit)
+            plane_fit_checked.toggled.connect(self.update_plane_fit)
+
+        self.checkBox_read_power.stateChanged.connect(self.real_time_power)
+        self.checkBox_laser_shutter.stateChanged.connect(lambda: self.laser_controller.openShutter() if self.checkBox_laser_shutter.isChecked() else self.laser_controller.closeShutter())
+        self.pushButton_laser_controller.clicked.connect(self.reconnect_opa)
+        self.pushButton_laser_set_wavelength.clicked.connect(
+            lambda: self.opa_set_wavelength(self.doubleSpinBox_laser_set_wavelength.value()))
+        self.pushButton_ndfilter_controller.clicked.connect(self.reconnect_ndfilter)
+        self.pushButton_ndfilter.clicked.connect(
+            lambda: self.ndfilter_set_angle(self.doubleSpinBox_ndfilter.value())
+        )
+        self.pushButton_power.clicked.connect(self.reconnect_power)
+        self.pushButton_laser_calibration.clicked.connect(self.toggle_calibration)
+
+        self.pushButton_laser_calibration_abort.clicked.connect(self.abort_calibration)
+
+        self.pushButton_laser_calibration_save.clicked.connect(self.save_calibration_form)
+
+        self.pushButton_laser_measurement.clicked.connect(self.toggle_laser_measurement)
+        self.pushButton_laser_measurement_abort.clicked.connect(self.abort_laser_measurement)
 
 
 
+    def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
+        plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max)
+
+    def toggle_colorbar_main(self):
+        toggle_colorbar_main(self)
+
+    def toggle_colorbar_ch1(self):
+        toggle_colorbar_ch1(self)
+
+    def toggle_colorbar_ch2(self):
+        toggle_colorbar_ch2(self)
 
     def toggle_maintenance(self):
         if self.checkBox_maintenance.isChecked():
@@ -212,7 +424,6 @@ class SPMController(QWidget):
 
 
     def toggle_map_button(self):
-        self.label_error.setText("")
         if self.error_lock:
             self.label_error.setText(self.error_lock_text)
             return
@@ -274,12 +485,12 @@ class SPMController(QWidget):
             self)  # .curr_coords, self.XX, self.YY, self.frequency, self.update_voltage_signal, self.scan_on_boolean_in_list)
         self.map.moveToThread(self.thread_map)
         self.thread_map.started.connect(self.map.run)
-        self.thread_map.started.connect(lambda: update_graphs(self))
+        self.thread_map.started.connect(self.update_graphs)
         self.map.finishedAfterMapping.connect(self.toggle_map_button)
         # self.map.finished.connect(self.on_off_spinbox_list_turn_on)
         self.map.finished.connect(self.map.deleteLater)
         self.map.finished.connect(self.thread_map.exit)
-        self.map.lineFinished.connect(lambda: update_graphs(self))
+        self.map.lineFinished.connect(self.update_graphs)
         self.thread_map.finished.connect(self.thread_map.deleteLater)
         self.thread_map.start()
 
@@ -296,7 +507,6 @@ class SPMController(QWidget):
     def clear_approach_monitor(self):
         self.display_list_ch1.clear()
         self.display_list_ch2.clear()
-        self.update_display_approach_signal.emit()
 
     def update_voltage(self):
         # print("Updated voltage: x = ", self.curr_coords[0], ", y = ", self.curr_coords[1])
