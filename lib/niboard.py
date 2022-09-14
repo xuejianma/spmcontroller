@@ -1,5 +1,5 @@
 import nidaqmx
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QMutex
 from nidaqmx.stream_readers import AnalogMultiChannelReader, AnalogSingleChannelReader
 import time
 import json
@@ -37,6 +37,34 @@ class OutputVoltage:
         except:
             self.label_error.setText(label_error_text)
 
+
+class OutputVoltageXYZ:
+    def __init__(self, label_error, ratio = 15):
+        self.label_error = label_error
+        self.ratio = ratio
+        try:
+            self.ports = {'encoder': nidevice_port_name + "/ao0", 'x': nidevice_port_name + "/ao1",
+                          'y': nidevice_port_name + "/ao2", 'z': nidevice_port_name + "/ao3"}
+            self.task = nidaqmx.Task()
+            self.task.ao_channels.add_ao_voltage_chan(self.ports['x'])
+            self.task.ao_channels.add_ao_voltage_chan(self.ports['y'])
+            self.task.ao_channels.add_ao_voltage_chan(self.ports['z'])
+        except:
+            self.label_error.setText(label_error_text)
+    def outputVoltage(self, voltage_xyz_array):
+        try:
+            voltage_xyz_array_output = [item / self.ratio for item in voltage_xyz_array]
+            self.task.write(voltage_xyz_array_output, auto_start = True)
+        except:
+            self.label_error.setText(label_error_text)
+
+    def close(self):
+        try:
+            self.task.close()
+        except:
+            self.label_error.setText(label_error_text)
+
+mutex = QMutex()
 class InputVoltage:
     def __init__(self, label_error):
         self.label_error = label_error
@@ -53,11 +81,13 @@ class InputVoltage:
             self.label_error.setText(label_error_text)
     def getVoltage(self):
         try:
-            # t1 = time.time()
+            # t1 = time()
+            mutex.lock()
             vals = self.task.read()
+            mutex.unlock()
             self.pre_ch1, self.pre_ch2 = vals
             return vals
-            # print(time.time() - t1)
+            # print(time() - t1)
             # return val
             # return 0
             # return self.task.read()
@@ -91,9 +121,12 @@ class InputVoltageEncoder(QObject):
         except:
             self.label_error.setText(label_error_text)
     def getVoltage(self):
+        mutex.lock()
         self.curr_value = self.task.read() * 1000
+        mutex.unlock()
         # print(self.curr_value)
         self.lcdNumber_encoder_reading.display(self.curr_value)
+        
         # self.update.emit()
 
 

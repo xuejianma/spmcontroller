@@ -59,6 +59,7 @@ class PowerCalibration(QObject):
             self.sweep_wavelength_mode_A()
         else:
             self.sweep_wavelength_mode_B()
+        self.main.save_calibration_form_without_dialog()
 
     def sweep_wavelength_mode_A(self):
         # self.progress = 0

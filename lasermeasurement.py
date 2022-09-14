@@ -73,6 +73,16 @@ class LaserMeasurement(QObject):
         if self.mode == 4:
             self.power_dict = self.get_calibration_dict_angle_to_power_in_form()
         # print(self.angle_dict)
+    
+    def get_voltages(self):
+        rounds = self.main.spinBox_laser_measurement_number_of_points_averaging.value()
+        sum_ch1, sum_ch2 = 0.0, 0.0
+        for i in range(rounds):
+            ch1, ch2 = self.main.get_voltage_ch1_ch2()
+            sum_ch1 += ch1
+            sum_ch2 += ch2
+        return sum_ch1 / rounds, sum_ch2 / rounds
+
     def laser_measurement(self):
         if self.mode == 1 or self.mode == 2:
             self.laser_measurement_modes_1_2()
@@ -124,7 +134,7 @@ class LaserMeasurement(QObject):
                 self.set_wavelength_mechanical(self.curr_wavelength)
             if (self.mode == 1 and key in self.angle_dict) or self.mode == 2:
                 # print('voltages', self.main.get_voltage_ch1_ch2())
-                ch1_voltage, ch2_voltage = self.main.get_voltage_ch1_ch2()
+                ch1_voltage, ch2_voltage = self.get_voltages()
                 self.main.laser_measurement_line_trace['wavelength'].append(self.curr_wavelength)
                 self.main.laser_measurement_line_trace['ch1'].append(ch1_voltage)
                 self.main.laser_measurement_line_trace['ch2'].append(ch2_voltage)
@@ -134,7 +144,10 @@ class LaserMeasurement(QObject):
             self.progress_finished_wavelength.emit()
             sleep(0.05)  # This time ensures that the calibration form updates with correct self.curr_wavelength in extreme cases
             self.i += 1
-
+        df = pd.DataFrame({'wavelength (nm)': self.main.laser_measurement_line_trace['wavelength'],
+                            'ch1 (V)': self.main.laser_measurement_line_trace['ch1'],
+                            'ch2 (V)': self.main.laser_measurement_line_trace['ch2']})
+        df.to_csv(self.main.lineEdit_laser_measurement_data_save_directory.text() + '/' + self.filename, index = False)
         if self.main.laser_measurement_on:
             # if self.curr_wavelength != self.ending_wavelength:
             #     self.curr_wavelength = self.ending_wavelength
@@ -146,10 +159,7 @@ class LaserMeasurement(QObject):
             #     self.main.laser_wavelength_changing = False
             #     # print(laserwavelength_change.wavelength)
             #     self.progress_finished_wavelength.emit()
-            df = pd.DataFrame({'wavelength (nm)': self.main.laser_measurement_line_trace['wavelength'],
-                               'ch1 (V)': self.main.laser_measurement_line_trace['ch1'],
-                               'ch2 (V)': self.main.laser_measurement_line_trace['ch2']})
-            df.to_csv(self.main.lineEdit_laser_measurement_data_save_directory.text() + '/' + self.filename, index = False)
+
             self.finished.emit()
             # return
         self.moveToThread(self.main.mainThread)
@@ -185,13 +195,12 @@ class LaserMeasurement(QObject):
             #     self.main.laser_measurement_line_trace['wavelength'].append(self.curr_wavelength)
             #     self.main.laser_measurement_line_trace['ch1'].append(ch1_voltage)
             #     self.main.laser_measurement_line_trace['ch2'].append(ch2_voltage)
+            ch1_voltage, ch2_voltage = self.get_voltages()
             if self.convert_angle_to_power_boolean and key in self.power_dict:
-                ch1_voltage, ch2_voltage = self.main.get_voltage_ch1_ch2()
                 self.main.laser_measurement_line_trace['power'].append(curr_power)
                 self.main.laser_measurement_line_trace['ch1'].append(ch1_voltage)
                 self.main.laser_measurement_line_trace['ch2'].append(ch2_voltage)
             elif not self.convert_angle_to_power_boolean:
-                ch1_voltage, ch2_voltage = self.main.get_voltage_ch1_ch2()
                 self.main.laser_measurement_line_trace['angle'].append(self.curr_angle)
                 self.main.laser_measurement_line_trace['ch1'].append(ch1_voltage)
                 self.main.laser_measurement_line_trace['ch2'].append(ch2_voltage)
@@ -201,18 +210,18 @@ class LaserMeasurement(QObject):
             self.progress_finished_wavelength.emit()
             sleep(0.05)  # This time ensures that the calibration form updates with correct self.curr_wavelength in extreme cases
             self.i += 1
-
+        if self.convert_angle_to_power_boolean:
+            df = pd.DataFrame({'power (uW)': self.main.laser_measurement_line_trace['power'],
+                                'ch1 (V)': self.main.laser_measurement_line_trace['ch1'],
+                                'ch2 (V)': self.main.laser_measurement_line_trace['ch2']})
+        else:
+            df = pd.DataFrame({'angle (degree)': self.main.laser_measurement_line_trace['angle'],
+                                'ch1 (V)': self.main.laser_measurement_line_trace['ch1'],
+                                'ch2 (V)': self.main.laser_measurement_line_trace['ch2']})
+        df.to_csv(self.main.lineEdit_laser_measurement_data_save_directory.text() + '/' + self.filename,
+                    index=False)
         if self.main.laser_measurement_on:
-            if self.convert_angle_to_power_boolean:
-                df = pd.DataFrame({'power (uW)': self.main.laser_measurement_line_trace['power'],
-                                   'ch1 (V)': self.main.laser_measurement_line_trace['ch1'],
-                                   'ch2 (V)': self.main.laser_measurement_line_trace['ch2']})
-            else:
-                df = pd.DataFrame({'angle (degree)': self.main.laser_measurement_line_trace['angle'],
-                                   'ch1 (V)': self.main.laser_measurement_line_trace['ch1'],
-                                   'ch2 (V)': self.main.laser_measurement_line_trace['ch2']})
-            df.to_csv(self.main.lineEdit_laser_measurement_data_save_directory.text() + '/' + self.filename,
-                      index=False)
+
             self.finished.emit()
             # return
         self.moveToThread(self.main.mainThread)

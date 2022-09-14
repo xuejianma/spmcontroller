@@ -3,6 +3,8 @@ Created by Xuejian Ma at 10/22/2021.
 All rights reserved.
 """
 import pyvisa as visa
+from PyQt5.QtCore import QMutex
+
 import json
 
 name_dict = {
@@ -18,6 +20,7 @@ try:
 except:
     print("No lockin substitute names found in ../config.json")
 class SR8x0():
+    mutex = QMutex()
     def __init__(self, up_or_down):
         # COM_number = name_dict[up_or_down]
         # # COM_number = 9 for SR830 Top, 8 for SR830 Bottom
@@ -71,3 +74,9 @@ class SR8x0():
 
     def get_identification(self):
         return self.instrument.query("*IDN?")
+
+    def get_output(self):
+        self.mutex.lock()
+        ret = float(self.instrument.query("OUTP? R")) 
+        self.mutex.unlock()
+        return ret

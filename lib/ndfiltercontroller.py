@@ -70,7 +70,7 @@ class NDFilterChange(QObject):
 #         self.angle = 0
 #     def get_angle(self):
 #         return self.angle
-#
+
 # class NDFilterChange(QObject):
 #     finished = pyqtSignal()
 #     progress_update = pyqtSignal()
@@ -80,7 +80,7 @@ class NDFilterChange(QObject):
 #         self.parent = parent
 #         self.angle = angle
 #         self.progress = 100
-#
+
 #     def set_angle(self):
 #         sleep_time = 0.1 * abs(self.angle - self.ndfilter_controller.angle) # simulate hardware response time
 #         for i in range(20):
@@ -89,12 +89,12 @@ class NDFilterChange(QObject):
 #                 self.progress_update.emit()
 #                 self.finished.emit()
 #                 return
-#             sleep(sleep_time / 20)
+#             sleep(sleep_time / 20*2)
 #             self.progress = (i + 1) * 5
 #             self.progress_update.emit()
-#
+
 #         # if not self.parent.ndfilter_controller_changing:
 #         #   return
 #         self.ndfilter_controller.angle = self.angle
-#
+
 #         self.finished.emit()

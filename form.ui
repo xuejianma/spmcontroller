@@ -188,10 +188,13 @@
        <height>61</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>{d}: date, {t}: time</string>
+     </property>
      <property name="text">
       <string>Channel 2
 Filenames (*.txt, *.tiff)
-trace and retrace</string>
+trace and retrace (?)</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_rotation">
@@ -700,7 +703,7 @@ Recommended: 50</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_piezo_limit_y">
      <property name="geometry">
       <rect>
-       <x>350</x>
+       <x>430</x>
        <y>440</y>
        <width>62</width>
        <height>22</height>
@@ -759,19 +762,6 @@ Recommended: 50</string>
      </property>
      <property name="text">
       <string>{d}_{t}_ch1 retrace</string>
-     </property>
-    </widget>
-    <widget class="Line" name="line_goto">
-     <property name="geometry">
-      <rect>
-       <x>780</x>
-       <y>10</y>
-       <width>20</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
      </property>
     </widget>
     <widget class="QLabel" name="label_rotation_2">
@@ -854,8 +844,8 @@ Recommended: 50</string>
     <widget class="QLabel" name="label_piezo_limit_y">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>470</y>
+       <x>320</x>
+       <y>430</y>
        <width>121</width>
        <height>31</height>
       </rect>
@@ -1341,10 +1331,13 @@ Recommended: 50</string>
        <height>41</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>{d}: date, {t}: time</string>
+     </property>
      <property name="text">
       <string>Channel 1
 Filenames (*.txt, *.tiff)
-trace and retrace</string>
+trace and retrace (?)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_colorbar_main">
@@ -1402,7 +1395,7 @@ trace and retrace</string>
     <widget class="QPushButton" name="pushButton_goto0">
      <property name="geometry">
       <rect>
-       <x>710</x>
+       <x>720</x>
        <y>20</y>
        <width>71</width>
        <height>32</height>
@@ -1888,8 +1881,99 @@ trace and retrace</string>
       </rect>
      </property>
      <property name="text">
-      <string>Current Line:</string>
+      <string/>
      </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_stop_goto">
+     <property name="geometry">
+      <rect>
+       <x>720</x>
+       <y>54</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Stop Goto</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_source_of_channels_in_scan_page">
+     <property name="geometry">
+      <rect>
+       <x>750</x>
+       <y>250</y>
+       <width>261</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Source of Channels (Scan &amp; Approach &amp; Laser):</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_channel_source_lockins_in_scan_page">
+     <property name="geometry">
+      <rect>
+       <x>1090</x>
+       <y>250</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LockIns</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_channel_source_niboard_in_scan_page">
+     <property name="geometry">
+      <rect>
+       <x>1010</x>
+       <y>250</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>NIBoard</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>470</y>
+       <width>301</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="pushButton_show_newer">
+        <property name="text">
+         <string>&lt;&lt; Newer</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label_image_display_number">
+        <property name="text">
+         <string>1 (Imaging) / 1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_show_older">
+        <property name="text">
+         <string>Older &gt;&gt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_approach">
@@ -2212,9 +2296,9 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>590</x>
-       <y>560</y>
+       <y>550</y>
        <width>221</width>
-       <height>341</height>
+       <height>351</height>
       </rect>
      </property>
      <property name="title">
@@ -2354,9 +2438,9 @@ trace and retrace</string>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_z">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>20</x>
         <y>250</y>
-        <width>71</width>
+        <width>91</width>
         <height>22</height>
        </rect>
       </property>
@@ -2367,7 +2451,7 @@ trace and retrace</string>
        <number>6</number>
       </property>
       <property name="maximum">
-       <double>60.000000000000000</double>
+       <double>100.000000000000000</double>
       </property>
       <property name="singleStep">
        <double>0.100000000000000</double>
@@ -2376,14 +2460,14 @@ trace and retrace</string>
      <widget class="QLabel" name="label_z">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>230</y>
-        <width>111</width>
+        <width>121</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
-       <string>Current Scanner-Z (V):</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Current Scanner-Z (V):&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_z_goto">
@@ -2391,7 +2475,7 @@ trace and retrace</string>
        <rect>
         <x>80</x>
         <y>290</y>
-        <width>41</width>
+        <width>51</width>
         <height>31</height>
        </rect>
       </property>
@@ -2402,9 +2486,9 @@ trace and retrace</string>
      <widget class="QPushButton" name="pushButton_z_goto0">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>20</x>
         <y>290</y>
-        <width>41</width>
+        <width>51</width>
         <height>31</height>
        </rect>
       </property>
@@ -2428,8 +2512,8 @@ trace and retrace</string>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_z_goto">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>300</y>
+        <x>140</x>
+        <y>297</y>
         <width>61</width>
         <height>22</height>
        </rect>
@@ -2441,10 +2525,87 @@ trace and retrace</string>
        <number>2</number>
       </property>
       <property name="maximum">
-       <double>60.000000000000000</double>
+       <double>100.000000000000000</double>
       </property>
       <property name="singleStep">
        <double>0.100000000000000</double>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_z_stop_goto">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>323</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Stop Goto</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_z_change_instantly">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>214</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Change z instantly:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_z_change_continuously">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>270</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Change z continuously:</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="doubleSpinBox_z_piezo_limit">
+      <property name="geometry">
+       <rect>
+        <x>148</x>
+        <y>250</y>
+        <width>51</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+      <property name="value">
+       <double>50.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_z_piezo_limit">
+      <property name="geometry">
+       <rect>
+        <x>138</x>
+        <y>230</y>
+        <width>91</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Piezo limit z (V):&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </widget>
@@ -2503,7 +2664,7 @@ trace and retrace</string>
     <widget class="QPushButton" name="pushButton_approach_monitor">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>300</x>
        <y>130</y>
        <width>251</width>
        <height>51</height>
@@ -2517,7 +2678,7 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>850</x>
-       <y>530</y>
+       <y>550</y>
        <width>231</width>
        <height>321</height>
       </rect>
@@ -3216,7 +3377,7 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>400</x>
-       <y>580</y>
+       <y>550</y>
        <width>161</width>
        <height>301</height>
       </rect>
@@ -3328,23 +3489,10 @@ trace and retrace</string>
       </property>
      </widget>
     </widget>
-    <widget class="QPushButton" name="pushButton_approach_auto_stop">
-     <property name="geometry">
-      <rect>
-       <x>950</x>
-       <y>860</y>
-       <width>141</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>STOP Auto Approach</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="pushButton_approach_monitor_clear">
      <property name="geometry">
       <rect>
-       <x>680</x>
+       <x>580</x>
        <y>130</y>
        <width>141</width>
        <height>51</height>
@@ -3352,6 +3500,77 @@ trace and retrace</string>
      </property>
      <property name="text">
       <string>Clear Display Data</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_read_lockin">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>570</y>
+       <width>75</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>read lockin</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_channel_source_niboard_in_approach_page">
+     <property name="geometry">
+      <rect>
+       <x>1000</x>
+       <y>160</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>NIBoard</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_channel_source_lockins_in_approach_page">
+     <property name="geometry">
+      <rect>
+       <x>1070</x>
+       <y>160</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LockIns</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_source_of_channels_in_approach_page">
+     <property name="geometry">
+      <rect>
+       <x>740</x>
+       <y>160</y>
+       <width>261</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Source of Channels (Scan &amp; Approach &amp; Laser):</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_error_approach_channels">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>140</y>
+       <width>171</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>
@@ -3457,7 +3676,7 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>260</y>
+       <y>270</y>
        <width>1161</width>
        <height>16</height>
       </rect>
@@ -3520,7 +3739,7 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>250</y>
+       <y>260</y>
        <width>251</width>
        <height>16</height>
       </rect>
@@ -3534,12 +3753,12 @@ trace and retrace</string>
       <rect>
        <x>420</x>
        <y>460</y>
-       <width>211</width>
+       <width>291</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Default Calibration Directory:</string>
+      <string>Default Calibration Directory (also for auto save):</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_laser_calibration_directory">
@@ -3572,7 +3791,7 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>280</y>
+       <y>290</y>
        <width>361</width>
        <height>231</height>
       </rect>
@@ -3603,7 +3822,7 @@ trace and retrace</string>
      <property name="geometry">
       <rect>
        <x>420</x>
-       <y>280</y>
+       <y>290</y>
        <width>101</width>
        <height>51</height>
       </rect>
@@ -3643,9 +3862,9 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>560</y>
+       <y>580</y>
        <width>701</width>
-       <height>171</height>
+       <height>151</height>
       </rect>
      </property>
     </widget>
@@ -3697,19 +3916,19 @@ Measurement</string>
       <rect>
        <x>50</x>
        <y>740</y>
-       <width>171</width>
+       <width>281</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Default Sweeping Directory:</string>
+      <string>Default Sweeping Directory for auto save:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_laser_calibration_time">
      <property name="geometry">
       <rect>
        <x>680</x>
-       <y>420</y>
+       <y>430</y>
        <width>121</width>
        <height>20</height>
       </rect>
@@ -3722,7 +3941,7 @@ Measurement</string>
      <property name="geometry">
       <rect>
        <x>810</x>
-       <y>420</y>
+       <y>430</y>
        <width>111</width>
        <height>22</height>
       </rect>
@@ -3959,8 +4178,8 @@ Measurement</string>
     <widget class="QCheckBox" name="checkBox_laser_shutter">
      <property name="geometry">
       <rect>
-       <x>1050</x>
-       <y>200</y>
+       <x>280</x>
+       <y>220</y>
        <width>101</width>
        <height>20</height>
       </rect>
@@ -4074,8 +4293,8 @@ Filter Controller</string>
       </rect>
      </property>
      <property name="text">
-      <string>Reconnect ND
-Filter Controller</string>
+      <string>Reconnect
+Powermeter</string>
      </property>
     </widget>
     <widget class="QProgressBar" name="progressBar_power_calibration">
@@ -4085,7 +4304,7 @@ Filter Controller</string>
      <property name="geometry">
       <rect>
        <x>420</x>
-       <y>340</y>
+       <y>350</y>
        <width>211</width>
        <height>20</height>
       </rect>
@@ -4104,7 +4323,7 @@ Filter Controller</string>
      <property name="geometry">
       <rect>
        <x>530</x>
-       <y>280</y>
+       <y>290</y>
        <width>101</width>
        <height>51</height>
       </rect>
@@ -4118,7 +4337,7 @@ Calibration</string>
      <property name="geometry">
       <rect>
        <x>420</x>
-       <y>390</y>
+       <y>400</y>
        <width>101</width>
        <height>51</height>
       </rect>
@@ -4132,7 +4351,7 @@ as .csv file</string>
      <property name="geometry">
       <rect>
        <x>530</x>
-       <y>390</y>
+       <y>400</y>
        <width>101</width>
        <height>51</height>
       </rect>
@@ -4144,7 +4363,7 @@ as .csv file</string>
     <widget class="QLineEdit" name="lineEdit_laser_calibration_default_filename">
      <property name="geometry">
       <rect>
-       <x>760</x>
+       <x>780</x>
        <y>510</y>
        <width>171</width>
        <height>21</height>
@@ -4159,12 +4378,15 @@ as .csv file</string>
       <rect>
        <x>660</x>
        <y>510</y>
-       <width>101</width>
+       <width>121</width>
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>{d}: date, {t}: time, {m}: mode, {l}: label</string>
+     </property>
      <property name="text">
-      <string>Default Filename:</string>
+      <string>Default Filename (?):</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_laser_measurement_data_save_filename">
@@ -4189,17 +4411,20 @@ as .csv file</string>
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>{d}: date, {t}: time, {m}: mode, {l}: label</string>
+     </property>
      <property name="text">
-      <string>Default Filename:</string>
+      <string>Default Filename (?):</string>
      </property>
     </widget>
     <widget class="PlotWidget" name="widget_laser_measurement_ch2" native="true">
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>740</y>
+       <y>760</y>
        <width>701</width>
-       <height>171</height>
+       <height>151</height>
       </rect>
      </property>
     </widget>
@@ -4297,7 +4522,7 @@ as .csv file</string>
      <property name="geometry">
       <rect>
        <x>640</x>
-       <y>280</y>
+       <y>290</y>
        <width>561</width>
        <height>131</height>
       </rect>
@@ -4968,6 +5193,154 @@ as .csv file</string>
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Please make sure that angle increase corresponds to power decrease&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
+    <widget class="QSpinBox" name="spinBox_laser_measurement_number_of_points_averaging">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>710</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="keyboardTracking">
+      <bool>false</bool>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>999</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_measurement_number_of_points_averaging">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>710</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string># Points Averaging:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_error_calibration_path">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>370</y>
+       <width>211</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="checkBox_set_wavelength_powermeter">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>220</y>
+       <width>281</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Also set wavelength for powermeter</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="checkBox_set_wavelength_labels">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>240</y>
+       <width>281</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Also set wavelength for data info labels below</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_channel_source_lockins_in_laser_page">
+     <property name="geometry">
+      <rect>
+       <x>1090</x>
+       <y>560</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LockIns</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_channel_source_niboard_in_laser_page">
+     <property name="geometry">
+      <rect>
+       <x>1020</x>
+       <y>560</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>NIBoard</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_source_of_channels_in_laser_page">
+     <property name="geometry">
+      <rect>
+       <x>760</x>
+       <y>560</y>
+       <width>261</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Source of Channels (Scan &amp; Approach &amp; Laser):</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_measurement_channel_1">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>560</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Channel 1:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_laser_measurement_channel_2">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>740</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Channel 2:</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
@@ -4982,17 +5355,17 @@ as .csv file</string>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_9"/>
   <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_7"/>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_11"/>
-  <buttongroup name="buttonGroup_12"/>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_9"/>
   <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_8"/>
+  <buttongroup name="buttonGroup_11"/>
+  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_7"/>
   <buttongroup name="buttonGroup_10"/>
+  <buttongroup name="buttonGroup_12"/>
+  <buttongroup name="buttonGroup_8"/>
   <buttongroup name="buttonGroup_6"/>
  </buttongroups>
 </ui>

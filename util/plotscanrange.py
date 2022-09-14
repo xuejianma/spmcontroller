@@ -1,6 +1,6 @@
 
 
-def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
+def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max, map_trace, map_retrace):
     widget.getFigure().clear()
     subplot = widget.getFigure().subplots()
     subplot.set_aspect(1)
@@ -34,71 +34,71 @@ def plot_scan_range(self, widget, xlim_min, xlim_max, ylim_min, ylim_max):
             if self.radioButton_main_ch1.isChecked():
                 if self.radioButton_main_trace.isChecked():
                     if not self.colorbar_manual_main:
-                        subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch1'],
+                        subplot.pcolormesh(map_trace['XX'], map_trace['YY'], map_trace['ch1'],
                                            cmap='afmhot', shading='auto')
                     else:
-                        subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch1'],
+                        subplot.pcolormesh(map_trace['XX'], map_trace['YY'], map_trace['ch1'],
                                            cmap='afmhot', vmin=self.doubleSpinBox_colorbar_manual_min_main.value(),
                                            vmax=self.doubleSpinBox_colorbar_manual_max_main.value(), shading='auto')
                 else:
                     if len(self.map_retrace['XX']) != 0:
                         if not self.colorbar_manual_main:
-                            subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch1'],
+                            subplot.pcolormesh(map_retrace['XX'], map_retrace['YY'], map_retrace['ch1'],
                                                cmap='afmhot', shading='auto')
                         else:
-                            subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch1'],
+                            subplot.pcolormesh(map_retrace['XX'], map_retrace['YY'], map_retrace['ch1'],
                                                cmap='afmhot', vmin=self.doubleSpinBox_colorbar_manual_min_main.value(),
                                                vmax=self.doubleSpinBox_colorbar_manual_max_main.value(), shading='auto')
             else:
                 if self.radioButton_main_trace.isChecked():
                     if not self.colorbar_manual_main:
-                        subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch2'],
+                        subplot.pcolormesh(map_trace['XX'], map_trace['YY'], map_trace['ch2'],
                                            cmap='afmhot', shading='auto')
                     else:
-                        subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch2'],
+                        subplot.pcolormesh(map_trace['XX'], map_trace['YY'], map_trace['ch2'],
                                            cmap='afmhot', vmin=self.doubleSpinBox_colorbar_manual_min_main.value(),
                                            vmax=self.doubleSpinBox_colorbar_manual_max_main.value(), shading='auto')
                 else:
                     if len(self.map_retrace['XX']) != 0:
                         if not self.colorbar_manual_main:
-                            subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch2'],
+                            subplot.pcolormesh(map_retrace['XX'], map_retrace['YY'], map_retrace['ch2'],
                                                cmap='afmhot', shading='auto')
                         else:
-                            subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch2'],
+                            subplot.pcolormesh(map_retrace['XX'], map_retrace['YY'], map_retrace['ch2'],
                                                cmap='afmhot', vmin=self.doubleSpinBox_colorbar_manual_min_main.value(),
                                                vmax=self.doubleSpinBox_colorbar_manual_max_main.value(), shading='auto')
         elif widget == self.widget_display_scan_window_ch1:
             if self.radioButton_ch1_trace.isChecked():
                 if not self.colorbar_manual_ch1:
-                    subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch1'], cmap='afmhot', shading='auto')
+                    subplot.pcolormesh(map_trace['XX'], map_trace['YY'], map_trace['ch1'], cmap='afmhot', shading='auto')
                 else:
-                    subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch1'], cmap='afmhot',
+                    subplot.pcolormesh(map_trace['XX'], map_trace['YY'], map_trace['ch1'], cmap='afmhot',
                                        vmin=self.doubleSpinBox_colorbar_manual_min_ch1.value(),
                                        vmax=self.doubleSpinBox_colorbar_manual_max_ch1.value(), shading='auto')
             else:
                 if len(self.map_retrace['XX']) != 0:
                     if not self.colorbar_manual_ch1:
-                        subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch1'],
+                        subplot.pcolormesh(map_retrace['XX'], map_retrace['YY'], map_retrace['ch1'],
                                            cmap='afmhot', shading='auto')
                     else:
-                        subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch1'],
+                        subplot.pcolormesh(map_retrace['XX'], map_retrace['YY'], map_retrace['ch1'],
                                            cmap='afmhot',vmin=self.doubleSpinBox_colorbar_manual_min_ch1.value(),
                                            vmax=self.doubleSpinBox_colorbar_manual_max_ch1.value(), shading='auto')
         elif widget == self.widget_display_scan_window_ch2:
             if self.radioButton_ch2_trace.isChecked():
                 if not self.colorbar_manual_ch2:
-                    subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch2'], cmap='afmhot', shading='auto')
+                    subplot.pcolormesh(map_trace['XX'], map_trace['YY'], map_trace['ch2'], cmap='afmhot', shading='auto')
                 else:
-                    subplot.pcolormesh(self.map_trace['XX'], self.map_trace['YY'], self.map_trace['ch2'], cmap='afmhot',
+                    subplot.pcolormesh(map_trace['XX'], map_trace['YY'], map_trace['ch2'], cmap='afmhot',
                                        vmin=self.doubleSpinBox_colorbar_manual_min_ch2.value(),
                                        vmax=self.doubleSpinBox_colorbar_manual_max_ch2.value(), shading='auto')
             else:
                 if len(self.map_retrace['XX']) != 0:
                     if not self.colorbar_manual_ch2:
-                        subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch2'],
+                        subplot.pcolormesh(map_retrace['XX'], map_retrace['YY'], map_retrace['ch2'],
                                             cmap='afmhot', shading='auto')
                     else:
-                        subplot.pcolormesh(self.map_retrace['XX'], self.map_retrace['YY'], self.map_retrace['ch2'],
+                        subplot.pcolormesh(map_retrace['XX'], map_retrace['YY'], map_retrace['ch2'],
                                            cmap='afmhot', vmin=self.doubleSpinBox_colorbar_manual_min_ch2.value(),
                                            vmax=self.doubleSpinBox_colorbar_manual_max_ch2.value(), shading='auto')
 

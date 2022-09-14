@@ -1,8 +1,15 @@
 """
 Created by Xiaoyu Wu / Yuan Ren pre-2018
+
+One point worth mentioning:
+for all "get..." commands, we should use read() twice as the complete cycle of response. 
+For example, write(geto 1) -> read() -> read() will give us two returns after splitting: ['voltage', '=', '0.000000', 'V'] and ['OK]
+That's why "while (tempstr.strip() != 'OK'):" is needed, or actually we could use two read() such as "tempstr = self.instrument.read(); status = self.instrument.read();",
+where "tempstr" is the real out with valid information. status can be "OK" or "ERROR".
 """
 
 
+from time import sleep
 import pyvisa as visa
 
 # Attention: AID range {1, 2, 3, 4}. Not starting from 0!
@@ -89,8 +96,23 @@ class ANC300():
     def getv(self, AID):
         self.instrument.write("getv "+str(AID)+"\n")
         tempstr0 = self.instrument.read()
-        tempstr = self.instrument.read()
+        status = self.instrument.read()
         return tempstr0.split()[2]
+
+        self.instrument.write("getv "+str(AID)+"\n")
+        tempstr = self.instrument.read()
+        while (tempstr.strip() != 'OK'):
+            tempstr0 = tempstr
+            tempstr = self.instrument.read()
+        return tempstr0.strip()
+
+    def geto(self, AID):
+        # onoff should be a string with two options "on" and "off"
+        self.instrument.write("geto "+str(AID)+"\n")
+        tempstr0 = self.instrument.read()
+        status = self.instrument.read() 
+        # sleep(0.1)
+        return float(tempstr0.split()[2])
 
 
 
