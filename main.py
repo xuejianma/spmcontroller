@@ -11,6 +11,7 @@ from PyQt5.QtMultimedia import QSound
 from pages.approach_page import ApproachPage
 from pages.laser_page import LaserPage
 from pages.scan_page import ScanPage
+from pages.lifetime_page import LifetimePage
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox
@@ -34,7 +35,7 @@ from util.planefit import PlaneFit
 # from lasermeasurement import LaserMeasurement
 
 
-class SPMController(QWidget, ApproachPage, ScanPage, LaserPage, Connect):
+class SPMController(QWidget, ApproachPage, ScanPage, LaserPage, LifetimePage, Connect):
     update_graphs_signal = pyqtSignal()
     update_display_approach_signal = pyqtSignal()
 
@@ -138,6 +139,7 @@ class SPMController(QWidget, ApproachPage, ScanPage, LaserPage, Connect):
         self.reconnect_opa()
         self.reconnect_ndfilter()
         self.reconnect_power()
+        self.reconnect_oscilloscope()
         self.preload()
         self.set_z_max()
         self.set_channel_signal_source()
@@ -210,6 +212,9 @@ class SPMController(QWidget, ApproachPage, ScanPage, LaserPage, Connect):
 
         self.widget_laser_measurement_ch1.setBackground("w")
         self.widget_laser_measurement_ch2.setBackground("w")
+
+        self.widget_lifetime_current.setBackground("w")
+        self.widget_lifetime_averaged.setBackground("w")
     
     def set_channel_signal_source(self):
         if self.channel_signal_source == 1:
@@ -343,9 +348,6 @@ class SPMController(QWidget, ApproachPage, ScanPage, LaserPage, Connect):
             print("preload error ignored")
             print(e)
 
-        # try:
-        #     self.
-
     def closeEvent(self, event):
         def msg_func(evt):
             if evt.text() == "Cancel":
@@ -361,9 +363,6 @@ class SPMController(QWidget, ApproachPage, ScanPage, LaserPage, Connect):
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         msg.buttonClicked.connect(msg_func)
         msg.exec_()
-
-    # def isZeroed(self):
-
 
     def closeAndSaveStates(self):
         print("closing and saving")
@@ -390,7 +389,6 @@ class SPMController(QWidget, ApproachPage, ScanPage, LaserPage, Connect):
             self.settings.setValue(key, self.approach_attributes_float[key].value())
         for key in self.approach_attributes_int:
             self.settings.setValue(key, self.approach_attributes_int[key].value())
-
         # self.output_voltage_x.close()
         # self.output_voltage_y.close()
         self.output_voltage_z.close()

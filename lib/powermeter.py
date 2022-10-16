@@ -2,7 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, QMutex
 from pyvisa import ResourceManager
 from time import sleep
 
-label_error_text = "🚫 Error: Power Meter not detected!"
+label_error_text = "🚫 Error: Power Meter (P0016683) Load Error!"
 
 class PowerMeter:
     mutex = QMutex()

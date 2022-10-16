@@ -151,3 +151,7 @@ class Connect:
         self.pushButton_laser_measurement_data_save_directory.clicked.connect(self.select_directory_laser_measurement)
         self.pushButton_laser_measurement.clicked.connect(self.toggle_laser_measurement)
         self.pushButton_laser_measurement_abort.clicked.connect(self.abort_laser_measurement)
+
+        # Lifetime Page:
+        self.pushButton_lifetime.clicked.connect(self.start_lifetime)
+        self.pushButton_reconnect_oscilloscope.clicked.connect(self.reconnect_oscilloscope)

@@ -26,7 +26,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_scan">
     <attribute name="title">
@@ -5424,17 +5424,17 @@ as .csv file</string>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_8"/>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_7"/>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_12"/>
-  <buttongroup name="buttonGroup_11"/>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_7"/>
+  <buttongroup name="buttonGroup_12"/>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_8"/>
   <buttongroup name="buttonGroup_6"/>
+  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup_10"/>
   <buttongroup name="buttonGroup_9"/>
+  <buttongroup name="buttonGroup_11"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>
