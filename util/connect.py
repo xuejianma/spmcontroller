@@ -155,3 +155,4 @@ class Connect:
         # Lifetime Page:
         self.pushButton_lifetime.clicked.connect(self.start_lifetime)
         self.pushButton_reconnect_oscilloscope.clicked.connect(self.reconnect_oscilloscope)
+        self.pushButton_lifetime_directory.clicked.connect(self.select_directory_lifetime)
